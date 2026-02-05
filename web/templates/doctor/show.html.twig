@@ -1,0 +1,86 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Doctor{% endblock %}
+
+{% block body %}
+    <h1>Doctor</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ doctor.id }}</td>
+            </tr>
+            <tr>
+                <th>Role</th>
+                <td>{{ doctor.role }}</td>
+            </tr>
+            <tr>
+                <th>IsActive</th>
+                <td>{{ doctor.isActive ? 'Yes' : 'No' }}</td>
+            </tr>
+            <tr>
+                <th>Created_at</th>
+                <td>{{ doctor.createdAt ? doctor.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>CreationDate</th>
+                <td>{{ doctor.creationDate ? doctor.creationDate|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Name</th>
+                <td>{{ doctor.name }}</td>
+            </tr>
+            <tr>
+                <th>Email</th>
+                <td>{{ doctor.email }}</td>
+            </tr>
+            <tr>
+                <th>Password</th>
+                <td>{{ doctor.password }}</td>
+            </tr>
+            <tr>
+                <th>Phone</th>
+                <td>{{ doctor.phone }}</td>
+            </tr>
+            <tr>
+                <th>Specialty</th>
+                <td>{{ doctor.specialty }}</td>
+            </tr>
+            <tr>
+                <th>LicenseNumber</th>
+                <td>{{ doctor.licenseNumber }}</td>
+            </tr>
+            <tr>
+                <th>ConsultationFee</th>
+                <td>{{ doctor.consultationFee }}</td>
+            </tr>
+            <tr>
+                <th>AverageRating</th>
+                <td>{{ doctor.averageRating }}</td>
+            </tr>
+            <tr>
+                <th>TotalReviews</th>
+                <td>{{ doctor.totalReviews }}</td>
+            </tr>
+            <tr>
+                <th>Bio</th>
+                <td>{{ doctor.bio }}</td>
+            </tr>
+            <tr>
+                <th>ProfileImage</th>
+                <td>{{ doctor.profileImage }}</td>
+            </tr>
+            <tr>
+                <th>IsVerified</th>
+                <td>{{ doctor.isVerified ? 'Yes' : 'No' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_doctor_index') }}">back to list</a>
+
+    <a href="{{ path('app_doctor_edit', {'id': doctor.id}) }}">edit</a>
+
+    {{ include('doctor/_delete_form.html.twig') }}
+{% endblock %}

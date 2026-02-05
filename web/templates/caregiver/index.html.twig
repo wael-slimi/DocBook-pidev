@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Caregiver index{% endblock %}
+
+{% block body %}
+    <h1>Caregiver index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Role</th>
+                <th>IsActive</th>
+                <th>Created_at</th>
+                <th>CreationDate</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Password</th>
+                <th>Phone</th>
+                <th>Relationship_type</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for caregiver in caregivers %}
+            <tr>
+                <td>{{ caregiver.id }}</td>
+                <td>{{ caregiver.role }}</td>
+                <td>{{ caregiver.isActive ? 'Yes' : 'No' }}</td>
+                <td>{{ caregiver.createdAt ? caregiver.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ caregiver.creationDate ? caregiver.creationDate|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ caregiver.name }}</td>
+                <td>{{ caregiver.email }}</td>
+                <td>{{ caregiver.password }}</td>
+                <td>{{ caregiver.phone }}</td>
+                <td>{{ caregiver.relationshipType }}</td>
+                <td>
+                    <a href="{{ path('app_caregiver_show', {'id': caregiver.id}) }}">show</a>
+                    <a href="{{ path('app_caregiver_edit', {'id': caregiver.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="11">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_caregiver_new') }}">Create new</a>
+{% endblock %}

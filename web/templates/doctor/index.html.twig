@@ -1,0 +1,65 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Doctor index{% endblock %}
+
+{% block body %}
+    <h1>Doctor index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Role</th>
+                <th>IsActive</th>
+                <th>Created_at</th>
+                <th>CreationDate</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Password</th>
+                <th>Phone</th>
+                <th>Specialty</th>
+                <th>LicenseNumber</th>
+                <th>ConsultationFee</th>
+                <th>AverageRating</th>
+                <th>TotalReviews</th>
+                <th>Bio</th>
+                <th>ProfileImage</th>
+                <th>IsVerified</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for doctor in doctors %}
+            <tr>
+                <td>{{ doctor.id }}</td>
+                <td>{{ doctor.role }}</td>
+                <td>{{ doctor.isActive ? 'Yes' : 'No' }}</td>
+                <td>{{ doctor.createdAt ? doctor.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ doctor.creationDate ? doctor.creationDate|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ doctor.name }}</td>
+                <td>{{ doctor.email }}</td>
+                <td>{{ doctor.password }}</td>
+                <td>{{ doctor.phone }}</td>
+                <td>{{ doctor.specialty }}</td>
+                <td>{{ doctor.licenseNumber }}</td>
+                <td>{{ doctor.consultationFee }}</td>
+                <td>{{ doctor.averageRating }}</td>
+                <td>{{ doctor.totalReviews }}</td>
+                <td>{{ doctor.bio }}</td>
+                <td>{{ doctor.profileImage }}</td>
+                <td>{{ doctor.isVerified ? 'Yes' : 'No' }}</td>
+                <td>
+                    <a href="{{ path('app_doctor_show', {'id': doctor.id}) }}">show</a>
+                    <a href="{{ path('app_doctor_edit', {'id': doctor.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="18">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_doctor_new') }}">Create new</a>
+{% endblock %}
