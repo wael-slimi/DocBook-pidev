@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Enum\UserRole;
 
 #[Route('/patient')]
 final class PatientController extends AbstractController
@@ -30,9 +31,15 @@ final class PatientController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+        
+            $patient->setRole(UserRole::PATIENT);
+            
+            $patient->setIsActive(true);
+    
+            $patient->setCreationDate(new \DateTimeImmutable());
             $entityManager->persist($patient);
             $entityManager->flush();
-
+    
             return $this->redirectToRoute('app_patient_index', [], Response::HTTP_SEE_OTHER);
         }
 

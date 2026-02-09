@@ -11,21 +11,20 @@ class CaregiverType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder
-            ->add('role')
-            ->add('isActive')
-            ->add('created_at', null, [
-                'widget' => 'single_text',
-            ])
-            ->add('creationDate', null, [
-                'widget' => 'single_text',
-            ])
-            ->add('name')
-            ->add('email')
-            ->add('password')
-            ->add('phone')
-            ->add('relationship_type')
-        ;
+        $builder->add('relationship_type', ChoiceType::class, [
+            'choices'  => [
+                'Family Member' => 'family',
+                'Professional'  => 'professional',
+                'Friend'        => 'friend',
+                'Other'         => 'other',
+            ],
+            'label' => 'Relationship to Patient'
+        ]);
+    }
+    public function getParent(): string
+    {
+        // It tells Symfony to look at UserType to get Name, Email, Password, and Phone.
+        return UserType::class;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

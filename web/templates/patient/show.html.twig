@@ -9,19 +9,15 @@
         <tbody>
             <tr>
                 <th>Id</th>
-                <td>{{ patient.id }}</td>
+                <td>{{ patient.getId() }}</td>
             </tr>
             <tr>
                 <th>Role</th>
-                <td>{{ patient.role }}</td>
+                <td>{{ patient.getRole().value }}</td>
             </tr>
             <tr>
                 <th>IsActive</th>
                 <td>{{ patient.isActive ? 'Yes' : 'No' }}</td>
-            </tr>
-            <tr>
-                <th>Created_at</th>
-                <td>{{ patient.createdAt ? patient.createdAt|date('Y-m-d H:i:s') : '' }}</td>
             </tr>
             <tr>
                 <th>CreationDate</th>

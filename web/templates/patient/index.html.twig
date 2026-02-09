@@ -24,19 +24,18 @@
         <tbody>
         {% for patient in patients %}
             <tr>
-                <td>{{ patient.id }}</td>
-                <td>{{ patient.role }}</td>
+                <td>{{ patient.getId() }}</td>
+                <td>{{ patient.role.value }}</td>
                 <td>{{ patient.isActive ? 'Yes' : 'No' }}</td>
-                <td>{{ patient.createdAt ? patient.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ patient.creationDate ? patient.creationDate|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ patient.getCreationDate() ? patient.getCreationDate()|date('Y-m-d H:i:s') : '' }}</td>
                 <td>{{ patient.name }}</td>
                 <td>{{ patient.email }}</td>
                 <td>{{ patient.password }}</td>
                 <td>{{ patient.phone }}</td>
                 <td>{{ patient.dateOfBirth ? patient.dateOfBirth|date('Y-m-d') : '' }}</td>
                 <td>
-                    <a href="{{ path('app_patient_show', {'id': patient.id}) }}">show</a>
-                    <a href="{{ path('app_patient_edit', {'id': patient.id}) }}">edit</a>
+                    <a href="{{ path('app_patient_show', {'id': patient.getId()}) }}">show</a>
+                    <a href="{{ path('app_patient_edit', {'id': patient.getId()}) }}">edit</a>
                 </td>
             </tr>
         {% else %}

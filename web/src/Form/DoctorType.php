@@ -12,27 +12,27 @@ class DoctorType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('role')
-            ->add('isActive')
-            ->add('created_at', null, [
-                'widget' => 'single_text',
+            ->add('specialty', TextType::class, [
+                'label' => 'Medical Specialty',
+                'attr' => ['placeholder' => 'e.g. Cardiology']
             ])
-            ->add('creationDate', null, [
-                'widget' => 'single_text',
+            ->add('licenseNumber', TextType::class, [
+                'label' => 'Medical License Number'
             ])
-            ->add('name')
-            ->add('email')
-            ->add('password')
-            ->add('phone')
-            ->add('specialty')
-            ->add('licenseNumber')
-            ->add('consultationFee')
-            ->add('averageRating')
-            ->add('totalReviews')
-            ->add('bio')
-            ->add('profileImage')
-            ->add('isVerified')
+            ->add('consultationFee', MoneyType::class, [
+                'currency' => 'TND', // Use your currency code
+                'divisor' => 1,
+            ])
+            ->add('bio', TextareaType::class, [
+                'required' => false,
+                'attr' => ['rows' => 5]
+            ])
         ;
+    }
+
+    public function getParent(): string
+    {
+        return UserType::class;
     }
 
     public function configureOptions(OptionsResolver $resolver): void
