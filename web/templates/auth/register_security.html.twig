@@ -1,0 +1,65 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Registration: Security - DOCBOOK{% endblock %}
+
+{% block body %}
+    {% include 'components/navbar.html.twig' %}
+
+    <main class="flex-grow flex items-center justify-center px-4 py-12">
+        <div class="max-w-[480px] w-full bg-white dark:bg-slate-900 p-8 md:p-10 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
+            
+            <div class="flex flex-col gap-3 pb-8">
+                <div class="flex justify-between items-center">
+                    <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Step 3 of 4</p>
+                    <p class="text-primary text-sm font-bold">75%</p>
+                </div>
+                <div class="rounded-full bg-slate-100 dark:bg-slate-800 h-2 overflow-hidden">
+                    <div class="h-full rounded-full bg-primary" style="width: 75%;"></div>
+                </div>
+            </div>
+
+            <h1 class="text-slate-900 dark:text-white text-3xl font-bold text-center pb-2">Create Password</h1>
+            <p class="text-slate-500 dark:text-slate-400 text-center text-sm mb-8">Set a secure password for your new account.</p>
+
+            <form action="{{ path('app_register_security') }}" method="POST" class="space-y-6">
+                
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold text-slate-700 dark:text-slate-200">New Password</label>
+                    <div class="relative">
+                        <input name="password" type="password" required
+                               class="w-full rounded-lg border-slate-300 dark:border-slate-700 dark:bg-slate-800 h-12 pl-4 pr-12 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" 
+                               placeholder="Min. 8 characters">
+                        <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 cursor-pointer hover:text-primary transition-colors">visibility</span>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold text-slate-700 dark:text-slate-200">Confirm Password</label>
+                    <div class="relative">
+                        <input name="confirm_password" type="password" required
+                               class="w-full rounded-lg border-slate-300 dark:border-slate-700 dark:bg-slate-800 h-12 pl-4 pr-12 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" 
+                               placeholder="Repeat password">
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-100 dark:border-slate-800 space-y-2">
+                    <div class="flex items-center gap-2 text-xs text-green-500 font-medium">
+                        <span class="material-symbols-outlined text-sm">check_circle</span> At least 8 characters
+                    </div>
+                    <div class="flex items-center gap-2 text-xs text-slate-400">
+                        <span class="material-symbols-outlined text-sm">radio_button_unchecked</span> One special character (!@#$%)
+                    </div>
+                </div>
+
+                <div class="pt-4 flex gap-3">
+                    <a href="{{ path('app_register_role') }}" class="flex-1 flex items-center justify-center rounded-lg h-12 border border-slate-200 text-sm font-bold hover:bg-slate-50 transition-colors">Back</a>
+                    <button type="submit" class="flex-[2] bg-primary text-white rounded-lg h-12 text-sm font-bold hover:bg-primary/90 transition-all shadow-lg">
+                        Final Step
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    {% include 'components/footer.html.twig' %}
+{% endblock %}
