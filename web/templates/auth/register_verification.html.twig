@@ -35,7 +35,7 @@
                 We've sent a 6-digit verification code to your email. Please enter it below to complete your setup.
             </p>
 
-            <form action="{{ path('app_login') }}" method="POST" class="flex flex-col gap-6">
+            <form action="{{ path('app_register_verification') }}" method="POST" class="flex flex-col gap-6">
                 <div class="flex justify-center gap-3 px-4 pb-8">
                     {# Using name="otp[]" allows PHP to receive all numbers as an array #}
                     <input class="w-12 h-14 text-center text-2xl font-bold border-2 border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-lg focus:border-primary outline-none" maxlength="1" type="text" name="otp[]" required />

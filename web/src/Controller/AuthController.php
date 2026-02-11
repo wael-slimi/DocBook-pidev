@@ -2,20 +2,25 @@
 
 namespace App\Controller;
 
+use App\Entity\Doctor;
+use App\Entity\Patient;
+use App\Entity\Caregiver;
+use App\Enum\UserRole;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class AuthController extends AbstractController
 {
-
     #[Route('/login', name: 'app_login')]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
         if ($this->getUser()) {
-            return $this->redirectToRoute('app_home'); // Or your dashboard
+            return $this->redirectToRoute('app_home'); 
         }
 
         $error = $authenticationUtils->getLastAuthenticationError();
@@ -38,6 +43,8 @@ class AuthController extends AbstractController
             $session->set('reg_data', [
                 'full_name' => $request->request->get('full_name'),
                 'email' => $request->request->get('email'),
+                'phone' => $request->request->get('phone'), // Added phone if you have it in Step 1
+                'dob' => $request->request->get('dob'),
             ]);
 
             return $this->redirectToRoute('app_register_role');
@@ -55,10 +62,9 @@ class AuthController extends AbstractController
         if ($request->isMethod('POST')) {
             $selectedRole = $request->request->get('selected_role');
             
-            // Security check: ensure the role is one of the allowed types
             $allowedRoles = ['ROLE_PATIENT', 'ROLE_DOCTOR', 'ROLE_CAREGIVER'];
             if (!in_array($selectedRole, $allowedRoles)) {
-                $selectedRole = 'ROLE_PATIENT'; // Default fallback
+                $selectedRole = 'ROLE_PATIENT';
             }
 
             $session = $request->getSession();
@@ -83,16 +89,13 @@ class AuthController extends AbstractController
             $confirm = $request->request->get('confirm_password');
 
             if ($password !== $confirm) {
-                // Add an error message if they don't match
                 $this->addFlash('error', 'Passwords do not match');
                 return $this->redirectToRoute('app_register_security');
             }
 
-            // Temporarily store password in session (Only for demo/dev purposes)
-            // Once you merge your User branch, you will replace this with the Database save.
             $session = $request->getSession();
             $data = $session->get('reg_data', []);
-            $data['password'] = $password; // Usually you'd hash this before saving
+            $data['password'] = $password; 
             $session->set('reg_data', $data);
 
             return $this->redirectToRoute('app_register_verification');
@@ -102,21 +105,65 @@ class AuthController extends AbstractController
     }
 
     /**
-     * STEP 4: Verification (OTP)
+     * STEP 4: Verification (OTP) & Final Database Save
      */
     #[Route('/register/verification', name: 'app_register_verification', methods: ['GET', 'POST'])]
-    public function verification(Request $request): Response
-    {
+    public function verification(
+        Request $request, 
+        EntityManagerInterface $entityManager, 
+        UserPasswordHasherInterface $userPasswordHasher
+    ): Response {
         if ($request->isMethod('POST')) {
-            // Get the OTP array from the form
             $otpArray = $request->request->all('otp');
             $fullCode = implode('', $otpArray);
 
-            // Logic: In a real app, you'd verify $fullCode against a code in your DB or Session.
+            // Fetch session data
+            $session = $request->getSession();
+            $data = $session->get('reg_data');
+
+            if (!$data) {
+                $this->addFlash('error', 'Session expired. Please start over.');
+                return $this->redirectToRoute('app_register');
+            }
+
+            // 1. Create the specific Entity based on selected role
+            $user = match($data['role']) {
+                'ROLE_DOCTOR' => new Doctor(),
+                'ROLE_CAREGIVER' => new Caregiver(),
+                default => new Patient(),
+            };
+
+            // 2. Hydrate user with session data
+            $user->setName($data['full_name']);
+            $user->setEmail($data['email']);
+            $user->setPhone($data['phone'] ?? null);
+            $user->setIsActive(true);
+            if (empty($data['dob'])) {
+                $this->addFlash('error', 'Date of birth is required.');
+                return $this->redirectToRoute('app_register');
+            }
+            $user->setDateOfBirth(new \DateTime($data['dob'])); //date of birth 
             
-            // Success! Clear the session and go to login.
-            $request->getSession()->remove('reg_data');
-            $this->addFlash('success', 'Account verified successfully! Please log in.');
+            // 3. Set the Enum Role
+            $user->setRole(match($data['role']) {
+                'ROLE_DOCTOR' => UserRole::DOCTOR,
+                'ROLE_CAREGIVER' => UserRole::CAREGIVER,
+                default => UserRole::PATIENT,
+            });
+            $user->setCreationDate(new \DateTimeImmutable());
+
+            // 4. Hash the password
+            $hashedPassword = $userPasswordHasher->hashPassword($user, $data['password']);
+            $user->setPassword($hashedPassword);
+
+
+            // 5. Persist and Flush to Database
+            $entityManager->persist($user);
+            $entityManager->flush();
+
+            // 6. Success! Clear the session
+            $session->remove('reg_data');
+            $this->addFlash('success', 'Registration successful! You can now log in.');
 
             return $this->redirectToRoute('app_login');
         }
@@ -127,18 +174,16 @@ class AuthController extends AbstractController
     #[Route('/forgot-password', name: 'app_forgot_password', methods: ['GET', 'POST'])]
     public function forgotPassword(Request $request): Response
     {
-        $step = $request->query->get('step', 'request'); // Default to the email input step
+        $step = $request->query->get('step', 'request');
 
         if ($request->isMethod('POST')) {
             $currentStep = $request->request->get('current_step');
 
             if ($currentStep === 'request') {
-                // Logic: Send email...
                 return $this->redirectToRoute('app_forgot_password', ['step' => 'sent']);
             }
 
             if ($currentStep === 'reset') {
-                // Logic: Update password in DB...
                 return $this->redirectToRoute('app_forgot_password', ['step' => 'success']);
             }
         }

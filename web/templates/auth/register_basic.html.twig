@@ -37,6 +37,25 @@
                     </div>
                 </div>
 
+                <div class="flex flex-col gap-2">
+                    <label class="text-slate-900 dark:text-slate-200 text-sm font-semibold flex justify-between">
+                        <span>Date of Birth</span>
+                        <span class="text-red-500 text-xs">* Required</span>
+                    </label>
+                    <div class="relative">
+                        <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">cake</span>
+                        <input 
+                            name="dob" 
+                            type="date" 
+                            {# 'required' triggers browser-level blocking #}
+                            required 
+                            {# 'max' prevents choosing future dates #}
+                            max="{{ "now"|date("Y-m-d") }}" 
+                            class="form-input w-full rounded-lg border-[#cedbe8] dark:border-slate-700 dark:bg-slate-800 h-14 pl-12 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all invalid:border-red-500"
+                        >
+                    </div>
+                </div>
+
                 <button type="submit" class="w-full bg-primary text-white h-14 rounded-lg font-bold hover:bg-primary/90 transition-all">
                     Continue to Role Selection
                 </button>
