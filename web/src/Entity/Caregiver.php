@@ -25,12 +25,6 @@ class Caregiver extends User
         $this->patientCaregivers = new ArrayCollection();
     }
 
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
     public function getRelationshipType(): ?string
     {
         return $this->relationship_type;

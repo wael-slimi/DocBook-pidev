@@ -1,0 +1,158 @@
+{% extends 'dashboard_base.html.twig' %}
+
+{% block title %}Patient Dashboard - DOCBOOK{% endblock %}
+
+{# --- 1. MACROS FOR TREND LOGIC --- #}
+{% macro trend_indicator(current, previous) %}
+    {% set diff = current - previous %}
+    {% if previous > 0 %}
+        {% set percent = (diff / previous * 100)|round(1) %}
+    {% else %}
+        {% set percent = 0 %}
+    {% endif %}
+    
+    {% if diff > 0 %}
+        <span class="flex items-center text-red-500 text-xs font-bold">
+            <span class="material-symbols-outlined text-[14px]">trending_up</span> {{ percent|abs }}%
+        </span>
+    {% elseif diff < 0 %}
+        <span class="flex items-center text-emerald-500 text-xs font-bold">
+            <span class="material-symbols-outlined text-[14px]">trending_down</span> {{ percent|abs }}%
+        </span>
+    {% else %}
+        <span class="flex items-center text-slate-400 text-xs font-bold">
+            <span class="material-symbols-outlined text-[14px]">horizontal_rule</span> 0%
+        </span>
+    {% endif %}
+{% endmacro %}
+
+{% import _self as tools %}
+
+{% block body %}
+<div class="flex flex-col gap-8">
+    
+    {# --- PAGE HEADER --- #}
+    <div class="flex flex-wrap justify-between items-end gap-4">
+        <div class="flex flex-col gap-1">
+            <h1 class="text-slate-900 dark:text-white text-4xl font-black leading-tight tracking-tight">Welcome, Alex</h1>
+            <p class="text-slate-500 dark:text-slate-400 text-base font-medium">Your health is looking stable today. You have one upcoming appointment.</p>
+        </div>
+        <div class="flex gap-3">
+            <button class="flex h-10 items-center justify-center rounded-xl px-4 bg-primary text-white font-bold text-sm gap-2 shadow-lg shadow-primary/20 hover:scale-105 transition-transform">
+                <span class="material-symbols-outlined text-lg">calendar_add_on</span>
+                New Appointment
+            </button>
+        </div>
+    </div>
+
+    {# --- HEALTH METRICS GRID --- #}
+    <div class="flex flex-col">
+        <div class="flex items-center justify-between pb-4">
+            <h2 class="text-slate-900 dark:text-white text-[22px] font-bold tracking-tight">Live Health Metrics</h2>
+            <span class="text-[10px] font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded uppercase tracking-widest">Real-time sync</span>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            {# Heart Rate Card #}
+            {% set hr_now = 72 %}{% set hr_prev = 78 %}
+            <div class="group flex flex-col gap-3 rounded-2xl p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm transition-all hover:border-primary/50">
+                <div class="flex justify-between items-start">
+                    <p class="text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-widest">Heart Rate</p>
+                    <div class="p-2 bg-red-50 dark:bg-red-900/20 rounded-lg text-red-500 group-hover:animate-pulse">
+                        <span class="material-symbols-outlined fill-1">favorite</span>
+                    </div>
+                </div>
+                <div class="flex items-baseline gap-2">
+                    <p class="text-slate-900 dark:text-white text-4xl font-black">{{ hr_now }}</p>
+                    <p class="text-slate-400 text-sm font-bold">BPM</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    {{ tools.trend_indicator(hr_now, hr_prev) }}
+                    <p class="text-slate-400 text-[10px] font-medium uppercase">vs. last check ({{ hr_prev }})</p>
+                </div>
+                {# Fixed SVG Sparkline #}
+                <div class="h-10 w-full mt-2">
+                    <svg viewBox="0 0 100 20" class="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <polyline points="0,15 10,12 20,18 30,10 40,14 50,5 60,12 70,8 80,15 90,10 100,12" 
+                                  stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </div>
+            </div>
+
+            {# Blood Pressure Card #}
+            <div class="flex flex-col gap-3 rounded-2xl p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm transition-all">
+                <div class="flex justify-between items-start">
+                    <p class="text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-widest">Blood Pressure</p>
+                    <div class="p-2 bg-primary/10 rounded-lg text-primary">
+                        <span class="material-symbols-outlined">vital_signs</span>
+                    </div>
+                </div>
+                <div class="flex items-baseline gap-2">
+                    <p class="text-slate-900 dark:text-white text-4xl font-black">120/80</p>
+                    <p class="text-slate-400 text-sm font-bold">mmHg</p>
+                </div>
+                <div class="flex items-center gap-2 text-emerald-500 text-[10px] font-bold uppercase">
+                    <span class="material-symbols-outlined text-[14px]">check_circle</span>
+                    Optimal Condition
+                </div>
+                {# Progress Bar Graphic #}
+                <div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full mt-6 overflow-hidden">
+                    <div class="bg-primary h-full w-[65%] rounded-full shadow-[0_0_12px_rgba(0,102,204,0.3)]"></div>
+                </div>
+            </div>
+
+            {# Glucose Card #}
+            {% set gl_now = 95 %}{% set gl_prev = 84 %}
+            <div class="relative overflow-hidden flex flex-col gap-3 rounded-2xl p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm transition-all">
+                <div class="flex justify-between items-start z-10">
+                    <p class="text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-widest">Glucose</p>
+                    <div class="p-2 bg-amber-50 dark:bg-amber-900/20 rounded-lg text-amber-500">
+                        <span class="material-symbols-outlined">water_drop</span>
+                    </div>
+                </div>
+                <div class="flex items-baseline gap-2 z-10">
+                    <p class="text-slate-900 dark:text-white text-4xl font-black">{{ gl_now }}</p>
+                    <p class="text-slate-400 text-sm font-bold">mg/dL</p>
+                </div>
+                <div class="flex items-center gap-2 z-10">
+                    {{ tools.trend_indicator(gl_now, gl_prev) }}
+                    <p class="text-slate-400 text-[10px] font-medium uppercase tracking-tighter">vs. previous {{ gl_prev }}</p>
+                </div>
+                {# Area Chart Graphic #}
+                <div class="absolute bottom-0 left-0 w-full h-16 pointer-events-none opacity-20">
+                    <svg viewBox="0 0 100 20" class="w-full h-full" preserveAspectRatio="none">
+                        <path d="M0,20 L0,15 L20,10 L40,18 L60,5 L80,12 L100,8 L100,20 Z" fill="#f59e0b" />
+                    </svg>
+                </div>
+                <div class="mt-4 flex items-center justify-center py-1 bg-amber-500/10 rounded-lg border border-amber-500/20 z-10">
+                    <p class="text-[9px] text-amber-600 font-bold uppercase tracking-widest">Fasted State</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    {# --- UPCOMING APPOINTMENT SECTION --- #}
+    <div class="rounded-3xl bg-slate-900 p-8 text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl relative overflow-hidden">
+        <div class="flex flex-col gap-4 z-10">
+            <div class="flex flex-col gap-1">
+                <p class="text-primary text-xs font-bold uppercase tracking-[0.2em]">Up Next</p>
+                <h3 class="text-3xl font-black">Dr. Sarah Smith</h3>
+                <p class="text-slate-400 text-sm font-medium">Cardiology • Tomorrow at 10:00 AM</p>
+            </div>
+            <div class="flex gap-3">
+                <button class="bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-xl font-bold text-sm transition-all">Join Consultation</button>
+                <button class="bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-xl font-bold text-sm transition-all border border-white/10">Reschedule</button>
+            </div>
+        </div>
+        <div class="relative z-10">
+            <div class="size-32 rounded-2xl bg-slate-800 border-2 border-white/10 overflow-hidden rotate-3">
+                <img src="https://images.unsplash.com/photo-1559839734-2b71f1536783?auto=format&fit=crop&q=80&w=200" alt="Doctor" class="object-cover w-full h-full">
+            </div>
+        </div>
+        {# Background Decorative Circles #}
+        <div class="absolute -right-10 -bottom-10 size-64 bg-primary/10 rounded-full blur-3xl"></div>
+    </div>
+</div>
+{% endblock %}

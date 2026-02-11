@@ -34,10 +34,6 @@ class Doctor extends User
     #[ORM\Column]
     private ?bool $isVerified = null;
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
 
     public function getSpecialty(): ?string
     {
