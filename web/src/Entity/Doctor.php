@@ -9,21 +9,20 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: DoctorRepository::class)]
 class Doctor extends User
 {
-    
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)] // Made nullable for initial registration
     private ?string $specialty = null;
 
-    #[ORM\Column(length: 50)]
+    #[ORM\Column(length: 50, nullable: true)] // Made nullable for initial registration
     private ?string $licenseNumber = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
     private ?string $consultationFee = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 3, scale: 2)]
-    private ?string $averageRating = null;
+    #[ORM\Column(type: Types::DECIMAL, precision: 3, scale: 2, nullable: true)]
+    private ?string $averageRating = "0.00";
 
     #[ORM\Column]
-    private ?int $totalReviews = null;
+    private ?int $totalReviews = 0; // Default to 0
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $bio = null;
@@ -32,18 +31,24 @@ class Doctor extends User
     private ?string $profileImage = null;
 
     #[ORM\Column]
-    private ?bool $isVerified = null;
+    private ?bool $isVerified = false; // Default to false
 
+    // --- Constructor to ensure defaults are set ---
+    public function __construct()
+    {
+        $this->totalReviews = 0;
+        $this->isVerified = false;
+        $this->averageRating = "0.00";
+    }
 
     public function getSpecialty(): ?string
     {
         return $this->specialty;
     }
 
-    public function setSpecialty(string $specialty): static
+    public function setSpecialty(?string $specialty): static
     {
         $this->specialty = $specialty;
-
         return $this;
     }
 
@@ -52,10 +57,9 @@ class Doctor extends User
         return $this->licenseNumber;
     }
 
-    public function setLicenseNumber(string $licenseNumber): static
+    public function setLicenseNumber(?string $licenseNumber): static
     {
         $this->licenseNumber = $licenseNumber;
-
         return $this;
     }
 
@@ -64,10 +68,9 @@ class Doctor extends User
         return $this->consultationFee;
     }
 
-    public function setConsultationFee(string $consultationFee): static
+    public function setConsultationFee(?string $consultationFee): static
     {
         $this->consultationFee = $consultationFee;
-
         return $this;
     }
 
@@ -76,10 +79,9 @@ class Doctor extends User
         return $this->averageRating;
     }
 
-    public function setAverageRating(string $averageRating): static
+    public function setAverageRating(?string $averageRating): static
     {
         $this->averageRating = $averageRating;
-
         return $this;
     }
 
@@ -91,7 +93,6 @@ class Doctor extends User
     public function setTotalReviews(int $totalReviews): static
     {
         $this->totalReviews = $totalReviews;
-
         return $this;
     }
 
@@ -103,7 +104,6 @@ class Doctor extends User
     public function setBio(?string $bio): static
     {
         $this->bio = $bio;
-
         return $this;
     }
 
@@ -115,7 +115,6 @@ class Doctor extends User
     public function setProfileImage(?string $profileImage): static
     {
         $this->profileImage = $profileImage;
-
         return $this;
     }
 
@@ -127,7 +126,6 @@ class Doctor extends User
     public function setIsVerified(bool $isVerified): static
     {
         $this->isVerified = $isVerified;
-
         return $this;
     }
 }

@@ -15,7 +15,7 @@ class DashboardController extends AbstractController
     public function index(): Response
     {
         $user = $this->getUser();
-
+        
         // 1. Check if user is a Doctor
         if ($this->isGranted('ROLE_DOCTOR')) {
             return $this->render('doctor/dashboard.html.twig');

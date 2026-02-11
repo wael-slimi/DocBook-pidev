@@ -19,7 +19,9 @@ class AuthController extends AbstractController
     #[Route('/login', name: 'app_login')]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
-        if ($this->getUser()) {
+        $user = $this->getUser();
+        if ($user) {
+
             return $this->redirectToRoute('app_dashboard'); 
         }
 
@@ -138,6 +140,9 @@ class AuthController extends AbstractController
                 'ROLE_CAREGIVER' => new Caregiver(),
                 default => new Patient(),
             };
+            if ($user instanceof Caregiver) {
+                $user->setRelationshipType(\App\Enum\RelationshipType::FAMILY);
+            }
 
             // 2. Hydrate user with session data
             $user->setName($data['full_name']);

@@ -11,16 +11,15 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: PatientRepository::class)]
 class Patient extends User
 {
-    
-
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTime $date_of_birth = null;
 
     /**
      * @var Collection<int, PatientCaregiver>
      */
     #[ORM\OneToMany(targetEntity: PatientCaregiver::class, mappedBy: 'patient')]
     private Collection $patientCaregivers;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $caregiver = null;
 
     public function __construct()
     {
@@ -32,17 +31,6 @@ class Patient extends User
         return $this->id;
     }
 
-    public function getDateOfBirth(): ?\DateTime
-    {
-        return $this->date_of_birth;
-    }
-
-    public function setDateOfBirth(\DateTime $date_of_birth): static
-    {
-        $this->date_of_birth = $date_of_birth;
-
-        return $this;
-    }
 
     /**
      * @return Collection<int, PatientCaregiver>
@@ -70,6 +58,18 @@ class Patient extends User
                 $patientCaregiver->setPatient(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCaregiver(): ?string
+    {
+        return $this->caregiver;
+    }
+
+    public function setCaregiver(?string $caregiver): static
+    {
+        $this->caregiver = $caregiver;
 
         return $this;
     }
