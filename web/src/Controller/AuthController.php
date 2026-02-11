@@ -20,7 +20,7 @@ class AuthController extends AbstractController
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
         if ($this->getUser()) {
-            return $this->redirectToRoute('app_home'); 
+            return $this->redirectToRoute('app_dashboard'); 
         }
 
         $error = $authenticationUtils->getLastAuthenticationError();
@@ -30,6 +30,12 @@ class AuthController extends AbstractController
             'last_username' => $lastUsername,
             'error'         => $error, 
         ]);
+    }
+
+    #[Route(path: '/logout', name: 'app_logout')]
+    public function logout(): void
+    {
+        throw new \LogicException('This method can be blank.');
     }
 
     /**
