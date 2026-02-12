@@ -1,0 +1,75 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Documents - {{ dossier.numeroDossier }} - Admin{% endblock %}
+
+{% block body %}
+<h1>Documents – {{ dossier.patientNom }} {{ dossier.patientPrenom }}</h1>
+<p>
+    <a href="{{ path('app_admin_dossier_show', { id: dossier.id }) }}" class="btn btn-secondary">Retour dossier</a>
+    <a href="{{ path('app_admin_document_new', { dossierId: dossier.id }) }}" class="btn btn-primary">Nouveau document</a>
+</p>
+
+<div class="filters">
+    <div><label for="q">Recherche</label><input type="text" id="q" value="{{ q|default('') }}" placeholder="Titre, contenu"></div>
+    <div><label for="tri">Tri</label>
+        <select id="tri">
+            <option value="dateDocument" {{ tri == 'dateDocument' ? 'selected' : '' }}>Date document</option>
+            <option value="dateCreation" {{ tri == 'dateCreation' ? 'selected' : '' }}>Date création</option>
+            <option value="titre" {{ tri == 'titre' ? 'selected' : '' }}>Titre</option>
+            <option value="typeDocument" {{ tri == 'typeDocument' ? 'selected' : '' }}>Type</option>
+        </select>
+    </div>
+    <div><label for="ordre">Ordre</label><select id="ordre"><option value="DESC" {{ ordre == 'DESC' ? 'selected' : '' }}>Desc</option><option value="ASC" {{ ordre == 'ASC' ? 'selected' : '' }}>Asc</option></select></div>
+    <div><label for="type">Type</label>
+        <select id="type">
+            <option value="">-- Tous --</option>
+            {% for t in ['ordonnance','rapport','examen','compte_rendu','autre'] %}
+            <option value="{{ t }}" {{ type == t ? 'selected' : '' }}>{{ t }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div><label for="date_debut">Date début</label><input type="date" id="date_debut" value="{{ date_debut|default('') }}"></div>
+    <div><label for="date_fin">Date fin</label><input type="date" id="date_fin" value="{{ date_fin|default('') }}"></div>
+    <div><button type="button" class="btn btn-primary" id="btn-search">Rechercher</button></div>
+</div>
+
+<p><span id="list-total">{{ total }}</span> document(s).</p>
+<table>
+    <thead><tr><th>Titre</th><th>Type</th><th>Date doc.</th><th>Actions</th></tr></thead>
+    <tbody id="document-tbody">{% include 'admin/document/_list_rows.html.twig' %}</tbody>
+</table>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+(function() {
+    const baseUrl = '{{ path('app_admin_document_index', { dossierId: dossier.id }) }}';
+    const tbody = document.getElementById('document-tbody');
+    const totalEl = document.getElementById('list-total');
+    function params() {
+        const p = new URLSearchParams(); p.set('ajax','1');
+        const q=document.getElementById('q'); if(q.value)p.set('q',q.value);
+        p.set('tri', document.getElementById('tri').value);
+        p.set('ordre', document.getElementById('ordre').value);
+        const type=document.getElementById('type'); if(type.value)p.set('type',type.value);
+        const d1=document.getElementById('date_debut'); if(d1.value)p.set('date_debut',d1.value);
+        const d2=document.getElementById('date_fin'); if(d2.value)p.set('date_fin',d2.value);
+        return p.toString();
+    }
+    function doSearch() {
+        fetch(baseUrl + '?' + params(), { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(r => { const t = r.headers.get('X-Total-Count'); if (t !== null && totalEl) totalEl.textContent = t; return r.text(); })
+            .then(html => tbody.innerHTML = html);
+    }
+    let debounceTimer;
+    function doSearchDebounced() { clearTimeout(debounceTimer); debounceTimer = setTimeout(doSearch, 300); }
+    document.getElementById('btn-search').addEventListener('click', doSearch);
+    document.getElementById('q').addEventListener('input', doSearchDebounced);
+    document.getElementById('tri').addEventListener('change', doSearch);
+    document.getElementById('ordre').addEventListener('change', doSearch);
+    document.getElementById('type').addEventListener('change', doSearch);
+    document.getElementById('date_debut').addEventListener('change', doSearch);
+    document.getElementById('date_fin').addEventListener('change', doSearch);
+})();
+</script>
+{% endblock %}

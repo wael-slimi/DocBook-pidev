@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Accueil - DocBook{% endblock %}
+
+{% block body %}
+<h1>DocBook – Gestion des patients</h1>
+<p>Choisissez votre espace selon votre rôle :</p>
+<ul>
+    <li><strong><a href="{{ path('app_admin_dossier_index') }}">Admin</a></strong> – Accès complet (dossiers et documents).</li>
+    <li><strong><a href="{{ path('app_medecin_dossier_index') }}">Médecin</a></strong> – Lecture des dossiers, création / modification / suppression des documents.</li>
+    <li><strong><a href="{{ path('app_patient_dossier_index') }}">Patient</a></strong> – Saisie et gestion de son dossier et des documents.</li>
+</ul>
+{% endblock %}

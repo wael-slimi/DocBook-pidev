@@ -1,0 +1,14 @@
+{% for document in documents %}
+<tr>
+    <td>{{ document.titre }}</td>
+    <td>{{ document.typeDocument }}</td>
+    <td>{{ document.dateDocument ? document.dateDocument|date('d/m/Y') : '' }}</td>
+    <td>
+        <a href="{{ path('app_medecin_document_show', { dossierId: dossier.id, id: document.id }) }}" class="btn btn-sm btn-secondary">Voir</a>
+        <a href="{{ path('app_medecin_document_edit', { dossierId: dossier.id, id: document.id }) }}" class="btn btn-sm btn-primary">Modifier</a>
+        <form method="post" action="{{ path('app_medecin_document_delete', { dossierId: dossier.id, id: document.id }) }}" style="display:inline;" onsubmit="return confirm('Supprimer ?');">
+            <button type="submit" class="btn btn-sm btn-danger">Supprimer</button>
+        </form>
+    </td>
+</tr>
+{% else %}<tr><td colspan="4">Aucun document.</td></tr>{% endfor %}

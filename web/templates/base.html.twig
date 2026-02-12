@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}DocBook{% endblock %}</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>📋</text></svg>">
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; background: #f5f5f5; color: #333; }
+        .navbar { background: #1a365d; color: #fff; padding: 0.75rem 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; }
+        .navbar a { color: #fff; text-decoration: none; padding: 0.35rem 0.75rem; border-radius: 4px; }
+        .navbar a:hover { background: rgba(255,255,255,0.15); }
+        .navbar .brand { font-weight: 700; font-size: 1.2rem; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 1.5rem; }
+        .flash-success { background: #c6f6d5; color: #22543d; padding: 0.75rem; border-radius: 6px; margin-bottom: 1rem; }
+        .flash-error { background: #fed7d7; color: #742a2a; padding: 0.75rem; border-radius: 6px; margin-bottom: 1rem; }
+        .form-errors { background: #fed7d7; color: #742a2a; padding: 0.75rem; border-radius: 6px; margin-bottom: 1rem; list-style: none; }
+        .field-error { color: #c53030; font-size: 0.875rem; margin-top: 0.25rem; }
+        table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+        th, td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        th { background: #edf2f7; font-weight: 600; }
+        tr:hover { background: #f7fafc; }
+        .btn { display: inline-block; padding: 0.5rem 1rem; border-radius: 6px; text-decoration: none; font-size: 0.875rem; cursor: pointer; border: none; }
+        .btn-primary { background: #3182ce; color: #fff; }
+        .btn-primary:hover { background: #2c5282; }
+        .btn-success { background: #38a169; color: #fff; }
+        .btn-danger { background: #e53e3e; color: #fff; }
+        .btn-secondary { background: #718096; color: #fff; }
+        .btn-sm { padding: 0.35rem 0.65rem; font-size: 0.8rem; }
+        form label { display: block; margin-top: 0.75rem; font-weight: 500; }
+        form input[type="text"], form input[type="email"], form input[type="date"], form textarea, form select { width: 100%; max-width: 400px; padding: 0.5rem; border: 1px solid #cbd5e0; border-radius: 6px; }
+        form textarea { min-height: 100px; }
+        .filters { background: #fff; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.08); display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end; }
+        .filters label { margin: 0; }
+        .filters input, .filters select { max-width: 180px; }
+        .actions { margin-top: 1rem; }
+        .actions .btn { margin-right: 0.5rem; }
+    </style>
+    {% block stylesheets %}{% endblock %}
+</head>
+<body>
+    <nav class="navbar">
+        <a href="{{ path('app_home') }}" class="brand">DocBook</a>
+        <div>
+            <a href="{{ path('app_admin_dossier_index') }}">Admin</a>
+            <a href="{{ path('app_medecin_dossier_index') }}">Médecin</a>
+            <a href="{{ path('app_patient_dossier_index') }}">Patient</a>
+        </div>
+    </nav>
+    <main class="container">
+        {% for message in app.flashes('success') %}
+            <div class="flash-success">{{ message }}</div>
+        {% endfor %}
+        {% for message in app.flashes('error') %}
+            <div class="flash-error">{{ message }}</div>
+        {% endfor %}
+        {% block body %}{% endblock %}
+    </main>
+    {% block javascripts %}{% endblock %}
+</body>
+</html>

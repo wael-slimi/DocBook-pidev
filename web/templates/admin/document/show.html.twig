@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ document.titre }} - Admin{% endblock %}
+
+{% block body %}
+<h1>{{ document.titre }}</h1>
+<p>
+    <a href="{{ path('app_admin_document_index', { dossierId: dossier.id }) }}" class="btn btn-secondary">Retour liste</a>
+    <a href="{{ path('app_admin_document_edit', { dossierId: dossier.id, id: document.id }) }}" class="btn btn-primary">Modifier</a>
+</p>
+<table>
+    <tr><th>Dossier</th><td>{{ dossier.numeroDossier }} - {{ dossier.patientNom }} {{ dossier.patientPrenom }}</td></tr>
+    <tr><th>Type</th><td>{{ document.typeDocument }}</td></tr>
+    <tr><th>Date document</th><td>{{ document.dateDocument ? document.dateDocument|date('d/m/Y') : '' }}</td></tr>
+    <tr><th>Contenu</th><td><pre style="white-space:pre-wrap;">{{ document.contenu }}</pre></td></tr>
+    <tr><th>Fichier</th><td>{{ document.fichierPath }}</td></tr>
+</table>
+{% endblock %}

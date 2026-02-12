@@ -1,0 +1,21 @@
+{% for dossier in dossiers %}
+<tr>
+    <td>{{ dossier.numeroDossier }}</td>
+    <td>{{ dossier.patientNom }} {{ dossier.patientPrenom }}</td>
+    <td>{{ dossier.dateCreation ? dossier.dateCreation|date('d/m/Y H:i') : '' }}</td>
+    <td>
+        <a href="{{ path('app_admin_dossier_show', { id: dossier.id }) }}" class="btn btn-sm btn-secondary">Voir</a>
+        <a href="{{ path('app_admin_document_index', { dossierId: dossier.id }) }}" class="btn btn-sm btn-primary">Documents</a>
+        {% if can_edit_dossier %}
+        <a href="{{ path('app_admin_dossier_edit', { id: dossier.id }) }}" class="btn btn-sm btn-primary">Modifier</a>
+        {% endif %}
+        {% if can_delete_dossier %}
+        <form method="post" action="{{ path('app_admin_dossier_delete', { id: dossier.id }) }}" style="display:inline;" onsubmit="return confirm('Supprimer ce dossier ?');">
+            <button type="submit" class="btn btn-sm btn-danger">Supprimer</button>
+        </form>
+        {% endif %}
+    </td>
+</tr>
+{% else %}
+<tr><td colspan="4">Aucun dossier.</td></tr>
+{% endfor %}

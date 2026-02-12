@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+{% block title %}Dossier {{ dossier.numeroDossier }} - Patient{% endblock %}
+{% block body %}
+<h1>Mon dossier {{ dossier.numeroDossier }}</h1>
+<p>
+    <a href="{{ path('app_patient_dossier_index') }}" class="btn btn-secondary">Retour liste</a>
+    <a href="{{ path('app_patient_dossier_edit', { id: dossier.id }) }}" class="btn btn-primary">Modifier</a>
+    <a href="{{ path('app_patient_document_index', { dossierId: dossier.id }) }}" class="btn btn-primary">Documents ({{ dossier.documents|length }})</a>
+</p>
+<table>
+    <tr><th>N° dossier</th><td>{{ dossier.numeroDossier }}</td></tr>
+    <tr><th>Nom</th><td>{{ dossier.patientNom }}</td></tr>
+    <tr><th>Prénom</th><td>{{ dossier.patientPrenom }}</td></tr>
+    <tr><th>Date naissance</th><td>{{ dossier.dateNaissance ? dossier.dateNaissance|date('d/m/Y') : '' }}</td></tr>
+    <tr><th>Genre</th><td>{{ dossier.genre }}</td></tr>
+    <tr><th>Email</th><td>{{ dossier.email }}</td></tr>
+    <tr><th>Téléphone</th><td>{{ dossier.telephone }}</td></tr>
+    <tr><th>Adresse</th><td>{{ dossier.adresse }}</td></tr>
+    <tr><th>Remarques</th><td>{{ dossier.remarques }}</td></tr>
+    <tr><th>Créé le</th><td>{{ dossier.dateCreation ? dossier.dateCreation|date('d/m/Y H:i') : '' }}</td></tr>
+</table>
+{% endblock %}
