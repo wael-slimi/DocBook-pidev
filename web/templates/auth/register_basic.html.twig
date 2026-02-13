@@ -7,6 +7,12 @@
 
     <main class="flex flex-1 justify-center py-10 px-4 md:px-40">
         <div class="layout-content-container flex flex-col max-w-[560px] flex-1 bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-[#cedbe8] dark:border-slate-800 p-8">
+            {% for message in app.flashes('error') %}
+                <div class="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 text-red-700 dark:text-red-400 flex items-center gap-3 rounded shadow-sm">
+                    <span class="material-symbols-outlined">error</span>
+                    <p class="text-sm font-semibold">{{ message }}</p>
+                </div>
+            {% endfor %}
             <div class="flex flex-col gap-3 pb-8">
                 <div class="flex gap-6 justify-between items-center">
                     <p class="text-slate-900 dark:text-white text-sm font-semibold uppercase tracking-wider">Step 1 of 4</p>
@@ -37,10 +43,11 @@
                     </div>
                 </div>
 
+                
+
                 <div class="flex flex-col gap-2">
                     <label class="text-slate-900 dark:text-slate-200 text-sm font-semibold flex justify-between">
                         <span>Date of Birth</span>
-                        <span class="text-red-500 text-xs">* Required</span>
                     </label>
                     <div class="relative">
                         <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">cake</span>
@@ -65,3 +72,4 @@
     
     {% include 'components/footer.html.twig' %}
 {% endblock %}
+

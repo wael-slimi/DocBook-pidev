@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use App\Repository\UserRepository;
 
 class AuthController extends AbstractController
 {
@@ -44,9 +45,18 @@ class AuthController extends AbstractController
      * STEP 1: Basic Information
      */
     #[Route('/register', name: 'app_register', methods: ['GET', 'POST'])]
-    public function register(Request $request): Response
+    public function register(Request $request , UserRepository $userRepository): Response
     {
         if ($request->isMethod('POST')) {
+            $email = $request->request->get('email');
+            
+            $existingUser = $userRepository->findOneBy(['email' => $email]);
+
+            if ($existingUser) {
+                $this->addFlash('error', 'This email is already registered.');
+                return $this->redirectToRoute('app_register');
+            }
+
             $session = $request->getSession();
             $session->set('reg_data', [
                 'full_name' => $request->request->get('full_name'),
