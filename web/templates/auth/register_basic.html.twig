@@ -43,8 +43,10 @@
                     </div>
                 </div>
 
-                
 
+                {% set maxDob = "now -16 years"|date("Y-m-d") %}
+                {% set minDob = "now -120 years"|date("Y-m-d") %}
+                
                 <div class="flex flex-col gap-2">
                     <label class="text-slate-900 dark:text-slate-200 text-sm font-semibold flex justify-between">
                         <span>Date of Birth</span>
@@ -54,11 +56,10 @@
                         <input 
                             name="dob" 
                             type="date" 
-                            {# 'required' triggers browser-level blocking #}
                             required 
-                            {# 'max' prevents choosing future dates #}
-                            max="{{ "now"|date("Y-m-d") }}" 
-                            class="form-input w-full rounded-lg border-[#cedbe8] dark:border-slate-700 dark:bg-slate-800 h-14 pl-12 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all invalid:border-red-500"
+                            min="{{ minDob }}"
+                            max="{{ maxDob }}"
+                            class="form-input w-full rounded-lg border-[#cedbe8] dark:border-slate-700 dark:bg-slate-800 h-14 pl-12 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all "
                         >
                     </div>
                 </div>

@@ -49,6 +49,23 @@ class AuthController extends AbstractController
     {
         if ($request->isMethod('POST')) {
             $email = $request->request->get('email');
+            $dobString = $request->request->get('dob');
+
+            if ($dobString) {
+                $dob = new \DateTime($dobString);
+                $now = new \DateTime();
+                $age = $now->diff($dob)->y; // Calculates the difference in years
+
+                if ($age < 16) {
+                    $this->addFlash('error', 'You must be at least 16 years old to register.');
+                    return $this->redirectToRoute('app_register');
+                }
+
+                if ($age > 120) {
+                    $this->addFlash('error', 'Please enter a valid date of birth.');
+                    return $this->redirectToRoute('app_register');
+                }
+            }
             
             $existingUser = $userRepository->findOneBy(['email' => $email]);
 
@@ -63,6 +80,7 @@ class AuthController extends AbstractController
                 'email' => $request->request->get('email'),
                 'phone' => $request->request->get('phone'), // Added phone if you have it in Step 1
                 'dob' => $request->request->get('dob'),
+
             ]);
 
             return $this->redirectToRoute('app_register_role');
@@ -108,6 +126,12 @@ class AuthController extends AbstractController
 
             if ($password !== $confirm) {
                 $this->addFlash('error', 'Passwords do not match');
+                return $this->redirectToRoute('app_register_security');
+            }
+
+            $regex = '/^(?=.*[0-9])(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/';
+            if (!preg_match($regex, $password)) {
+                $this->addFlash('error', 'Password must be at least 8 characters long and include at least one number and one special character.');
                 return $this->redirectToRoute('app_register_security');
             }
 

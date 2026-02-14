@@ -8,46 +8,52 @@
     <main class="flex-grow flex items-center justify-center px-4 py-12">
         <div class="max-w-[480px] w-full bg-white dark:bg-slate-900 p-8 md:p-10 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
             
-            <div class="flex flex-col gap-3 pb-8">
-                <div class="flex justify-between items-center">
-                    <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Step 3 of 4</p>
-                    <p class="text-primary text-sm font-bold">75%</p>
+            {# Flash messages for backend errors #}
+            {% for message in app.flashes('error') %}
+                <div class="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 flex items-center gap-3 rounded shadow-sm">
+                    <span class="material-symbols-outlined">error</span>
+                    <p class="text-sm font-medium">{{ message }}</p>
                 </div>
-                <div class="rounded-full bg-slate-100 dark:bg-slate-800 h-2 overflow-hidden">
-                    <div class="h-full rounded-full bg-primary" style="width: 75%;"></div>
-                </div>
+            {% endfor %}
+
+            <div class="flex flex-col gap-3 pb-8 text-center">
+                <h1 class="text-slate-900 dark:text-white text-3xl font-bold">Create Password</h1>
+                <p class="text-slate-500 dark:text-slate-400 text-sm">Set a secure password for your account.</p>
             </div>
 
-            <h1 class="text-slate-900 dark:text-white text-3xl font-bold text-center pb-2">Create Password</h1>
-            <p class="text-slate-500 dark:text-slate-400 text-center text-sm mb-8">Set a secure password for your new account.</p>
-
-            <form action="{{ path('app_register_security') }}" method="POST" class="space-y-6">
+            <form action="{{ path('app_register_security') }}" method="POST" class="group space-y-6">
                 
                 <div class="space-y-2">
                     <label class="text-sm font-semibold text-slate-700 dark:text-slate-200">New Password</label>
                     <div class="relative">
-                        <input name="password" type="password" required
-                               class="w-full rounded-lg border-slate-300 dark:border-slate-700 dark:bg-slate-800 h-12 pl-4 pr-12 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" 
-                               placeholder="Min. 8 characters">
-                        <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 cursor-pointer hover:text-primary transition-colors">visibility</span>
+                        <input 
+                            name="password" 
+                            type="password" 
+                            required
+                            {# HTML5 Pattern: 8+ chars, at least 1 number, at least 1 special char #}
+                            pattern="(?=.*[0-9])(?=.*[!@#$%^&*(),.?&quot;:{}|<>]).{8,}"
+                            title="Password must be at least 8 characters long and include one number and one special character."
+                            class="peer w-full rounded-lg border-slate-300 dark:border-slate-700 dark:bg-slate-800 h-12 pl-4 pr-12 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all invalid:border-red-300 valid:border-green-500" 
+                            placeholder="••••••••">
+                        <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">lock</span>
                     </div>
                 </div>
 
                 <div class="space-y-2">
                     <label class="text-sm font-semibold text-slate-700 dark:text-slate-200">Confirm Password</label>
-                    <div class="relative">
-                        <input name="confirm_password" type="password" required
-                               class="w-full rounded-lg border-slate-300 dark:border-slate-700 dark:bg-slate-800 h-12 pl-4 pr-12 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" 
-                               placeholder="Repeat password">
-                    </div>
+                    <input name="confirm_password" type="password" required
+                           class="w-full rounded-lg border-slate-300 dark:border-slate-700 dark:bg-slate-800 h-12 px-4 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" 
+                           placeholder="Repeat password">
                 </div>
 
+                {# Static Validation Instructions #}
                 <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-100 dark:border-slate-800 space-y-2">
-                    <div class="flex items-center gap-2 text-xs text-green-500 font-medium">
-                        <span class="material-symbols-outlined text-sm">check_circle</span> At least 8 characters
+                    <p class="text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1 uppercase tracking-tight">Security Requirements:</p>
+                    <div class="flex items-center gap-2 text-xs text-slate-500">
+                        <span class="material-symbols-outlined text-[16px]">info</span> At least 8 characters
                     </div>
-                    <div class="flex items-center gap-2 text-xs text-slate-400">
-                        <span class="material-symbols-outlined text-sm">radio_button_unchecked</span> One special character (!@#$%)
+                    <div class="flex items-center gap-2 text-xs text-slate-500">
+                        <span class="material-symbols-outlined text-[16px]">info</span> One number and one special character
                     </div>
                 </div>
 
