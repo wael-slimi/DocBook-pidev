@@ -1,0 +1,98 @@
+{% extends 'dashboard_base.html.twig' %}
+
+{% block title %}Complete Your Profile - DOCBOOK{% endblock %}
+
+{% block body %}
+<main class="flex flex-1 justify-center py-12 bg-slate-50 dark:bg-slate-950 min-h-screen">
+    <div class="layout-content-container flex flex-col w-full max-w-[800px] px-6">
+        
+        {# Header Section #}
+        <div class="flex flex-col gap-2 mb-8">
+            <div class="flex items-center gap-2 text-primary mb-2">
+                <span class="material-symbols-outlined">verified_user</span>
+                <span class="text-xs font-black uppercase tracking-widest">Professional Verification</span>
+            </div>
+            <h1 class="text-slate-900 dark:text-white text-3xl font-black leading-tight tracking-tight">
+                Complete your profile
+            </h1>
+            <p class="text-slate-500 dark:text-slate-400 text-base">
+                Please provide your professional details. This information will be visible to patients and is required to appear in search results.
+            </p>
+        </div>
+
+        {# Form Start #}
+        {{ form_start(form, {'attr': {'class': 'flex flex-col gap-6'}}) }}
+            
+            <div class="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-sm border border-slate-200 dark:border-slate-800">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    
+                    {# Specialty Field #}
+                    <div class="flex flex-col gap-2">
+                        <label class="text-sm font-bold text-slate-900 dark:text-white">Medical Specialty</label>
+                        {{ form_widget(form.specialty, {
+                            'attr': {'class': 'flex h-12 w-full rounded-lg border border-slate-200 bg-slate-50 px-4 text-base focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all dark:bg-slate-800 dark:border-slate-700 dark:text-white'}
+                        }) }}
+                        <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Your primary field of expertise</p>
+                    </div>
+
+                    {# License Number Field #}
+                    <div class="flex flex-col gap-2">
+                        <label class="text-sm font-bold text-slate-900 dark:text-white">License Number</label>
+                        {{ form_widget(form.licenseNumber, {
+                            'attr': {'class': 'flex h-12 w-full rounded-lg border border-slate-200 bg-slate-50 px-4 text-base focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all dark:bg-slate-800 dark:border-slate-700 dark:text-white'}
+                        }) }}
+                        <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Official Medical ID</p>
+                    </div>
+
+                    {# Consultation Fee #}
+                    <div class="flex flex-col gap-2">
+                        <label class="text-sm font-bold text-slate-900 dark:text-white">Consultation Fee ($)</label>
+                        <div class="relative">
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">$</span>
+                            {{ form_widget(form.consultationFee, {
+                                'attr': {'class': 'flex h-12 w-full rounded-lg border border-slate-200 bg-slate-50 pl-8 pr-4 text-base focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all dark:bg-slate-800 dark:border-slate-700 dark:text-white'}
+                            }) }}
+                        </div>
+                        <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Per session rate</p>
+                    </div>
+                </div>
+
+                {# Biography Field #}
+                <div class="flex flex-col gap-2 mt-8">
+                    <label class="text-sm font-bold text-slate-900 dark:text-white">Professional Biography</label>
+                    {{ form_widget(form.bio, {
+                        'attr': {
+                            'class': 'flex min-h-[120px] w-full rounded-lg border border-slate-200 bg-slate-50 p-4 text-base focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all dark:bg-slate-800 dark:border-slate-700 dark:text-white',
+                            'placeholder': 'Share your experience, education, and clinical interests...'
+                        }
+                    }) }}
+                    <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">This helps patients choose the right doctor</p>
+                </div>
+            </div>
+
+            {# Form Actions #}
+            <div class="flex items-center justify-end gap-4 mt-4">
+                <a href="{{ path('app_dashboard') }}" class="text-sm font-bold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors">
+                    Save as draft
+                </a>
+                <button type="submit" class="flex h-12 items-center justify-center rounded-xl bg-primary px-10 text-white font-black shadow-lg shadow-primary/30 hover:bg-primary/90 hover:scale-[1.02] active:scale-95 transition-all">
+                    Complete Setup
+                </button>
+            </div>
+
+        {{ form_end(form) }}
+        
+        {# Trust Footer #}
+        <div class="mt-12 flex items-center justify-center gap-6 border-t border-slate-200 dark:border-slate-800 pt-8">
+            <div class="flex items-center gap-2 opacity-50">
+                <span class="material-symbols-outlined text-sm">lock</span>
+                <span class="text-[10px] font-bold uppercase">Encrypted Data</span>
+            </div>
+            <div class="flex items-center gap-2 opacity-50">
+                <span class="material-symbols-outlined text-sm">gavel</span>
+                <span class="text-[10px] font-bold uppercase">HIPAA Compliant</span>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}
