@@ -21,7 +21,48 @@
         </div>
 
         {# Form Start #}
-        {{ form_start(form, {'attr': {'class': 'flex flex-col gap-6'}}) }}
+        {{ form_start(form, {'attr': {'class': 'flex flex-col gap-6', 'enctype': 'multipart/form-data'}}) }}
+
+            {# Profile Picture Section (Pure HTML/Twig - No JS) #}
+            <div class="flex flex-col items-center gap-4 mb-8">
+                <div class="relative">
+                    <div class="size-32 rounded-3xl bg-slate-200 dark:bg-slate-800 border-4 border-white dark:border-slate-900 shadow-xl overflow-hidden">
+                        {% if app.user.profilePicture %}
+                            <img src="{{ asset('uploads/profiles/' ~ app.user.profilePicture) }}" class="w-full h-full object-cover"> 
+                                 class="w-full h-full object-cover" 
+                                 alt="Profile Picture">
+                        {% else %}
+                            <div class="w-full h-full flex items-center justify-center text-slate-400">
+                                <span class="material-symbols-outlined text-4xl">person</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    {# Standard Label linked to hidden file input #}
+                    <label for="{{ form.profilePicture.vars.id }}" 
+                           class="absolute -bottom-2 -right-2 p-2 bg-primary text-white rounded-xl shadow-lg cursor-pointer hover:bg-primary/90 transition-colors border-2 border-white dark:border-slate-900">
+                        <span class="material-symbols-outlined text-sm">photo_camera</span>
+                    </label>
+                </div>
+
+                {# Hidden File Input #}
+                <div class="hidden">
+                    {{ form_widget(form.profilePicture) }}
+                </div>
+                
+                <div class="text-center">
+                    <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
+                        {% if app.user.profilePicture %}
+                            Click the camera to change photo
+                        {% else %}
+                            Upload a professional headshot
+                        {% endif %}
+                    </p>
+                    <div class="text-red-500 text-xs mt-1">
+                        {{ form_errors(form.profilePicture) }}
+                    </div>
+                </div>
+            </div>
             
             <div class="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-sm border border-slate-200 dark:border-slate-800">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -33,6 +74,7 @@
                             'attr': {'class': 'flex h-12 w-full rounded-lg border border-slate-200 bg-slate-50 px-4 text-base focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all dark:bg-slate-800 dark:border-slate-700 dark:text-white'}
                         }) }}
                         <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Your primary field of expertise</p>
+                        <div class="text-red-500 text-xs">{{ form_errors(form.specialty) }}</div>
                     </div>
 
                     {# License Number Field #}
@@ -42,6 +84,7 @@
                             'attr': {'class': 'flex h-12 w-full rounded-lg border border-slate-200 bg-slate-50 px-4 text-base focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all dark:bg-slate-800 dark:border-slate-700 dark:text-white'}
                         }) }}
                         <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Official Medical ID</p>
+                        <div class="text-red-500 text-xs">{{ form_errors(form.licenseNumber) }}</div>
                     </div>
 
                     {# Consultation Fee #}
@@ -54,6 +97,7 @@
                             }) }}
                         </div>
                         <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Per session rate</p>
+                        <div class="text-red-500 text-xs">{{ form_errors(form.consultationFee) }}</div>
                     </div>
                 </div>
 
@@ -67,16 +111,17 @@
                         }
                     }) }}
                     <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">This helps patients choose the right doctor</p>
+                    <div class="text-red-500 text-xs">{{ form_errors(form.bio) }}</div>
                 </div>
             </div>
 
             {# Form Actions #}
             <div class="flex items-center justify-end gap-4 mt-4">
                 <a href="{{ path('app_dashboard') }}" class="text-sm font-bold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors">
-                    Save as draft
+                    Cancel
                 </a>
                 <button type="submit" class="flex h-12 items-center justify-center rounded-xl bg-primary px-10 text-white font-black shadow-lg shadow-primary/30 hover:bg-primary/90 hover:scale-[1.02] active:scale-95 transition-all">
-                    Complete Setup
+                    Save Professional Profile
                 </button>
             </div>
 

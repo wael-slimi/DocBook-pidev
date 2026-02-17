@@ -3,14 +3,16 @@
 namespace App\Form;
 
 use App\Entity\Doctor;
-use App\Enum\Specialty; // Import your Enum
+use App\Enum\Specialty; 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\EnumType; // Use EnumType
+use Symfony\Component\Form\Extension\Core\Type\EnumType; 
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Validator\Constraints\File;
 
 class DoctorCompleteProfileType extends AbstractType
 {
@@ -42,7 +44,22 @@ class DoctorCompleteProfileType extends AbstractType
                     'rows' => 4, 
                     'placeholder' => 'Tell patients about your experience...'
                 ]
+            ])
+
+            ->add('profilePicture', FileType::class, [
+                'label' => 'Profile Picture',
+                'mapped' => false,
+                'required' => false,
+                'constraints' => [
+                    new File(
+                        maxSize: '2M',
+                        mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
+                        mimeTypesMessage: 'Please upload a valid image (JPEG, PNG, WEBP)'
+                    )
+                ],
             ]);
+
+
     }
 
     public function configureOptions(OptionsResolver $resolver): void
