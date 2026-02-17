@@ -5,12 +5,13 @@ namespace App\Entity;
 use App\Repository\DoctorRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Enum\Specialty;
 
 #[ORM\Entity(repositoryClass: DoctorRepository::class)]
 class Doctor extends User
 {
-    #[ORM\Column(length: 255, nullable: true)] // Made nullable for initial registration
-    private ?string $specialty = null;
+    #[ORM\Column(type: 'string', enumType: Specialty::class, nullable: true)]   
+    private ?Specialty $specialty = null;
 
     #[ORM\Column(length: 50, nullable: true)] // Made nullable for initial registration
     private ?string $licenseNumber = null;
@@ -41,12 +42,12 @@ class Doctor extends User
         $this->averageRating = "0.00";
     }
 
-    public function getSpecialty(): ?string
+    public function getSpecialty(): ?Specialty
     {
         return $this->specialty;
     }
 
-    public function setSpecialty(?string $specialty): static
+    public function setSpecialty(?Specialty $specialty): static
     {
         $this->specialty = $specialty;
         return $this;
@@ -127,5 +128,12 @@ class Doctor extends User
     {
         $this->isVerified = $isVerified;
         return $this;
+    }
+    
+    public function isProfileComplete(): bool
+    {
+        return $this->specialty !== null && 
+               !empty($this->licenseNumber) && 
+               !empty($this->consultationFee);
     }
 }
