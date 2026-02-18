@@ -16,14 +16,21 @@
                     </div>
                     <h2 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">DOCBOOK</h2>
                 </div>
-                <label class="hidden md:flex flex-col min-w-40 !h-10 max-w-64">
+                <form action="{{ path('app_doctor_search') }}" method="GET" class="hidden md:flex flex-col min-w-40 !h-10 max-w-64">
                     <div class="flex w-full flex-1 items-stretch rounded-lg h-full">
                         <div class="text-slate-500 flex border-none bg-slate-100 dark:bg-slate-800 items-center justify-center pl-4 rounded-l-lg border-r-0">
                             <span class="material-symbols-outlined">search</span>
                         </div>
-                        <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-white focus:outline-0 focus:ring-0 border-none bg-slate-100 dark:bg-slate-800 h-full placeholder:text-slate-500 px-4 rounded-l-none pl-2 text-base font-normal" placeholder="Search records, doctors..."/>
+                        {# CHANGE: added name="q" and value attribute #}
+                        <input 
+                            name="q" 
+                            type="text"
+                            value="{{ app.request.query.get('q') }}"
+                            class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-white focus:outline-0 focus:ring-0 border-none bg-slate-100 dark:bg-slate-800 h-full placeholder:text-slate-500 px-4 rounded-l-none pl-2 text-base font-normal" 
+                            placeholder="Search doctors..."
+                        />
                     </div>
-                </label>
+                </form>
             </div>
         
             <div class="flex flex-1 justify-end gap-8">

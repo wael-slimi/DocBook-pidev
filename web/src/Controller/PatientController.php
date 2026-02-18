@@ -10,6 +10,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\User;
 use App\Form\PatientSettingsType;
+use App\Repository\UserRepository;
+USE App\Enum\Specialty;
 
 #[Route('/patient')]
 #[IsGranted('IS_AUTHENTICATED_FULLY')]
@@ -58,6 +60,28 @@ class PatientController extends AbstractController
 
         return $this->render('patient/settings.html.twig', [
             'form' => $form->createView(),
+        ]);
+    }
+
+    #[Route('/patient/search', name: 'app_doctor_search')]
+    public function search(Request $request, UserRepository $userRepository): Response
+    {
+        $searchTerm = $request->query->get('q', '');
+
+        $specialty = $request->query->get('specialty', 'All');
+
+        $minPrice = $request->query->get('minPrice') !== '' ? (float)$request->query->get('minPrice') : null;
+        $maxPrice = $request->query->get('maxPrice') !== '' ? (float)$request->query->get('maxPrice') : null;
+
+        $doctors = $userRepository->findDoctorsByFilters($searchTerm, $specialty, $minPrice, $maxPrice);
+
+        return $this->render('patient/search.html.twig', [
+            'doctors' => $doctors,
+            'searchTerm' => $searchTerm,
+            'selectedSpecialty' => $specialty, 
+            'minPrice' => $minPrice,
+            'maxPrice' => $maxPrice,
+            'specialties' => Specialty::cases(), 
         ]);
     }
 }

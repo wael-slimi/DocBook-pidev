@@ -21,3 +21,8 @@ app_patient_settings:
     path: /patient/settings
     controller: App\Controller\PatientController::settings
     methods: [GET, POST]
+
+app_doctor_search:
+    path: /patient/search
+    controller: App\Controller\PatientController::search
+    methods: [GET]
