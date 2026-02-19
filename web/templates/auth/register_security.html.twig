@@ -10,9 +10,14 @@
             
             {# Flash messages for backend errors #}
             {% for message in app.flashes('error') %}
-                <div class="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 flex items-center gap-3 rounded shadow-sm">
-                    <span class="material-symbols-outlined">error</span>
-                    <p class="text-sm font-medium">{{ message }}</p>
+                <div class="mb-6 p-4 bg-red-50 border-l-4 border-red-600 text-red-800 rounded shadow-md animate-bounce-short">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-red-600">shield_moon</span>
+                        <div>
+                            <p class="text-sm font-bold">Security Alert</p>
+                            <p class="text-xs opacity-90">{{ message }}</p>
+                        </div>
+                    </div>
                 </div>
             {% endfor %}
 

@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Check Your Email - DOCBOOK{% endblock %}
+
+{% block body %}
+<div class="min-h-screen flex flex-col bg-[#f5f7f8] dark:bg-[#0f1923]">
+    {% include 'components/navbar.html.twig' %}
+    <main class="flex-1 flex items-center justify-center p-4">
+        <div class="max-w-[480px] w-full bg-white dark:bg-slate-900 p-10 rounded-xl shadow-sm border border-[#e6edf4] dark:border-slate-800 text-center">
+            <div class="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mb-6 mx-auto">
+                <span class="material-symbols-outlined text-primary text-5xl">forward_to_inbox</span>
+            </div>
+            <h1 class="text-2xl font-bold dark:text-white mb-4">Check your inbox!</h1>
+            <p class="text-slate-600 dark:text-slate-400 mb-6">If an account exists, an email has been sent with a link to reset your password.</p>
+            <p class="text-xs text-slate-400 italic">Link expires in: {{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}</p>
+            <div class="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800">
+                <a href="{{ path('app_forgot_password_request') }}" class="text-primary font-bold hover:underline">Try another email</a>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}

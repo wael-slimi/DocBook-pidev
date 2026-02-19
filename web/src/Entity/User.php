@@ -53,6 +53,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $profilePicture = null;
+
+    #[ORM\Column(type: 'boolean', nullable: true)]
+    private bool $isVerified = false;
     
 
 
@@ -191,6 +194,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setProfilePicture(?string $profilePicture): self
     {
         $this->profilePicture = $profilePicture;
+        return $this;
+    }
+
+    
+
+    // ADD THIS: Mandatory for UserInterface
+    public function eraseCredentials(): void
+    {
+    }
+
+    public function isVerified(): bool
+    {
+        return $this->isVerified;
+    }
+
+    public function setIsVerified(bool $isVerified): static
+    {
+        $this->isVerified = $isVerified;
         return $this;
     }
 

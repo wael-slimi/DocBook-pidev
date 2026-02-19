@@ -31,14 +31,10 @@ class Doctor extends User
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $profileImage = null;
 
-    #[ORM\Column]
-    private ?bool $isVerified = false; // Default to false
-
     // --- Constructor to ensure defaults are set ---
     public function __construct()
     {
         $this->totalReviews = 0;
-        $this->isVerified = false;
         $this->averageRating = "0.00";
     }
 
@@ -119,16 +115,6 @@ class Doctor extends User
         return $this;
     }
 
-    public function isVerified(): ?bool
-    {
-        return $this->isVerified;
-    }
-
-    public function setIsVerified(bool $isVerified): static
-    {
-        $this->isVerified = $isVerified;
-        return $this;
-    }
     
     public function isProfileComplete(): bool
     {
