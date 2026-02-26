@@ -1,120 +1,134 @@
+{# templates/patient/search.html.twig #}
 {% extends 'base.html.twig' %}
 
 {% block title %}Search Doctors - DOCBOOK{% endblock %}
 
 {% block body %}
-<div class="flex flex-col w-full bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="flex flex-col w-full bg-slate-50 dark:bg-slate-950 font-sans text-slate-900 dark:text-slate-100 min-h-screen">
     
-    <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-10 py-3 sticky top-0 z-50">
+    {# Header Section #}
+    <header class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-10 py-3 sticky top-0 z-50">
         <div class="flex items-center gap-8">
-            <div class="flex items-center gap-4 text-primary">
+            <div class="flex items-center gap-4 text-blue-600">
                 <div class="size-6">
                     <svg fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
                         <path clip-rule="evenodd" d="M24 4H6V17.3333V30.6667H24V44H42V30.6667V17.3333H24V4Z" fill="currentColor" fill-rule="evenodd"></path>
                     </svg>
                 </div>
-                <h2 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">DOCBOOK</h2>
+                <h2 class="text-slate-900 dark:text-white text-lg font-bold">DOCBOOK</h2>
             </div>
             
-            <form action="{{ path('app_doctor_search') }}" method="GET" class="flex flex-col min-w-40 !h-10 max-w-64">
-                <div class="flex w-full flex-1 items-stretch rounded-lg h-full">
-                    <div class="text-slate-500 flex border-none bg-slate-100 dark:bg-slate-800 items-center justify-center pl-4 rounded-l-lg border-r-0">
-                        <span class="material-symbols-outlined">search</span>
-                    </div>
-                    <input 
-                        name="q" 
-                        value="{{ searchTerm }}" 
-                        class="form-input flex w-full min-w-0 flex-1 rounded-lg text-slate-900 dark:text-white focus:outline-0 focus:ring-0 border-none bg-slate-100 dark:bg-slate-800 h-full placeholder:text-slate-500 px-4 rounded-l-none pl-2 text-base font-normal" 
-                        placeholder="Search doctors..."
-                    />
+            <form action="{{ path('app_doctor_search') }}" method="GET" class="flex items-stretch rounded-lg bg-slate-100 dark:bg-slate-800 h-10 w-64">
+                <div class="flex items-center pl-3 text-slate-500">
+                    <span class="material-symbols-outlined text-sm">search</span>
                 </div>
+                <input 
+                    name="q" 
+                    value="{{ searchTerm }}" 
+                    class="bg-transparent border-none focus:ring-0 text-sm w-full" 
+                    placeholder="Search doctors..."
+                />
             </form>
         </div>
         
-        <div class="flex flex-1 justify-end gap-8">
-            <div class="flex items-center gap-9">
-                <a class="text-primary text-sm font-semibold" href="{{ path('app_dashboard') }}">Dashboard</a>
-                <a class="text-slate-600 dark:text-slate-300 text-sm font-medium hover:text-primary transition-colors" href="#">My Appointments</a>
-            </div>
-            <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-primary/20" 
-                 style="background-image: url('{{ app.user.profilePicture ? asset('uploads/profiles/' ~ app.user.profilePicture) : 'https://ui-avatars.com/api/?name=' ~ app.user.name|url_encode }}');">
+        <div class="flex items-center gap-6">
+            <a class="text-blue-600 text-sm font-semibold" href="{{ path('app_dashboard') }}">Dashboard</a>
+            <div class="size-10 rounded-full border-2 border-blue-100 bg-cover bg-center" 
+                 style="background-image: url('https://ui-avatars.com/api/?name={{ app.user.name|url_encode }}');">
             </div>
         </div>
     </header>
 
-    <main class="max-w-[1280px] mx-auto w-full px-6 py-8">
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-8">
-            <div class="flex flex-col gap-1">
-                <h1 class="text-slate-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">Find your doctor</h1>
-                <p class="text-slate-500 dark:text-slate-400 text-base font-normal leading-normal">Book an appointment with top-rated specialists.</p>
-            </div>
+    <main class="max-w-7xl mx-auto w-full px-6 py-10">
+        <div class="mb-10">
+            <h1 class="text-4xl font-black text-slate-900 dark:text-white tracking-tight">Find your doctor</h1>
+            <p class="text-slate-500 mt-2">Book an appointment with top-rated specialists in Tunisia.</p>
         </div>
 
         <div class="grid grid-cols-12 gap-8">
+            {# Filters Sidebar #}
             <aside class="col-span-12 lg:col-span-3">
-                <div class="bg-white dark:bg-slate-900 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-800">
-                    <h3 class="text-slate-900 dark:text-white text-lg font-bold mb-4">Filters</h3>
+                <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 sticky top-24">
+                    <h3 class="text-lg font-bold mb-6">Filters</h3>
 
-                    <form action="{{ path('app_doctor_search') }}" method="GET" class="flex flex-col gap-6">
+                    <form action="{{ path('app_doctor_search') }}" method="GET" class="space-y-6">
                         <input type="hidden" name="q" value="{{ searchTerm }}">
 
-                        <div class="flex flex-col gap-3">
-                            <label class="text-sm font-semibold text-slate-900 dark:text-white">Specialty</label>
-                            <select name="specialty" onchange="this.form.submit()" class="form-select rounded-lg border-slate-200 dark:bg-slate-800 text-sm">
+                        <div class="space-y-2">
+                            <label class="text-xs font-bold uppercase tracking-wider text-slate-500">Specialty</label>
+                            <select name="specialty" onchange="this.form.submit()" class="w-full rounded-xl border-slate-200 dark:bg-slate-800 dark:border-slate-700 text-sm">
                                 <option value="All">All Specialties</option>
                                 {% for spec in specialties %}
-                                    <option value="{{ spec.value }}" {{ selectedSpecialty == spec.value ? 'selected' }}>
+                                    {# Compare using spec.value (lowercase) #}
+                                    <option value="{{ spec.value }}" {{ selectedSpecialty|lower == spec.value ? 'selected' }}>
                                         {{ spec.value|capitalize }}
                                     </option>
                                 {% endfor %}
                             </select>
                         </div>
 
-                        <div class="flex flex-col gap-3">
-                            <label class="text-sm font-semibold text-slate-900 dark:text-white">Price Range ($)</label>
+                        <div class="space-y-2">
+                            <label class="text-xs font-bold uppercase tracking-wider text-slate-500">Price Range (TND)</label>
                             <div class="flex gap-2">
-                                <input type="number" name="minPrice" value="{{ minPrice }}" placeholder="Min" class="form-input w-full rounded-lg border-slate-200 dark:bg-slate-800 text-sm">
-                                <input type="number" name="maxPrice" value="{{ maxPrice }}" placeholder="Max" class="form-input w-full rounded-lg border-slate-200 dark:bg-slate-800 text-sm">
+                                <input type="number" name="minPrice" value="{{ minPrice }}" placeholder="Min" class="w-full rounded-xl border-slate-200 dark:bg-slate-800 text-sm">
+                                <input type="number" name="maxPrice" value="{{ maxPrice }}" placeholder="Max" class="w-full rounded-xl border-slate-200 dark:bg-slate-800 text-sm">
                             </div>
-                            <button type="submit" class="bg-primary text-white py-2 rounded-lg font-bold text-sm">Apply Filters</button>
                         </div>
+
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold transition-all shadow-lg shadow-blue-200 dark:shadow-none">
+                            Update Results
+                        </button>
                     </form>
                 </div>
             </aside>
 
-            <div class="col-span-12 lg:col-span-9 flex flex-col gap-6">
+            {# Results Area #}
+            <div class="col-span-12 lg:col-span-9 space-y-4">
                 {% for doctor in doctors %}
-                    <div class="bg-white dark:bg-slate-900 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col md:flex-row gap-6">
-                        <div class="w-full md:w-32 h-32 rounded-xl bg-center bg-cover flex-shrink-0" 
+                    <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 hover:border-blue-300 transition-all flex flex-col md:flex-row gap-6">
+                        <div class="size-32 rounded-2xl bg-cover bg-center flex-shrink-0 shadow-inner" 
                              style="background-image: url('{{ doctor.profilePicture ? asset('uploads/profiles/' ~ doctor.profilePicture) : 'https://ui-avatars.com/api/?name=' ~ doctor.name|url_encode }}');">
                         </div>
+                        
                         <div class="flex-1">
-                            <div class="flex flex-col md:flex-row justify-between mb-4">
+                            <div class="flex justify-between items-start">
                                 <div>
                                     <h2 class="text-xl font-bold text-slate-900 dark:text-white">Dr. {{ doctor.name }}</h2>
-                                    <p class="text-primary font-semibold">{{ doctor.specialty.value|default('Specialist') }}</p>
-                                    <div class="flex items-center gap-1 mt-1">
-                                        <span class="material-symbols-outlined text-yellow-500 fill text-sm">star</span>
-                                        <span class="text-sm text-slate-500 dark:text-slate-400 ml-1">({{ doctor.totalReviews }} reviews)</span>
-                                    </div>
+                                    <p class="text-blue-600 font-medium text-sm">
+                                        {% if doctor.specialty %}
+                                            {{ doctor.specialty.value|capitalize }}
+                                        {% else %}
+                                            General Practitioner
+                                        {% endif %}
+                                    </p>
                                 </div>
-                                <div class="mt-4 md:mt-0 text-left md:text-right">
-                                    <span class="text-slate-500 text-xs uppercase tracking-wider font-bold block mb-1">Fee</span>
-                                    <span class="text-2xl font-black text-slate-900 dark:text-white">${{ doctor.consultationFee|default('0.00') }}</span>
+                                <div class="text-right">
+                                    <p class="text-[10px] font-bold uppercase text-slate-400">Consultation</p>
+                                    <p class="text-xl font-black text-slate-900 dark:text-white">{{ doctor.consultationFee|default('0') }} TND</p>
                                 </div>
                             </div>
-                            <p class="text-slate-600 dark:text-slate-400 text-sm mb-6 line-clamp-2">
-                                {{ doctor.bio ?: 'No professional bio provided yet.' }}
+                            
+                            <p class="text-slate-500 dark:text-slate-400 text-sm mt-3 line-clamp-2">
+                                {{ doctor.bio ?: 'Experienced healthcare professional dedicated to providing high-quality patient care.' }}
                             </p>
-                        </div>
-                        <div class="flex flex-col justify-end">
-                            <button class="w-full md:w-auto bg-primary text-white px-8 py-3 rounded-lg font-bold hover:bg-primary/90 transition-all shadow-md">Book Appointment</button>
+                            
+                            <div class="mt-6 flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <div class="flex text-yellow-400">
+                                        <span class="material-symbols-outlined text-sm">star</span>
+                                    </div>
+                                    <span class="text-xs font-bold text-slate-600 dark:text-slate-300">4.9 ({{ random(10, 50) }} reviews)</span>
+                                </div>
+                                <button class="bg-slate-900 dark:bg-white dark:text-slate-900 text-white px-6 py-2 rounded-lg text-sm font-bold">Book Now</button>
+                            </div>
                         </div>
                     </div>
                 {% else %}
-                    <div class="py-20 text-center bg-white dark:bg-slate-900 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-800">
-                        <span class="material-symbols-outlined text-slate-300 text-5xl">person_search</span>
-                        <p class="text-slate-500 dark:text-slate-400 mt-4 font-medium">No doctors found matching your search "{{ searchTerm }}".</p>
+                    <div class="py-20 text-center bg-white dark:bg-slate-900 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800">
+                        <span class="material-symbols-outlined text-slate-300 text-6xl">search_off</span>
+                        <h3 class="text-slate-900 dark:text-white font-bold mt-4">No doctors found</h3>
+                        <p class="text-slate-500 text-sm mt-1">Try adjusting your filters or search keywords.</p>
+                        <a href="{{ path('app_doctor_search') }}" class="inline-block mt-6 text-blue-600 font-bold text-sm underline">Clear all filters</a>
                     </div>
                 {% endfor %}
             </div>

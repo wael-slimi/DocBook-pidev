@@ -37,7 +37,7 @@ class TwoFactorSettingsController extends AbstractController
 
                 return in_array('ROLE_DOCTOR', $user->getRoles()) 
                     ? $this->redirectToRoute('app_doctor_dashboard') 
-                    : $this->redirectToRoute('app_home'); 
+                    : $this->redirectToRoute('home'); 
             }
 
             $this->addFlash('danger', 'Invalid code. Please try again.');

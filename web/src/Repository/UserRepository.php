@@ -22,23 +22,24 @@ class UserRepository extends ServiceEntityRepository
     {
         $qb = $this->getEntityManager()->createQueryBuilder();
         
+        // We query the Doctor entity specifically
         $qb->select('d')
            ->from(\App\Entity\Doctor::class, 'd');
     
-        // Filter by name ONLY if not empty
+        // 1. Name Filter (Case-insensitive)
         if (!empty($name)) {
-            $qb->andWhere('d.name LIKE :name')
+            $qb->andWhere('LOWER(d.name) LIKE LOWER(:name)')
                ->setParameter('name', '%' . $name . '%');
         }
     
-        // Filter by specialty ONLY if not "All"
+        // 2. Specialty Filter
+        // Note: We expect the lowercase 'backed value' here (e.g., 'cardiology')
         if (!empty($specialty) && $specialty !== 'All') {
-            // Use LOWER to ensure "Cardiology" matches "cardiology"
-            $qb->andWhere('LOWER(d.specialty) = :specialty')
-               ->setParameter('specialty', strtolower($specialty));
+            $qb->andWhere('d.specialty = :specialty')
+               ->setParameter('specialty', $specialty);
         }
     
-        // Price range filters
+        // 3. Price Filters
         if ($minPrice !== null) {
             $qb->andWhere('d.consultationFee >= :minPrice')
                ->setParameter('minPrice', $minPrice);
