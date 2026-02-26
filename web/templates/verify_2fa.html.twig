@@ -1,16 +1,16 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Verify Phone Number{% endblock %}
+{% block title %}Verify Security Code{% endblock %}
 
 {% block body %}
 <div class="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900 px-4">
     <div class="max-w-md w-full bg-white dark:bg-slate-800 rounded-3xl shadow-xl p-8 border border-slate-100 dark:border-slate-700">
         
-        {# Display Success/Error Messages (Important for WhatsApp feedback) #}
+        {# Display Success/Error Messages #}
         {% for label, messages in app.flashes %}
             {% for message in messages %}
                 <div class="mb-6 p-4 rounded-2xl text-sm font-bold text-center 
-                    {{ label == 'danger' ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600' }}">
+                    {{ label == 'danger' or label == 'error' ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600' }}">
                     {{ message }}
                 </div>
             {% endfor %}
@@ -18,16 +18,18 @@
 
         <div class="text-center mb-8">
             <div class="inline-flex items-center justify-center w-16 h-16 bg-primary/10 text-primary rounded-2xl mb-4">
-                {# Changed icon to 'chat' since it's WhatsApp now #}
-                <span class="material-symbols-outlined" style="font-size: 32px">chat</span>
+                <span class="material-symbols-outlined" style="font-size: 32px">shield_person</span>
             </div>
-            <h1 class="text-2xl font-black text-slate-900 dark:text-white">Check WhatsApp</h1>
+            <h1 class="text-2xl font-black text-slate-900 dark:text-white">
+                {{ is_activation|default(false) ? 'Confirm Activation' : 'Security Verification' }}
+            </h1>
             <p class="text-slate-500 dark:text-slate-400 mt-2">
-                We've sent a 6-digit verification code to your WhatsApp.
+                Enter the 6-digit code sent to your phone.
             </p>
         </div>
 
-        <form action="{{ path('app_2fa_confirm') }}" method="POST" class="space-y-6">
+        {# DYNAMIC ACTION: Switches between Login Verify and Setup Confirm #}
+        <form action="{{ is_activation|default(false) ? path('app_2fa_confirm') : path('app_2fa_login_verify') }}" method="POST" class="space-y-6">
             <div>
                 <label for="verification_code" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2 text-center">
                     Enter Verification Code
@@ -44,13 +46,21 @@
             </div>
 
             <button type="submit" class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-2xl shadow-lg shadow-primary/30 transition-all transform active:scale-[0.98]">
-                Verify & Activate 2FA
+                {{ is_activation|default(false) ? 'Verify & Activate 2FA' : 'Authorize Login' }}
             </button>
         </form>
 
         <div class="mt-8 text-center">
-            <a href="{{ path('app_patient_settings') }}" class="text-sm font-medium text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
-                Cancel and return to settings
+            {# DYNAMIC CANCEL LINK: Returns to the correct settings based on Role #}
+            {% set cancel_path = 'app_login' %}
+            {% if is_granted('ROLE_DOCTOR') %}
+                {% set cancel_path = path('app_doctor_settings') %}
+            {% elseif is_granted('ROLE_PATIENT') %}
+                {% set cancel_path = path('app_patient_settings') %}
+            {% endif %}
+
+            <a href="{{ is_activation|default(false) ? cancel_path : path('app_login') }}" class="text-sm font-medium text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
+                Cancel and return
             </a>
         </div>
     </div>

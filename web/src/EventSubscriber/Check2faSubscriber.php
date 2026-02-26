@@ -37,24 +37,26 @@ class Check2faSubscriber implements EventSubscriberInterface
         /** @var User $user */
         $user = $event->getUser();
     
-        // FIXED: Using the correct method name from your entity
+        // Check the boolean field in your User entity
+        // Note: Make sure the method is exactly as named in User.php (e.g., isIs2faEnabled)
         if (!$user->is2faEnabled()) {
-            return; // If switch is OFF, login completes normally
+            return; 
         }
     
-        // If switch is ON, continue with WhatsApp logic...
         $code = (string)random_int(100000, 999999);
         $user->setTempVerificationCode($code);
         $this->em->flush();
     
         try {
+            // This will trigger your Twilio/SmsService
             $this->smsService->sendSms($user->getPhone(), "Your DocBook login code is: " . $code);
         } catch (\Exception $e) {
-            // Fallback for testing: log the code if WhatsApp fails
+            // Log error if needed
         }
     
         $session = $event->getRequest()->getSession();
         $session->set('pending_2fa_user_id', $user->getId());
+        $session->set('2fa_status', 'pending'); // Use this to guard your dashboard
     
         $response = new RedirectResponse($this->urlGenerator->generate('app_2fa_login_verify'));
         $event->setResponse($response);
