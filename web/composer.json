@@ -10,6 +10,7 @@
         "doctrine/doctrine-bundle": "^3.2",
         "doctrine/doctrine-migrations-bundle": "^4.0",
         "doctrine/orm": "^3.6",
+        "scheb/2fa-bundle": "^8.4",
         "symfony/apache-pack": "*",
         "symfony/asset": "8.0.*",
         "symfony/console": "8.0.*",
@@ -27,7 +28,8 @@
         "symfony/twig-bundle": "8.0.*",
         "symfony/validator": "8.0.*",
         "symfony/yaml": "8.0.*",
-        "symfonycasts/reset-password-bundle": "^1.24"
+        "symfonycasts/reset-password-bundle": "^1.24",
+        "twilio/sdk": "^8.11"
     },
     "config": {
         "allow-plugins": {

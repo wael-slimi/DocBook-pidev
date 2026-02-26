@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Verify Phone Number{% endblock %}
+
+{% block body %}
+<div class="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900 px-4">
+    <div class="max-w-md w-full bg-white dark:bg-slate-800 rounded-3xl shadow-xl p-8 border border-slate-100 dark:border-slate-700">
+        
+        {# Display Success/Error Messages (Important for WhatsApp feedback) #}
+        {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="mb-6 p-4 rounded-2xl text-sm font-bold text-center 
+                    {{ label == 'danger' ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600' }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endfor %}
+
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-primary/10 text-primary rounded-2xl mb-4">
+                {# Changed icon to 'chat' since it's WhatsApp now #}
+                <span class="material-symbols-outlined" style="font-size: 32px">chat</span>
+            </div>
+            <h1 class="text-2xl font-black text-slate-900 dark:text-white">Check WhatsApp</h1>
+            <p class="text-slate-500 dark:text-slate-400 mt-2">
+                We've sent a 6-digit verification code to your WhatsApp.
+            </p>
+        </div>
+
+        <form action="{{ path('app_2fa_confirm') }}" method="POST" class="space-y-6">
+            <div>
+                <label for="verification_code" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2 text-center">
+                    Enter Verification Code
+                </label>
+                <input type="text" 
+                       name="verification_code" 
+                       id="verification_code" 
+                       maxlength="6"
+                       placeholder="000000"
+                       class="w-full text-center text-3xl tracking-[0.5em] font-mono py-4 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:border-primary focus:ring-0 outline-none transition-all dark:bg-slate-900 dark:border-slate-700 dark:text-white"
+                       required
+                       autofocus
+                       autocomplete="one-time-code">
+            </div>
+
+            <button type="submit" class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-2xl shadow-lg shadow-primary/30 transition-all transform active:scale-[0.98]">
+                Verify & Activate 2FA
+            </button>
+        </form>
+
+        <div class="mt-8 text-center">
+            <a href="{{ path('app_patient_settings') }}" class="text-sm font-medium text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
+                Cancel and return to settings
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

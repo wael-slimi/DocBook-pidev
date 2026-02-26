@@ -26,3 +26,18 @@ app_doctor_search:
     path: /patient/search
     controller: App\Controller\PatientController::search
     methods: [GET]
+
+app_2fa_toggle_settings:
+    path: /settings/2fa/toggle
+    controller: App\Controller\TwoFactorSettingsController::toggle2fa
+    methods: [POST]
+
+app_2fa_confirm:
+    path: /settings/2fa/confirm
+    controller: App\Controller\TwoFactorSettingsController::confirmEnable
+    methods: [POST]
+
+app_2fa_login_verify:
+    path: /login/2fa-verify
+    controller: App\Controller\TwoFactorSettingsController::verifyLogin
+    methods: [GET, POST]
