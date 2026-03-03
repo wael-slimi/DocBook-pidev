@@ -3,41 +3,99 @@
 {% block title %}Documents - {{ dossier.numeroDossier }} - Admin{% endblock %}
 
 {% block body %}
-<h1>Documents – {{ dossier.patientNom }} {{ dossier.patientPrenom }}</h1>
-<p>
-    <a href="{{ path('app_admin_dossier_show', { id: dossier.id }) }}" class="btn btn-secondary">Retour dossier</a>
-    <a href="{{ path('app_admin_document_new', { dossierId: dossier.id }) }}" class="btn btn-primary">Nouveau document</a>
-</p>
-
-<div class="filters">
-    <div><label for="q">Recherche</label><input type="text" id="q" value="{{ q|default('') }}" placeholder="Titre, contenu"></div>
-    <div><label for="tri">Tri</label>
-        <select id="tri">
-            <option value="dateDocument" {{ tri == 'dateDocument' ? 'selected' : '' }}>Date document</option>
-            <option value="dateCreation" {{ tri == 'dateCreation' ? 'selected' : '' }}>Date création</option>
-            <option value="titre" {{ tri == 'titre' ? 'selected' : '' }}>Titre</option>
-            <option value="typeDocument" {{ tri == 'typeDocument' ? 'selected' : '' }}>Type</option>
-        </select>
+<div class="page-header">
+    <div>
+        <h1>Documents – {{ dossier.patientNom }} {{ dossier.patientPrenom }}</h1>
+        <p style="margin: 0.25rem 0 0 0; font-size: 0.9rem; color: var(--text-muted);">Dossier {{ dossier.numeroDossier }}</p>
     </div>
-    <div><label for="ordre">Ordre</label><select id="ordre"><option value="DESC" {{ ordre == 'DESC' ? 'selected' : '' }}>Desc</option><option value="ASC" {{ ordre == 'ASC' ? 'selected' : '' }}>Asc</option></select></div>
-    <div><label for="type">Type</label>
-        <select id="type">
-            <option value="">-- Tous --</option>
-            {% for t in ['ordonnance','rapport','examen','compte_rendu','autre'] %}
-            <option value="{{ t }}" {{ type == t ? 'selected' : '' }}>{{ t }}</option>
-            {% endfor %}
-        </select>
+    <div class="page-actions">
+        <a href="{{ path('app_admin_dossier_show', { id: dossier.id }) }}" class="btn btn-secondary">Retour dossier</a>
+        <a href="{{ path('app_admin_document_export_excel', { dossierId: dossier.id, q: q, tri: tri, ordre: ordre, type: type, date_debut: date_debut, date_fin: date_fin }) }}" class="btn btn-secondary">Export Excel</a>
+        <a href="{{ path('app_admin_document_new', { dossierId: dossier.id }) }}" class="btn btn-primary">Nouveau document</a>
     </div>
-    <div><label for="date_debut">Date début</label><input type="date" id="date_debut" value="{{ date_debut|default('') }}"></div>
-    <div><label for="date_fin">Date fin</label><input type="date" id="date_fin" value="{{ date_fin|default('') }}"></div>
-    <div><button type="button" class="btn btn-primary" id="btn-search">Rechercher</button></div>
 </div>
 
-<p><span id="list-total">{{ total }}</span> document(s).</p>
-<table>
-    <thead><tr><th>Titre</th><th>Type</th><th>Date doc.</th><th>Actions</th></tr></thead>
-    <tbody id="document-tbody">{% include 'admin/document/_list_rows.html.twig' %}</tbody>
-</table>
+<div class="layout-table-filters">
+    <div class="card table-card">
+        <div class="card-header">
+            <h2>Liste des documents</h2>
+            <div class="list-count">
+                <span class="badge badge-indigo" id="list-total">{{ total }}</span> document(s)
+            </div>
+        </div>
+        <div class="card-body" style="padding: 0;">
+            <div class="data-table-wrap" style="border: none; border-radius: 0;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Titre</th>
+                            <th>Type</th>
+                            <th>Date doc.</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="document-tbody">
+                        {% include 'admin/document/_list_rows.html.twig' %}
+                    </tbody>
+                </table>
+            </div>
+            {% if pagination is defined and pagination is not null %}
+            {% include 'admin/_pagination.html.twig' with { pagination: pagination } %}
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card filters-card">
+        <div class="card-header">
+            <h2>Filtres – Recherche et Tri</h2>
+        </div>
+        <div class="card-body">
+            <div class="filters-vertical" id="filters-documents">
+                <div class="filter-group" style="margin-bottom: 1.25rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; color: var(--text-muted); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">Recherche</label>
+                    <input type="text" id="q" value="{{ q|default('') }}" placeholder="Titre, contenu" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: var(--radius-sm);">
+                </div>
+                <div class="filter-group" style="margin-bottom: 1.25rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; color: var(--text-muted); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">Tri</label>
+                    <select id="tri" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: var(--radius-sm);">
+                        <option value="dateDocument" {{ tri == 'dateDocument' ? 'selected' : '' }}>Date document</option>
+                        <option value="dateCreation" {{ tri == 'dateCreation' ? 'selected' : '' }}>Date création</option>
+                        <option value="titre" {{ tri == 'titre' ? 'selected' : '' }}>Titre</option>
+                        <option value="typeDocument" {{ tri == 'typeDocument' ? 'selected' : '' }}>Type</option>
+                    </select>
+                </div>
+                <div class="filter-group" style="margin-bottom: 1.25rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; color: var(--text-muted); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">Ordre</label>
+                    <select id="ordre" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: var(--radius-sm);">
+                        <option value="DESC" {{ ordre == 'DESC' ? 'selected' : '' }}>Décroissant</option>
+                        <option value="ASC" {{ ordre == 'ASC' ? 'selected' : '' }}>Croissant</option>
+                    </select>
+                </div>
+                <div class="filter-group" style="margin-bottom: 1.25rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; color: var(--text-muted); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">Type</label>
+                    <select id="type" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: var(--radius-sm);">
+                        <option value="">Tous</option>
+                        {% for t in ['ordonnance','rapport','examen','compte_rendu','autre'] %}
+                        <option value="{{ t }}" {{ type == t ? 'selected' : '' }}>{{ t }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem;">
+                    <div class="filter-group">
+                        <label style="display: block; margin-bottom: 0.5rem; color: var(--text-muted); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">Du</label>
+                        <input type="date" id="date_debut" value="{{ date_debut|default('') }}" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 0.85rem;">
+                    </div>
+                    <div class="filter-group">
+                        <label style="display: block; margin-bottom: 0.5rem; color: var(--text-muted); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">Au</label>
+                        <input type="date" id="date_fin" value="{{ date_fin|default('') }}" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 0.85rem;">
+                    </div>
+                </div>
+                <div class="text-muted" style="font-size: 0.8rem; text-align: center; font-style: italic;">Actualisation automatique</div>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block javascripts %}
@@ -47,13 +105,19 @@
     const tbody = document.getElementById('document-tbody');
     const totalEl = document.getElementById('list-total');
     function params() {
-        const p = new URLSearchParams(); p.set('ajax','1');
-        const q=document.getElementById('q'); if(q.value)p.set('q',q.value);
+        const p = new URLSearchParams();
+        p.set('ajax', '1');
+        p.set('page', '1');
+        const q = document.getElementById('q');
+        if (q.value) p.set('q', q.value);
         p.set('tri', document.getElementById('tri').value);
         p.set('ordre', document.getElementById('ordre').value);
-        const type=document.getElementById('type'); if(type.value)p.set('type',type.value);
-        const d1=document.getElementById('date_debut'); if(d1.value)p.set('date_debut',d1.value);
-        const d2=document.getElementById('date_fin'); if(d2.value)p.set('date_fin',d2.value);
+        const type = document.getElementById('type');
+        if (type.value) p.set('type', type.value);
+        const d1 = document.getElementById('date_debut');
+        if (d1.value) p.set('date_debut', d1.value);
+        const d2 = document.getElementById('date_fin');
+        if (d2.value) p.set('date_fin', d2.value);
         return p.toString();
     }
     function doSearch() {
@@ -63,7 +127,7 @@
     }
     let debounceTimer;
     function doSearchDebounced() { clearTimeout(debounceTimer); debounceTimer = setTimeout(doSearch, 300); }
-    document.getElementById('btn-search').addEventListener('click', doSearch);
+    document.getElementById('btn-search') && document.getElementById('btn-search').addEventListener('click', doSearch);
     document.getElementById('q').addEventListener('input', doSearchDebounced);
     document.getElementById('tri').addEventListener('change', doSearch);
     document.getElementById('ordre').addEventListener('change', doSearch);

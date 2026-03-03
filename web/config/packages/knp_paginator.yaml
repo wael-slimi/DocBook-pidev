@@ -1,0 +1,7 @@
+knp_paginator:
+    default_options:
+        page_name: page
+        sort_field_name: tri
+        sort_direction_name: ordre
+    template:
+        pagination: '@KnpPaginator/Pagination/twitter_bootstrap_v5_pagination.html.twig'

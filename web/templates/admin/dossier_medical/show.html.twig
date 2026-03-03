@@ -3,24 +3,74 @@
 {% block title %}Dossier {{ dossier.numeroDossier }} - Admin{% endblock %}
 
 {% block body %}
-<h1>Dossier {{ dossier.numeroDossier }}</h1>
-<p>
-    <a href="{{ path('app_admin_dossier_index') }}" class="btn btn-secondary">Retour liste</a>
-    {% if can_edit_dossier is defined and can_edit_dossier %}
-    <a href="{{ path('app_admin_dossier_edit', { id: dossier.id }) }}" class="btn btn-primary">Modifier</a>
-    {% endif %}
-    <a href="{{ path('app_admin_document_index', { dossierId: dossier.id }) }}" class="btn btn-primary">Documents ({{ dossier.documents|length }})</a>
-</p>
-<table>
-    <tr><th>N° dossier</th><td>{{ dossier.numeroDossier }}</td></tr>
-    <tr><th>Nom</th><td>{{ dossier.patientNom }}</td></tr>
-    <tr><th>Prénom</th><td>{{ dossier.patientPrenom }}</td></tr>
-    <tr><th>Date naissance</th><td>{{ dossier.dateNaissance ? dossier.dateNaissance|date('d/m/Y') : '' }}</td></tr>
-    <tr><th>Genre</th><td>{{ dossier.genre }}</td></tr>
-    <tr><th>Email</th><td>{{ dossier.email }}</td></tr>
-    <tr><th>Téléphone</th><td>{{ dossier.telephone }}</td></tr>
-    <tr><th>Adresse</th><td>{{ dossier.adresse }}</td></tr>
-    <tr><th>Remarques</th><td>{{ dossier.remarques }}</td></tr>
-    <tr><th>Créé le</th><td>{{ dossier.dateCreation ? dossier.dateCreation|date('d/m/Y H:i') : '' }}</td></tr>
-</table>
+<div class="page-header">
+    <h1>Dossier {{ dossier.numeroDossier }}</h1>
+    <div class="page-actions">
+        <a href="{{ path('app_admin_dossier_index') }}" class="btn btn-secondary">Retour liste</a>
+        <a href="{{ path('app_admin_dossier_export_pdf', { id: dossier.id }) }}" class="btn btn-secondary">Export PDF</a>
+        {% if can_edit_dossier is defined and can_edit_dossier %}
+        <a href="{{ path('app_admin_dossier_edit', { id: dossier.id }) }}" class="btn btn-primary">Modifier</a>
+        {% endif %}
+        <a href="{{ path('app_admin_document_index', { dossierId: dossier.id }) }}" class="btn btn-primary">Documents ({{ dossier.documents|length }})</a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <table class="detail-table">
+            <tr><th>N° dossier</th><td>{{ dossier.numeroDossier }}</td></tr>
+            <tr><th>Nom</th><td>{{ dossier.patientNom }}</td></tr>
+            <tr><th>Prénom</th><td>{{ dossier.patientPrenom }}</td></tr>
+            <tr><th>Date naissance</th><td>{{ dossier.dateNaissance ? dossier.dateNaissance|date('d/m/Y') : '—' }}</td></tr>
+            <tr><th>Genre</th><td>{{ dossier.genre }}</td></tr>
+            <tr><th>Email</th><td>{{ dossier.email ?: '—' }}</td></tr>
+            <tr><th>Téléphone</th><td>{{ dossier.telephone ?: '—' }}</td></tr>
+            <tr><th>Adresse</th><td>{{ dossier.adresse ? dossier.adresse|nl2br : '—' }}</td></tr>
+            <tr><th>Remarques</th><td>{{ dossier.remarques ? dossier.remarques|nl2br : '—' }}</td></tr>
+            <tr><th>Créé le</th><td>{{ dossier.dateCreation ? dossier.dateCreation|date('d/m/Y H:i') : '—' }}</td></tr>
+        </table>
+    </div>
+</div>
+
+<div class="card" style="margin-top:1.5rem;">
+    <div class="card-body">
+        <h2 class="card-title" style="font-size:1rem; margin-bottom:0.75rem;">Résumé IA (Gemini 2.5 Flash)</h2>
+        <p class="text-muted" style="font-size:0.875rem; margin-bottom:0.75rem;">Résumé synthétique du dossier généré par l’API Google Gemini. Données envoyées à Google (voir confidentialité dans la doc).</p>
+        <button type="button" id="btn-resume-ia" class="btn btn-primary">Générer le résumé</button>
+        <div id="resume-ia-result" style="margin-top:1rem; padding:1rem; background:#f0fdfa; border:1px solid #99f6e4; border-radius:6px; display:none; line-height:1.6; white-space:pre-wrap; max-height:60vh; overflow-y:auto;"></div>
+        <div id="resume-ia-loading" style="margin-top:1rem; display:none;">Chargement…</div>
+    </div>
+</div>
+
+<script>
+(function() {
+    var btn = document.getElementById('btn-resume-ia');
+    var result = document.getElementById('resume-ia-result');
+    var loading = document.getElementById('resume-ia-loading');
+    if (!btn || !result || !loading) return;
+    btn.addEventListener('click', function() {
+        btn.disabled = true;
+        result.style.display = 'none';
+        loading.style.display = 'block';
+        fetch('{{ path('app_admin_dossier_resume_ia', { id: dossier.id }) }}')
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                var raw = data.resume || 'Aucun résumé.';
+                var esc = document.createElement('div');
+                esc.textContent = raw;
+                var html = esc.innerHTML.replace(/\n/g, '<br>').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+                result.innerHTML = html;
+                result.style.display = 'block';
+                loading.style.display = 'none';
+                btn.disabled = false;
+            })
+            .catch(function() {
+                result.textContent = 'Erreur lors de l’appel à l’API.';
+                result.style.display = 'block';
+                loading.style.display = 'none';
+                btn.disabled = false;
+            });
+    });
+})();
+</script>
 {% endblock %}

@@ -1,19 +1,105 @@
 {% extends 'base.html.twig' %}
 {% block title %}{{ dossier.id ? 'Modifier' : 'Nouveau' }} dossier - Médecin{% endblock %}
 {% block body %}
-<h1>{{ dossier.id ? 'Modifier le dossier' : 'Nouveau dossier' }}</h1>
-<a href="{{ path('app_medecin_dossier_index') }}" class="btn btn-secondary">Retour liste</a>
-{% if form.vars.errors|length > 0 %}<ul class="form-errors">{% for error in form.vars.errors %}<li>{{ error.message }}</li>{% endfor %}</ul>{% endif %}
-<form method="post" novalidate="novalidate">
-    {{ form_row(form.numeroDossier) }}{% if form.numeroDossier.vars.errors|length > 0 %}<ul class="field-error">{% for e in form.numeroDossier.vars.errors %}<li>{{ e.message }}</li>{% endfor %}</ul>{% endif %}
-    {{ form_row(form.patientNom) }}{% if form.patientNom.vars.errors|length > 0 %}<ul class="field-error">{% for e in form.patientNom.vars.errors %}<li>{{ e.message }}</li>{% endfor %}</ul>{% endif %}
-    {{ form_row(form.patientPrenom) }}{% if form.patientPrenom.vars.errors|length > 0 %}<ul class="field-error">{% for e in form.patientPrenom.vars.errors %}<li>{{ e.message }}</li>{% endfor %}</ul>{% endif %}
-    {{ form_row(form.dateNaissance) }}{% if form.dateNaissance.vars.errors|length > 0 %}<ul class="field-error">{% for e in form.dateNaissance.vars.errors %}<li>{{ e.message }}</li>{% endfor %}</ul>{% endif %}
-    {{ form_row(form.genre) }}{% if form.genre.vars.errors|length > 0 %}<ul class="field-error">{% for e in form.genre.vars.errors %}<li>{{ e.message }}</li>{% endfor %}</ul>{% endif %}
-    {{ form_row(form.email) }}{% if form.email.vars.errors|length > 0 %}<ul class="field-error">{% for e in form.email.vars.errors %}<li>{{ e.message }}</li>{% endfor %}</ul>{% endif %}
-    {{ form_row(form.telephone) }}{% if form.telephone.vars.errors|length > 0 %}<ul class="field-error">{% for e in form.telephone.vars.errors %}<li>{{ e.message }}</li>{% endfor %}</ul>{% endif %}
-    {{ form_row(form.adresse) }}{% if form.adresse.vars.errors|length > 0 %}<ul class="field-error">{% for e in form.adresse.vars.errors %}<li>{{ e.message }}</li>{% endfor %}</ul>{% endif %}
-    {{ form_row(form.remarques) }}{% if form.remarques.vars.errors|length > 0 %}<ul class="field-error">{% for e in form.remarques.vars.errors %}<li>{{ e.message }}</li>{% endfor %}</ul>{% endif %}
-    {{ form_rest(form) }}<div class="actions"><button type="submit" class="btn btn-primary">Enregistrer</button></div>
-</form>
+<div class="page-header">
+    <div>
+        <h1>{{ dossier.id ? 'Modifier le dossier' : 'Nouveau dossier' }}</h1>
+        <p class="text-muted">Gestion clinique du dossier patient.</p>
+    </div>
+    <div class="page-actions">
+        <a href="{{ path('app_medecin_dossier_index') }}" class="btn btn-secondary">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            Retour liste
+        </a>
+    </div>
+</div>
+
+<div class="card" style="max-width: 1000px; margin: 0 auto;">
+    <div class="card-header">
+        <h2><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg> Informations Médicales</h2>
+    </div>
+    <div class="card-body">
+        {% if form.vars.errors|length > 0 %}
+        <ul class="form-errors">
+            {% for error in form.vars.errors %}
+            <li>{{ error.message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        <form method="post" novalidate="novalidate">
+            <div class="form-row">
+                {{ form_row(form.numeroDossier) }}
+                {% if form.numeroDossier.vars.errors|length > 0 %}
+                <ul class="field-error">{% for e in form.numeroDossier.vars.errors %}<li>{{ e.message }}</li>{% endfor %}</ul>
+                {% endif %}
+            </div>
+
+            <div class="form-row">
+                {{ form_row(form.email) }}
+                {% if form.email.vars.errors|length > 0 %}
+                <ul class="field-error">{% for e in form.email.vars.errors %}<li>{{ e.message }}</li>{% endfor %}</ul>
+                {% endif %}
+            </div>
+
+            <div class="form-row">
+                {{ form_row(form.patientNom) }}
+                {% if form.patientNom.vars.errors|length > 0 %}
+                <ul class="field-error">{% for e in form.patientNom.vars.errors %}<li>{{ e.message }}</li>{% endfor %}</ul>
+                {% endif %}
+            </div>
+
+            <div class="form-row">
+                {{ form_row(form.patientPrenom) }}
+                {% if form.patientPrenom.vars.errors|length > 0 %}
+                <ul class="field-error">{% for e in form.patientPrenom.vars.errors %}<li>{{ e.message }}</li>{% endfor %}</ul>
+                {% endif %}
+            </div>
+
+            <div class="form-row">
+                {{ form_row(form.dateNaissance) }}
+                {% if form.dateNaissance.vars.errors|length > 0 %}
+                <ul class="field-error">{% for e in form.dateNaissance.vars.errors %}<li>{{ e.message }}</li>{% endfor %}</ul>
+                {% endif %}
+            </div>
+
+            <div class="form-row">
+                {{ form_row(form.genre) }}
+                {% if form.genre.vars.errors|length > 0 %}
+                <ul class="field-error">{% for e in form.genre.vars.errors %}<li>{{ e.message }}</li>{% endfor %}</ul>
+                {% endif %}
+            </div>
+
+            <div class="form-row">
+                {{ form_row(form.telephone) }}
+                {% if form.telephone.vars.errors|length > 0 %}
+                <ul class="field-error">{% for e in form.telephone.vars.errors %}<li>{{ e.message }}</li>{% endfor %}</ul>
+                {% endif %}
+            </div>
+
+            <div class="form-row form-row-full">
+                {{ form_row(form.adresse) }}
+                {% if form.adresse.vars.errors|length > 0 %}
+                <ul class="field-error">{% for e in form.adresse.vars.errors %}<li>{{ e.message }}</li>{% endfor %}</ul>
+                {% endif %}
+                {% include '_address_map.html.twig' with { address_field_id: form.adresse.vars.id } %}
+            </div>
+
+            <div class="form-row">
+                {{ form_row(form.remarques) }}
+                {% if form.remarques.vars.errors|length > 0 %}
+                <ul class="field-error">{% for e in form.remarques.vars.errors %}<li>{{ e.message }}</li>{% endfor %}</ul>
+                {% endif %}
+            </div>
+
+            {{ form_rest(form) }}
+            <div class="actions">
+                <button type="submit" class="btn btn-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                    Enregistrer les modifications
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 {% endblock %}

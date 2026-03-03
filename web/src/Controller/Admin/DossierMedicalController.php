@@ -7,18 +7,31 @@ namespace App\Controller\Admin;
 use App\Entity\DossierMedical;
 use App\Form\DossierMedicalType;
 use App\Repository\DossierMedicalRepository;
+use App\Service\ExcelExportService;
+use App\Service\GeminiService;
+use App\Service\EmailService;
+use App\Service\PdfExportService;
 use App\Service\RoleAccessService;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/admin/dossiers')]
 class DossierMedicalController extends AbstractController
 {
+    private const PER_PAGE = 10;
+
     public function __construct(
         private readonly DossierMedicalRepository $repository,
-        private readonly RoleAccessService $roleAccess
+        private readonly RoleAccessService $roleAccess,
+        private readonly PaginatorInterface $paginator,
+        private readonly PdfExportService $pdfExport,
+        private readonly ExcelExportService $excelExport,
+        private readonly GeminiService $geminiService,
+        private readonly EmailService $emailService,
     ) {
     }
 
@@ -32,23 +45,24 @@ class DossierMedicalController extends AbstractController
         $dateFin = $request->query->get('date_fin') ? \DateTime::createFromFormat('Y-m-d', $request->query->get('date_fin')) : null;
         $genre = $request->query->get('genre');
 
-        $items = $this->repository->searchAndFilter($search, $tri, $ordre, $dateDebut, $dateFin, $genre);
-        $total = $this->repository->countSearchAndFilter($search, $dateDebut, $dateFin, $genre);
+        $qb = $this->repository->getQueryBuilderForSearch($search, $tri, $ordre, $dateDebut, $dateFin, $genre);
+        $pagination = $this->paginator->paginate($qb, $request->query->getInt('page', 1), self::PER_PAGE);
 
         if ($request->isXmlHttpRequest() || $request->query->get('ajax')) {
             $response = $this->render('admin/dossier_medical/_list_rows.html.twig', [
-                'dossiers' => $items,
+                'dossiers' => $pagination->getItems(),
                 'can_edit_dossier' => true,
                 'can_delete_dossier' => true,
                 'prefix' => '/admin',
             ]);
-            $response->headers->set('X-Total-Count', (string) $total);
+            $response->headers->set('X-Total-Count', (string) $pagination->getTotalItemCount());
             return $response;
         }
 
         return $this->render('admin/dossier_medical/index.html.twig', [
-            'dossiers' => $items,
-            'total' => $total,
+            'pagination' => $pagination,
+            'dossiers' => $pagination->getItems(),
+            'total' => $pagination->getTotalItemCount(),
             'q' => $search,
             'tri' => $tri,
             'ordre' => $ordre,
@@ -60,6 +74,19 @@ class DossierMedicalController extends AbstractController
         ]);
     }
 
+    #[Route('/export/excel', name: 'app_admin_dossier_export_excel', methods: ['GET'])]
+    public function exportExcel(Request $request): StreamedResponse
+    {
+        $search = $request->query->get('q');
+        $tri = $request->query->get('tri', 'dateCreation');
+        $ordre = $request->query->get('ordre', 'DESC');
+        $dateDebut = $request->query->get('date_debut') ? \DateTime::createFromFormat('Y-m-d', $request->query->get('date_debut')) : null;
+        $dateFin = $request->query->get('date_fin') ? \DateTime::createFromFormat('Y-m-d', $request->query->get('date_fin')) : null;
+        $genre = $request->query->get('genre');
+        $dossiers = $this->repository->searchAndFilter($search, $tri, $ordre, $dateDebut, $dateFin, $genre, 5000, 0);
+        return $this->excelExport->exportDossiers($dossiers);
+    }
+
     #[Route('/nouveau', name: 'app_admin_dossier_new', methods: ['GET', 'POST'])]
     public function new(Request $request): Response
     {
@@ -68,6 +95,11 @@ class DossierMedicalController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $this->repository->save($dossier, true);
+            $this->emailService->sendNewDossierNotification(
+                $dossier->getNumeroDossier() ?? '',
+                $dossier->getPatientNom() ?? '',
+                $dossier->getPatientPrenom() ?? ''
+            );
             $this->addFlash('success', 'Dossier créé.');
             return $this->redirectToRoute('app_admin_dossier_index');
         }
@@ -86,6 +118,49 @@ class DossierMedicalController extends AbstractController
             'prefix' => '/admin',
             'can_edit_dossier' => true,
         ]);
+    }
+
+    #[Route('/{id}/resume-ia', name: 'app_admin_dossier_resume_ia', requirements: ['id' => '\d+'], methods: ['GET'])]
+    public function resumeIa(DossierMedical $dossier): Response
+    {
+        $parts = [];
+        $parts[] = sprintf(
+            "Dossier %s – %s %s – Naissance %s – Genre %s – Email %s – Tél %s – Adresse %s – Remarques : %s",
+            $dossier->getNumeroDossier() ?? '',
+            $dossier->getPatientNom() ?? '',
+            $dossier->getPatientPrenom() ?? '',
+            $dossier->getDateNaissance() ? $dossier->getDateNaissance()->format('d/m/Y') : '—',
+            $dossier->getGenre() ?? '—',
+            $dossier->getEmail() ?? '—',
+            $dossier->getTelephone() ?? '—',
+            $dossier->getAdresse() ?? '—',
+            $dossier->getRemarques() ?? '—'
+        );
+        foreach ($dossier->getDocuments() as $doc) {
+            $parts[] = sprintf(
+                "[Document %s – %s – %s] %s",
+                $doc->getTypeDocument(),
+                $doc->getDateDocument() ? $doc->getDateDocument()->format('d/m/Y') : '',
+                $doc->getTitre() ?? '',
+                $doc->getContenu() ?? ''
+            );
+        }
+        $text = implode("\n\n", $parts);
+        $summary = $this->geminiService->summarizeDossier($text);
+
+        return $this->json([
+            'resume' => $summary ?? 'Impossible de générer le résumé (vérifier GEMINI_API_KEY ou connexion).',
+        ]);
+    }
+
+    #[Route('/{id}/export/pdf', name: 'app_admin_dossier_export_pdf', requirements: ['id' => '\d+'], methods: ['GET'])]
+    public function exportPdf(DossierMedical $dossier): Response
+    {
+        $pdf = $this->pdfExport->generateDossierPdf($dossier);
+        $response = new Response($pdf);
+        $response->headers->set('Content-Type', 'application/pdf');
+        $response->headers->set('Content-Disposition', 'attachment; filename="dossier-' . ($dossier->getNumeroDossier() ?? $dossier->getId()) . '.pdf"');
+        return $response;
     }
 
     #[Route('/{id}/modifier', name: 'app_admin_dossier_edit', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]

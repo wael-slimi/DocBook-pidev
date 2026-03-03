@@ -3,11 +3,46 @@
 {% block title %}Accueil - DocBook{% endblock %}
 
 {% block body %}
-<h1>DocBook – Gestion des patients</h1>
-<p>Choisissez votre espace selon votre rôle :</p>
-<ul>
-    <li><strong><a href="{{ path('app_admin_dossier_index') }}">Admin</a></strong> – Accès complet (dossiers et documents).</li>
-    <li><strong><a href="{{ path('app_medecin_dossier_index') }}">Médecin</a></strong> – Lecture des dossiers, création / modification / suppression des documents.</li>
-    <li><strong><a href="{{ path('app_patient_dossier_index') }}">Patient</a></strong> – Saisie et gestion de son dossier et des documents.</li>
-</ul>
+<div style="text-align: center; margin-bottom: 4rem; padding-top: 2rem;">
+    <h1 style="font-size: 3.5rem; margin-bottom: 1rem; background: linear-gradient(135deg, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">DocBook</h1>
+    <p style="font-size: 1.25rem; color: var(--text-muted); max-width: 600px; margin: 0 auto;">Votre plateforme intelligente de gestion des dossiers patients, conçue pour l'excellence médicale.</p>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem;">
+    <a href="{{ path('app_admin_dossier_index') }}" class="card" style="text-decoration: none; color: inherit; padding: 2.5rem; text-align: center;">
+        <div style="width: 80px; height: 80px; background: var(--primary-light); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: var(--primary);">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+        </div>
+        <h2 style="font-size: 1.5rem; margin-bottom: 1rem;">Administrateur</h2>
+        <p style="color: var(--text-muted); line-height: 1.6;">Gestion globale du système, sécurité et supervision des dossiers médicaux.</p>
+        <div style="margin-top: 2rem; font-weight: 700; color: var(--primary); display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+            Accéder à l'espace
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        </div>
+    </a>
+
+    <a href="{{ path('app_medecin_dossier_index') }}" class="card" style="text-decoration: none; color: inherit; padding: 2.5rem; text-align: center;">
+        <div style="width: 80px; height: 80px; background: #e0f2fe; border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: #0284c7;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+        </div>
+        <h2 style="font-size: 1.5rem; margin-bottom: 1rem;">Médecin</h2>
+        <p style="color: var(--text-muted); line-height: 1.6;">Consultation des dossiers patients et gestion dynamique des documents médicaux.</p>
+        <div style="margin-top: 2rem; font-weight: 700; color: #0284c7; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+            Accéder à l'espace
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        </div>
+    </a>
+
+    <a href="{{ path('app_patient_dossier_index') }}" class="card" style="text-decoration: none; color: inherit; padding: 2.5rem; text-align: center;">
+        <div style="width: 80px; height: 80px; background: #fef2f2; border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: #dc2626;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        </div>
+        <h2 style="font-size: 1.5rem; margin-bottom: 1rem;">Patient</h2>
+        <p style="color: var(--text-muted); line-height: 1.6;">Suivi personnalisé de votre santé et accès sécurisé à vos documents médicaux.</p>
+        <div style="margin-top: 2rem; font-weight: 700; color: #dc2626; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+            Accéder à l'espace
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        </div>
+    </a>
+</div>
 {% endblock %}

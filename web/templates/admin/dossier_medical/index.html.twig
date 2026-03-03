@@ -3,69 +3,113 @@
 {% block title %}Dossiers médicaux - Admin{% endblock %}
 
 {% block body %}
-<h1>Dossiers médicaux (Admin)</h1>
-{% if can_edit_dossier %}
-<p><a href="{{ path('app_admin_dossier_new') }}" class="btn btn-primary">Nouveau dossier</a></p>
-{% endif %}
-
-<div class="filters" id="filters-dossiers">
+<div class="page-header">
     <div>
-        <label for="q">Recherche</label>
-        <input type="text" id="q" name="q" value="{{ q|default('') }}" placeholder="N° dossier, nom, prénom, email">
+        <h1>Administration des dossiers</h1>
+        <p class="text-muted">Vue d'ensemble et gestion complète de tous les dossiers médicaux du système.</p>
     </div>
-    <div>
-        <label for="tri">Tri</label>
-        <select id="tri" name="tri">
-            <option value="dateCreation" {{ tri == 'dateCreation' ? 'selected' : '' }}>Date création</option>
-            <option value="dateModification" {{ tri == 'dateModification' ? 'selected' : '' }}>Date modification</option>
-            <option value="patientNom" {{ tri == 'patientNom' ? 'selected' : '' }}>Nom</option>
-            <option value="numeroDossier" {{ tri == 'numeroDossier' ? 'selected' : '' }}>N° dossier</option>
-        </select>
-    </div>
-    <div>
-        <label for="ordre">Ordre</label>
-        <select id="ordre" name="ordre">
-            <option value="DESC" {{ ordre == 'DESC' ? 'selected' : '' }}>Décroissant</option>
-            <option value="ASC" {{ ordre == 'ASC' ? 'selected' : '' }}>Croissant</option>
-        </select>
-    </div>
-    <div>
-        <label for="date_debut">Date début</label>
-        <input type="date" id="date_debut" name="date_debut" value="{{ date_debut|default('') }}">
-    </div>
-    <div>
-        <label for="date_fin">Date fin</label>
-        <input type="date" id="date_fin" name="date_fin" value="{{ date_fin|default('') }}">
-    </div>
-    <div>
-        <label for="genre">Genre</label>
-        <select id="genre" name="genre">
-            <option value="">-- Tous --</option>
-            <option value="M" {{ genre == 'M' ? 'selected' : '' }}>M</option>
-            <option value="F" {{ genre == 'F' ? 'selected' : '' }}>F</option>
-            <option value="Autre" {{ genre == 'Autre' ? 'selected' : '' }}>Autre</option>
-        </select>
-    </div>
-    <div>
-        <button type="button" class="btn btn-primary" id="btn-search">Rechercher</button>
+    <div class="page-actions">
+        <a href="{{ path('app_admin_dossier_export_excel', { q: q, tri: tri, ordre: ordre, date_debut: date_debut, date_fin: date_fin, genre: genre }) }}" class="btn btn-secondary">Export Excel</a>
+        {% if can_edit_dossier %}
+        <a href="{{ path('app_admin_dossier_new') }}" class="btn btn-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            Nouveau dossier
+        </a>
+        {% endif %}
     </div>
 </div>
 
-<p><span id="list-total">{{ total }}</span> dossier(s).</p>
+<div class="dashboard-grid admin-dossiers-layout">
+    <div class="card admin-table-card">
+        <div class="card-header">
+            <h2>Tous les dossiers médicaux</h2>
+            <div class="list-count">
+                <span class="badge badge-indigo" id="list-total">{{ total }}</span> dossiers au total
+            </div>
+        </div>
+        <div class="card-body" style="padding: 0;">
+            <div class="data-table-wrap" style="border: none; border-radius: 0;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>N° dossier</th>
+                            <th>Patient</th>
+                            <th>Date création</th>
+                            <th style="text-align: right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dossier-tbody">
+                        {% include 'admin/dossier_medical/_list_rows.html.twig' %}
+                    </tbody>
+                </table>
+            </div>
+            {% if pagination is defined and pagination is not null %}
+            {% include 'admin/_pagination.html.twig' with { pagination: pagination } %}
+            {% endif %}
+        </div>
+    </div>
 
-<table>
-    <thead>
-        <tr>
-            <th>N° dossier</th>
-            <th>Patient</th>
-            <th>Date création</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody id="dossier-tbody">
-        {% include 'admin/dossier_medical/_list_rows.html.twig' %}
-    </tbody>
-</table>
+    <div class="card admin-panel-card">
+        <div class="card-header">
+            <h2>Panneau de contrôle</h2>
+        </div>
+        <div class="card-body">
+            <div class="filters-vertical" id="filters-dossiers">
+                <div class="filter-group" style="margin-bottom: 1.25rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; color: var(--text-muted); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">Recherche avancée</label>
+                    <input type="text" id="q" name="q" value="{{ q|default('') }}" placeholder="ID, nom, email..." style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: var(--radius-sm);">
+                </div>
+                
+                <div class="filter-group" style="margin-bottom: 1.25rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; color: var(--text-muted); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">Trier par</label>
+                    <select id="tri" name="tri" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: var(--radius-sm);">
+                        <option value="dateCreation" {{ tri == 'dateCreation' ? 'selected' : '' }}>Date de création</option>
+                        <option value="dateModification" {{ tri == 'dateModification' ? 'selected' : '' }}>Modification</option>
+                        <option value="patientNom" {{ tri == 'patientNom' ? 'selected' : '' }}>Nom du patient</option>
+                    </select>
+                </div>
+
+                <div class="filter-group" style="margin-bottom: 1.25rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; color: var(--text-muted); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">Ordre d'affichage</label>
+                    <select id="ordre" name="ordre" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: var(--radius-sm);">
+                        <option value="DESC" {{ ordre == 'DESC' ? 'selected' : '' }}>Décroissant</option>
+                        <option value="ASC" {{ ordre == 'ASC' ? 'selected' : '' }}>Croissant</option>
+                    </select>
+                </div>
+
+                <div class="filter-group" style="margin-bottom: 1.25rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; color: var(--text-muted); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">Genre</label>
+                    <select id="genre" name="genre" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: var(--radius-sm);">
+                        <option value="">Tous les genres</option>
+                        <option value="M" {{ genre == 'M' ? 'selected' : '' }}>Masculin (M)</option>
+                        <option value="F" {{ genre == 'F' ? 'selected' : '' }}>Féminin (F)</option>
+                    </select>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem;">
+                    <div class="filter-group">
+                        <label style="display: block; margin-bottom: 0.5rem; color: var(--text-muted); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">Du</label>
+                        <input type="date" id="date_debut" name="date_debut" value="{{ date_debut|default('') }}" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 0.85rem;">
+                    </div>
+                    <div class="filter-group">
+                        <label style="display: block; margin-bottom: 0.5rem; color: var(--text-muted); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">Au</label>
+                        <input type="date" id="date_fin" name="date_fin" value="{{ date_fin|default('') }}" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 0.85rem;">
+                    </div>
+                </div>
+
+                <div class="text-muted" style="font-size: 0.8rem; text-align: center; font-style: italic;">
+                    Actualisation automatique des données
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.admin-dossiers-layout { display: grid; grid-template-columns: 1fr 340px; gap: 1.5rem; align-items: start; }
+@media (max-width: 1024px) { .admin-dossiers-layout { grid-template-columns: 1fr; } }
+.admin-panel-card { position: sticky; top: 5.5rem; }
+</style>
 {% endblock %}
 
 {% block javascripts %}
@@ -82,24 +126,36 @@
     const genre = document.getElementById('genre');
 
     function doSearch() {
+        tbody.style.opacity = '0.5';
         const params = new URLSearchParams();
         params.set('ajax', '1');
+        params.set('page', '1');
         if (q.value) params.set('q', q.value);
         params.set('tri', tri.value);
         params.set('ordre', ordre.value);
         if (dateDebut.value) params.set('date_debut', dateDebut.value);
         if (dateFin.value) params.set('date_fin', dateFin.value);
         if (genre.value) params.set('genre', genre.value);
+        
         fetch(baseUrl + '?' + params.toString(), { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-            .then(r => { const t = r.headers.get('X-Total-Count'); if (t !== null && totalEl) totalEl.textContent = t; return r.text(); })
-            .then(html => { tbody.innerHTML = html; });
+            .then(r => { 
+                const t = r.headers.get('X-Total-Count'); 
+                if (t !== null && totalEl) totalEl.textContent = t; 
+                return r.text(); 
+            })
+            .then(html => { 
+                tbody.innerHTML = html; 
+                tbody.style.opacity = '1';
+            });
     }
 
     let debounceTimer;
-    function doSearchDebounced() { clearTimeout(debounceTimer); debounceTimer = setTimeout(doSearch, 300); }
-    document.getElementById('btn-search').addEventListener('click', doSearch);
+    function doSearchDebounced() { 
+        clearTimeout(debounceTimer); 
+        debounceTimer = setTimeout(doSearch, 250); 
+    }
+
     q.addEventListener('input', doSearchDebounced);
-    q.addEventListener('keyup', function(e) { if (e.key === 'Enter') doSearch(); });
     tri.addEventListener('change', doSearch);
     ordre.addEventListener('change', doSearch);
     dateDebut.addEventListener('change', doSearch);

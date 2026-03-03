@@ -7,6 +7,7 @@ namespace App\Controller\Medecin;
 use App\Entity\DossierMedical;
 use App\Form\DossierMedicalType;
 use App\Repository\DossierMedicalRepository;
+use App\Service\EmailService;
 use App\Service\RoleAccessService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,7 +19,8 @@ class DossierMedicalController extends AbstractController
 {
     public function __construct(
         private readonly DossierMedicalRepository $repository,
-        private readonly RoleAccessService $roleAccess
+        private readonly RoleAccessService $roleAccess,
+        private readonly EmailService $emailService,
     ) {
     }
 
@@ -68,6 +70,11 @@ class DossierMedicalController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $this->repository->save($dossier, true);
+            $this->emailService->sendNewDossierNotification(
+                $dossier->getNumeroDossier() ?? '',
+                $dossier->getPatientNom() ?? '',
+                $dossier->getPatientPrenom() ?? ''
+            );
             $this->addFlash('success', 'Dossier créé.');
             return $this->redirectToRoute('app_medecin_dossier_index');
         }

@@ -1,13 +1,22 @@
 {% extends 'base.html.twig' %}
 {% block title %}{{ document.titre }} - Patient{% endblock %}
 {% block body %}
-<h1>{{ document.titre }}</h1>
-<p><a href="{{ path('app_patient_document_index', { dossierId: dossier.id }) }}" class="btn btn-secondary">Retour liste</a> <a href="{{ path('app_patient_document_edit', { dossierId: dossier.id, id: document.id }) }}" class="btn btn-primary">Modifier</a></p>
-<table>
-    <tr><th>Dossier</th><td>{{ dossier.numeroDossier }} - {{ dossier.patientNom }} {{ dossier.patientPrenom }}</td></tr>
-    <tr><th>Type</th><td>{{ document.typeDocument }}</td></tr>
-    <tr><th>Date document</th><td>{{ document.dateDocument ? document.dateDocument|date('d/m/Y') : '' }}</td></tr>
-    <tr><th>Contenu</th><td><pre style="white-space:pre-wrap;">{{ document.contenu }}</pre></td></tr>
-    <tr><th>Fichier</th><td>{{ document.fichierPath }}</td></tr>
-</table>
+<div class="page-header">
+    <h1>{{ document.titre }}</h1>
+    <div class="page-actions">
+        <a href="{{ path('app_patient_document_index', { dossierId: dossier.id }) }}" class="btn btn-secondary">Retour liste</a>
+        <a href="{{ path('app_patient_document_edit', { dossierId: dossier.id, id: document.id }) }}" class="btn btn-primary">Modifier</a>
+    </div>
+</div>
+<div class="card">
+    <div class="card-body">
+        <table class="detail-table">
+            <tr><th>Dossier</th><td>{{ dossier.numeroDossier }} – {{ dossier.patientNom }} {{ dossier.patientPrenom }}</td></tr>
+            <tr><th>Type</th><td><span class="badge badge-info">{{ document.typeDocument }}</span></td></tr>
+            <tr><th>Date document</th><td>{{ document.dateDocument ? document.dateDocument|date('d/m/Y') : '—' }}</td></tr>
+            <tr><th>Contenu</th><td><pre style="white-space:pre-wrap; margin:0; padding:0.75rem; background:#f8fafc; border-radius:var(--radius-sm); font-size:0.9rem;">{{ document.contenu }}</pre></td></tr>
+            <tr><th>Fichier</th><td>{{ document.fichierPath ?: '—' }}</td></tr>
+        </table>
+    </div>
+</div>
 {% endblock %}

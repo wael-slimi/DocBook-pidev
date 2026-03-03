@@ -1,13 +1,55 @@
 {% for dossier in dossiers %}
 <tr>
-    <td>{{ dossier.numeroDossier }}</td>
-    <td>{{ dossier.patientNom }} {{ dossier.patientPrenom }}</td>
-    <td>{{ dossier.dateCreation ? dossier.dateCreation|date('d/m/Y H:i') : '' }}</td>
     <td>
-        <a href="{{ path('app_patient_dossier_show', { id: dossier.id }) }}" class="btn btn-sm btn-secondary">Voir</a>
-        <a href="{{ path('app_patient_document_index', { dossierId: dossier.id }) }}" class="btn btn-sm btn-primary">Documents</a>
-        {% if can_edit_dossier %}<a href="{{ path('app_patient_dossier_edit', { id: dossier.id }) }}" class="btn btn-sm btn-primary">Modifier</a>{% endif %}
-        {% if can_delete_dossier %}<form method="post" action="{{ path('app_patient_dossier_delete', { id: dossier.id }) }}" style="display:inline;" onsubmit="return confirm('Supprimer ?');"><button type="submit" class="btn btn-sm btn-danger">Supprimer</button></form>{% endif %}
+        <span class="badge badge-indigo">#{{ dossier.numeroDossier }}</span>
+    </td>
+    <td>
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <div class="avatar">
+                {{ dossier.patientNom|first|upper }}{{ dossier.patientPrenom|first|upper }}
+            </div>
+            <div>
+                <div class="font-bold">{{ dossier.patientNom }} {{ dossier.patientPrenom }}</div>
+                <div class="text-muted" style="font-size: 0.8rem;">Patient ID: {{ dossier.id }}</div>
+            </div>
+        </div>
+    </td>
+    <td>
+        <div class="text-muted" style="font-size: 0.85rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            {{ dossier.dateCreation ? dossier.dateCreation|date('d/m/Y') : '—' }}
+        </div>
+    </td>
+    <td style="text-align: right;">
+        <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+            <a href="{{ path('app_patient_dossier_show', { id: dossier.id }) }}" class="btn btn-secondary btn-sm" title="Voir">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            </a>
+            <a href="{{ path('app_patient_document_index', { dossierId: dossier.id }) }}" class="btn btn-primary btn-sm" title="Documents">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            </a>
+            {% if can_edit_dossier %}
+            <a href="{{ path('app_patient_dossier_edit', { id: dossier.id }) }}" class="btn btn-secondary btn-sm" title="Modifier" style="color: var(--warning);">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+            </a>
+            {% endif %}
+            {% if can_delete_dossier %}
+            <form method="post" action="{{ path('app_patient_dossier_delete', { id: dossier.id }) }}" style="display:inline;" onsubmit="return confirm('Supprimer ce dossier ?');">
+                <button type="submit" class="btn btn-secondary btn-sm" title="Supprimer" style="color: var(--danger);">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                </button>
+            </form>
+            {% endif %}
+        </div>
     </td>
 </tr>
-{% else %}<tr><td colspan="4">Aucun dossier.</td></tr>{% endfor %}
+{% else %}
+<tr>
+    <td colspan="4" style="padding: 4rem 2rem; text-align: center;">
+        <div style="opacity: 0.5; margin-bottom: 1rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        </div>
+        <div class="text-muted">Aucun dossier trouvé correspondant à vos critères.</div>
+    </td>
+</tr>
+{% endfor %}

@@ -9,17 +9,26 @@ use App\Entity\DossierMedical;
 use App\Form\DocumentType;
 use App\Repository\DocumentRepository;
 use App\Repository\DossierMedicalRepository;
+use App\Service\ExcelExportService;
+use App\Service\PdfExportService;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/admin/dossiers/{dossierId}/documents', requirements: ['dossierId' => '\d+'])]
 class DocumentController extends AbstractController
 {
+    private const PER_PAGE = 10;
+
     public function __construct(
         private readonly DocumentRepository $documentRepository,
-        private readonly DossierMedicalRepository $dossierRepository
+        private readonly DossierMedicalRepository $dossierRepository,
+        private readonly PaginatorInterface $paginator,
+        private readonly PdfExportService $pdfExport,
+        private readonly ExcelExportService $excelExport,
     ) {
     }
 
@@ -43,23 +52,24 @@ class DocumentController extends AbstractController
         $dateDebut = $request->query->get('date_debut') ? \DateTime::createFromFormat('Y-m-d', $request->query->get('date_debut')) : null;
         $dateFin = $request->query->get('date_fin') ? \DateTime::createFromFormat('Y-m-d', $request->query->get('date_fin')) : null;
 
-        $items = $this->documentRepository->searchAndFilterByDossier($dossier, $search, $tri, $ordre, $type, $dateDebut, $dateFin);
-        $total = $this->documentRepository->countSearchAndFilterByDossier($dossier, $search, $type, $dateDebut, $dateFin);
+        $qb = $this->documentRepository->getQueryBuilderForSearch($dossier, $search, $tri, $ordre, $type, $dateDebut, $dateFin);
+        $pagination = $this->paginator->paginate($qb, $request->query->getInt('page', 1), self::PER_PAGE);
 
         if ($request->isXmlHttpRequest() || $request->query->get('ajax')) {
             $response = $this->render('admin/document/_list_rows.html.twig', [
-                'documents' => $items,
+                'documents' => $pagination->getItems(),
                 'dossier' => $dossier,
                 'prefix' => '/admin',
             ]);
-            $response->headers->set('X-Total-Count', (string) $total);
+            $response->headers->set('X-Total-Count', (string) $pagination->getTotalItemCount());
             return $response;
         }
 
         return $this->render('admin/document/index.html.twig', [
-            'documents' => $items,
+            'pagination' => $pagination,
+            'documents' => $pagination->getItems(),
             'dossier' => $dossier,
-            'total' => $total,
+            'total' => $pagination->getTotalItemCount(),
             'q' => $search,
             'tri' => $tri,
             'ordre' => $ordre,
@@ -68,6 +78,20 @@ class DocumentController extends AbstractController
             'date_fin' => $request->query->get('date_fin'),
             'prefix' => '/admin',
         ]);
+    }
+
+    #[Route('/export/excel', name: 'app_admin_document_export_excel', methods: ['GET'])]
+    public function exportExcel(Request $request, int $dossierId): StreamedResponse
+    {
+        $dossier = $this->getDossier($dossierId);
+        $search = $request->query->get('q');
+        $tri = $request->query->get('tri', 'dateDocument');
+        $ordre = $request->query->get('ordre', 'DESC');
+        $type = $request->query->get('type');
+        $dateDebut = $request->query->get('date_debut') ? \DateTime::createFromFormat('Y-m-d', $request->query->get('date_debut')) : null;
+        $dateFin = $request->query->get('date_fin') ? \DateTime::createFromFormat('Y-m-d', $request->query->get('date_fin')) : null;
+        $documents = $this->documentRepository->searchAndFilterByDossier($dossier, $search, $tri, $ordre, $type, $dateDebut, $dateFin, 5000, 0);
+        return $this->excelExport->exportDocuments($documents);
     }
 
     #[Route('/nouveau', name: 'app_admin_document_new', methods: ['GET', 'POST'])]
@@ -103,6 +127,20 @@ class DocumentController extends AbstractController
             'dossier' => $dossier,
             'prefix' => '/admin',
         ]);
+    }
+
+    #[Route('/{id}/export/pdf', name: 'app_admin_document_export_pdf', requirements: ['id' => '\d+'], methods: ['GET'])]
+    public function exportPdf(int $dossierId, Document $document): Response
+    {
+        $dossier = $this->getDossier($dossierId);
+        if ($document->getDossierMedical() !== $dossier) {
+            throw $this->createNotFoundException();
+        }
+        $pdf = $this->pdfExport->generateDocumentPdf($document);
+        $response = new Response($pdf);
+        $response->headers->set('Content-Type', 'application/pdf');
+        $response->headers->set('Content-Disposition', 'attachment; filename="document-' . $document->getId() . '-' . preg_replace('/[^a-z0-9_-]/i', '-', $document->getTitre() ?? '') . '.pdf"');
+        return $response;
     }
 
     #[Route('/{id}/modifier', name: 'app_admin_document_edit', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]

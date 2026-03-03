@@ -1,0 +1,98 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tableau de bord Admin - DocBook{% endblock %}
+
+{% block body %}
+<div class="page-header">
+    <h1>Tableau de bord</h1>
+    <div class="page-actions">
+        <a href="{{ path('app_admin_dossier_index') }}" class="btn btn-primary">Voir les dossiers</a>
+    </div>
+</div>
+
+<div class="dashboard-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; margin-bottom: 2rem;">
+    <div class="card" style="padding: 1.5rem;">
+        <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Dossiers médicaux</div>
+        <div style="font-size: 2rem; font-weight: 800; color: var(--primary); margin-top: 0.25rem;">{{ total_dossiers }}</div>
+    </div>
+    <div class="card" style="padding: 1.5rem;">
+        <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Documents</div>
+        <div style="font-size: 2rem; font-weight: 800; color: var(--primary); margin-top: 0.25rem;">{{ total_documents }}</div>
+    </div>
+</div>
+
+<div class="dashboard-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+    <div class="card">
+        <div class="card-header"><h2>Dossiers par genre</h2></div>
+        <div class="card-body" style="position: relative; height: 260px;">
+            <canvas id="chart-genre" width="300" height="250"></canvas>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header"><h2>Documents par type</h2></div>
+        <div class="card-body" style="position: relative; height: 260px;">
+            <canvas id="chart-type" width="300" height="250"></canvas>
+        </div>
+    </div>
+    <div class="card" style="grid-column: span 2;">
+        <div class="card-header"><h2>Activité (6 derniers mois)</h2></div>
+        <div class="card-body" style="position: relative; height: 280px;">
+            <canvas id="chart-line" width="600" height="260"></canvas>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+(function() {
+    var byGenre = {{ by_genre|json_encode|raw }};
+    var byType = {{ by_type|json_encode|raw }};
+    var lastMonths = {{ last_months|json_encode|raw }};
+
+    var genreLabels = byGenre.map(function(r) { return r.g || 'Non renseigné'; });
+    var genreData = byGenre.map(function(r) { return r.cnt; });
+    var genreColors = ['#4f46e5', '#ec4899', '#14b8a6', '#f59e0b'];
+
+    new Chart(document.getElementById('chart-genre'), {
+        type: 'pie',
+        data: {
+            labels: genreLabels,
+            datasets: [{ data: genreData, backgroundColor: genreColors.slice(0, genreLabels.length), borderWidth: 0 }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+    });
+
+    var typeLabels = byType.map(function(r) { return r.t; });
+    var typeData = byType.map(function(r) { return r.cnt; });
+    var typeColors = ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+
+    new Chart(document.getElementById('chart-type'), {
+        type: 'bar',
+        data: {
+            labels: typeLabels,
+            datasets: [{ label: 'Nombre', data: typeData, backgroundColor: typeColors.slice(0, typeLabels.length), borderRadius: 6 }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: 'y',
+            plugins: { legend: { display: false } },
+            scales: { x: { beginAtZero: true, grid: { display: false } }, y: { grid: { display: false } } }
+        }
+    });
+
+    var monthLabels = lastMonths.map(function(m) { return m.label; });
+    new Chart(document.getElementById('chart-line'), {
+        type: 'line',
+        data: {
+            labels: monthLabels,
+            datasets: [
+                { label: 'Dossiers créés', data: lastMonths.map(function(m) { return m.dossiers; }), borderColor: '#4f46e5', backgroundColor: 'rgba(79,70,229,0.1)', fill: true, tension: 0.3 },
+                { label: 'Documents créés', data: lastMonths.map(function(m) { return m.documents; }), borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.1)', fill: true, tension: 0.3 }
+            ]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } }, scales: { y: { beginAtZero: true }, x: { grid: { display: false } } } }
+    });
+})();
+</script>
+{% endblock %}

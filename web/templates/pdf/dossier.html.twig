@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: DejaVu Sans, helvetica, sans-serif; font-size: 11pt; color: #1e293b; margin: 0; padding: 28px; line-height: 1.4; }
+        .header { margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid #0f766e; }
+        .header h1 { margin: 0; font-size: 18pt; color: #0f766e; }
+        .header .sub { font-size: 10pt; color: #64748b; margin-top: 4px; }
+        table.info { width: 100%; border-collapse: collapse; margin-top: 8px; }
+        table.info th { text-align: left; width: 160px; padding: 8px 10px; background: #f1f5f9; font-weight: 600; color: #475569; }
+        table.info td { padding: 8px 10px; border-bottom: 1px solid #e2e8f0; }
+        .content-block { margin-top: 20px; }
+        .content-block h2 { font-size: 12pt; color: #334155; margin: 0 0 8px 0; }
+        .content-block p { margin: 0 0 8px 0; }
+        .authenticity { margin-top: 32px; padding-top: 20px; border-top: 2px solid #0f766e; page-break-inside: avoid; }
+        .authenticity-label { font-size: 10pt; font-weight: 700; color: #0f766e; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+        .authenticity-box { background: #f0fdfa; border: 1px solid #99f6e4; padding: 14px 16px; }
+        .auth-table { width: 100%; border-collapse: collapse; }
+        .auth-table td { vertical-align: middle; }
+        .auth-qr-cell { width: 80px; padding-right: 14px; vertical-align: middle; }
+        .auth-qr-cell img { width: 72px; height: 72px; display: block !important; }
+        .auth-qr-cell svg { width: 72px; height: 72px; display: block !important; }
+        .auth-qr-cell span { display: block !important; }
+        .auth-text-cell { font-size: 9pt; color: #475569; }
+        .auth-text-cell strong { color: #0f766e; }
+        .generated { font-size: 9pt; color: #94a3b8; margin-top: 12px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Dossier médical</h1>
+        <div class="sub">Réf. {{ numero_dossier }}</div>
+    </div>
+
+    <table class="info">
+        <tr><th>Patient</th><td>{{ patient_nom }} {{ patient_prenom }}</td></tr>
+        <tr><th>Date de naissance</th><td>{{ date_naissance }}</td></tr>
+        <tr><th>Genre</th><td>{{ genre }}</td></tr>
+        <tr><th>Email</th><td>{{ email }}</td></tr>
+        <tr><th>Téléphone</th><td>{{ telephone }}</td></tr>
+        <tr><th>Adresse</th><td>{{ adresse }}</td></tr>
+        <tr><th>Remarques</th><td>{{ remarques }}</td></tr>
+        <tr><th>Créé le</th><td>{{ date_creation }}</td></tr>
+    </table>
+
+    <div class="authenticity">
+        <div class="authenticity-label">Code QR d'authenticité</div>
+        <div class="authenticity-box">
+            <table class="auth-table"><tr>
+                <td class="auth-qr-cell">{{ qr_content|raw }}</td>
+                <td class="auth-text-cell">
+                    Ce document est authentifié par DocBook.<br>
+                    <strong>Référence :</strong> {{ qr_data }}<br>
+                    Scannez le QR pour vérifier l'authenticité.
+                </td>
+            </tr></table>
+        </div>
+        <div class="generated">DocBook – Généré le {{ generated_at }}</div>
+    </div>
+</body>
+</html>

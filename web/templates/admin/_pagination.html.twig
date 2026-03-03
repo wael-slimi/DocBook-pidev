@@ -1,0 +1,32 @@
+{% if pagination is defined and pagination is not null and pagination.pageCount > 1 %}
+<nav class="pagination-wrap" aria-label="Pagination">
+    <ul class="pagination">
+        <li class="pagination-item">
+            <a class="pagination-link pagination-prev {{ pagination.currentPageNumber == 1 ? 'disabled' : '' }}"
+               href="{{ pagination.currentPageNumber == 1 ? '#' : path(pagination.route, pagination.params|merge({ page: pagination.currentPageNumber - 1 })) }}"
+               {{ pagination.currentPageNumber == 1 ? 'aria-disabled="true"' : '' }}>
+                ‹ Précédent
+            </a>
+        </li>
+        {% for p in pagination.paginationData.pagesInRange %}
+            <li class="pagination-item">
+                {% if p == pagination.currentPageNumber %}
+                    <span class="pagination-link active" aria-current="page">{{ p }}</span>
+                {% else %}
+                    <a class="pagination-link" href="{{ path(pagination.route, pagination.params|merge({ page: p })) }}">{{ p }}</a>
+                {% endif %}
+            </li>
+        {% endfor %}
+        <li class="pagination-item">
+            <a class="pagination-link pagination-next {{ pagination.currentPageNumber == pagination.pageCount ? 'disabled' : '' }}"
+               href="{{ pagination.currentPageNumber == pagination.pageCount ? '#' : path(pagination.route, pagination.params|merge({ page: pagination.currentPageNumber + 1 })) }}"
+               {{ pagination.currentPageNumber == pagination.pageCount ? 'aria-disabled="true"' : '' }}>
+                Suivant ›
+            </a>
+        </li>
+    </ul>
+    <p class="pagination-info">
+        {{ pagination.getTotalItemCount }} résultat(s) – page {{ pagination.currentPageNumber }} / {{ pagination.pageCount }}
+    </p>
+</nav>
+{% endif %}

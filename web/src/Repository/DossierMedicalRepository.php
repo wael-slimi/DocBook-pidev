@@ -97,6 +97,47 @@ class DossierMedicalRepository extends ServiceEntityRepository
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
+    /**
+     * QueryBuilder for same filters as searchAndFilter (for KnpPaginator).
+     */
+    public function getQueryBuilderForSearch(
+        ?string $search = null,
+        ?string $tri = 'dateCreation',
+        ?string $ordre = 'DESC',
+        ?\DateTimeInterface $dateDebut = null,
+        ?\DateTimeInterface $dateFin = null,
+        ?string $genre = null
+    ): \Doctrine\ORM\QueryBuilder {
+        $qb = $this->createQueryBuilder('d');
+
+        if ($search !== null && $search !== '') {
+            $qb->andWhere(
+                $qb->expr()->orX(
+                    $qb->expr()->like('d.numeroDossier', ':search'),
+                    $qb->expr()->like('d.patientNom', ':search'),
+                    $qb->expr()->like('d.patientPrenom', ':search'),
+                    $qb->expr()->like('d.email', ':search')
+                )
+            )->setParameter('search', '%' . $search . '%');
+        }
+        if ($dateDebut !== null) {
+            $qb->andWhere('d.dateCreation >= :dateDebut')->setParameter('dateDebut', $dateDebut);
+        }
+        if ($dateFin !== null) {
+            $qb->andWhere('d.dateCreation <= :dateFin')->setParameter('dateFin', $dateFin);
+        }
+        if ($genre !== null && $genre !== '') {
+            $qb->andWhere('d.genre = :genre')->setParameter('genre', $genre);
+        }
+        $allowedSort = ['dateCreation', 'dateModification', 'patientNom', 'patientPrenom', 'numeroDossier'];
+        if (\in_array($tri, $allowedSort, true)) {
+            $qb->orderBy('d.' . $tri, $ordre === 'ASC' ? 'ASC' : 'DESC');
+        } else {
+            $qb->orderBy('d.dateCreation', 'DESC');
+        }
+        return $qb;
+    }
+
     public function save(DossierMedical $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
