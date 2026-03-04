@@ -10,8 +10,7 @@ doctrine:
     orm:
         validate_xml_mapping: true
         naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
-        identity_generation_preferences:
-            Doctrine\DBAL\Platforms\PostgreSQLPlatform: identity
+        # identity_generation_preferences for PostgreSQL only (not used with MySQL/XAMPP)
         auto_mapping: true
         mappings:
             App:
