@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Appointment;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -16,28 +17,23 @@ class AppointmentRepository extends ServiceEntityRepository
         parent::__construct($registry, Appointment::class);
     }
 
-    //    /**
-    //     * @return Appointment[] Returns an array of Appointment objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('a')
-    //            ->andWhere('a.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('a.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    /**
+     * @return Appointment[]
+     */
+    public function findTodayByDoctor(User $doctor): array
+    {
+        $today = (new \DateTime())->setTime(0, 0, 0);
+        $tomorrow = (clone $today)->modify('+1 day');
 
-    //    public function findOneBySomeField($value): ?Appointment
-    //    {
-    //        return $this->createQueryBuilder('a')
-    //            ->andWhere('a.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        return $this->createQueryBuilder('a')
+            ->andWhere('a.doctor = :doctor')
+            ->andWhere('a.scheduledAt >= :start')
+            ->andWhere('a.scheduledAt < :end')
+            ->setParameter('doctor', $doctor)
+            ->setParameter('start', $today)
+            ->setParameter('end', $tomorrow)
+            ->orderBy('a.scheduledAt', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }

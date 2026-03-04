@@ -9,6 +9,12 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: AppointmentRepository::class)]
 class Appointment
 {
+    public const STATUS_PENDING = 'PENDING';
+    public const STATUS_CONFIRMED = 'CONFIRMED';
+    public const STATUS_CANCELLED = 'CANCELLED';
+    public const STATUS_COMPLETED = 'COMPLETED';
+    public const STATUS_URGENT = 'URGENT';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -18,7 +24,7 @@ class Appointment
     private ?\DateTimeInterface $scheduledAt = null;
 
     #[ORM\Column(length: 50)]
-    private ?string $status = 'PENDING'; // PENDING, CONFIRMED, CANCELLED, COMPLETED
+    private ?string $status = 'PENDING';
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $reason = null;
@@ -52,9 +58,8 @@ class Appointment
     public function setDoctor(?User $doctor): static { $this->doctor = $doctor; return $this; }
 
     public function getTeleconsultation(): ?Teleconsultation { return $this->teleconsultation; }
-    public function setTeleconsultation(?Teleconsultation $teleconsultation): static 
+    public function setTeleconsultation(?Teleconsultation $teleconsultation): static
     {
-        // Set the owning side of the relation if necessary
         if ($teleconsultation !== null && $teleconsultation->getAppointment() !== $this) {
             $teleconsultation->setAppointment($this);
         }
