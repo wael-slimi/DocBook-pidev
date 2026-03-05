@@ -19,7 +19,7 @@ class AppointmentController extends AbstractController
     {
         $user = $this->getUser();
         $appointments = $user
-            ? $appointmentRepository->findTodayByDoctor($user)
+            ? $appointmentRepository->findByUser($user)
             : [];
 
         return $this->render('appointment/index.html.twig', [
@@ -31,6 +31,9 @@ class AppointmentController extends AbstractController
     public function new(Request $request, EntityManagerInterface $em): Response
     {
         $appointment = new Appointment();
+        $appointment->setPatient($this->getUser());
+        $appointment->setStatus(Appointment::STATUS_PENDING);
+        
         $form = $this->createForm(AppointmentType::class, $appointment);
         $form->handleRequest($request);
 

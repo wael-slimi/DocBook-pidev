@@ -3,22 +3,82 @@
 {% block title %}Appointments - DOCBOOK{% endblock %}
 
 {% block body %}
-<div class="layout-content-container flex flex-col w-full max-w-[1200px] px-6 lg:px-10 mx-auto">
-    <h1 class="text-slate-900 dark:text-white text-3xl font-black mb-6">Appointments</h1>
-    <p class="text-slate-500 dark:text-slate-400 mb-6">Use the Dashboard for today’s queue, or list all appointments here.</p>
-    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6">
-        {% if appointments is defined and appointments is not empty %}
-            <ul class="space-y-3">
-                {% for appointment in appointments %}
-                    <li class="flex items-center justify-between py-2 border-b border-slate-100 dark:border-slate-800 last:border-0">
-                        <span class="text-slate-700 dark:text-slate-200">{{ appointment.patient.name ?? 'Patient' }} — {{ appointment.scheduledAt ? appointment.scheduledAt|date('M j, g:i A') : '—' }}</span>
-                        <a href="{{ path('app_appointment_show', { id: appointment.id }) }}" class="text-primary text-sm font-bold hover:underline">View</a>
-                    </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p class="text-slate-500 dark:text-slate-400">No appointments.</p>
-        {% endif %}
+<div class="max-w-6xl mx-auto space-y-8">
+    <div class="flex flex-col gap-1">
+        <h1 class="text-4xl font-black text-slate-900 dark:text-white">My Appointments</h1>
+        <p class="text-slate-500">View and manage your scheduled appointments.</p>
+    </div>
+
+    <-v /client/input:/workspace/input
+-v Action Buttons -->
+    <div class="flex flex-wrap gap-4">
+        <a href="{{ path('app_appointment_new') }}" class="bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20">
+            <span class="material-symbols-outlined mr-2">add</span> Schedule New Appointment
+        </a>
+        <a href="{{ path('app_doctor_search') }}" class="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-6 py-3 rounded-lg font-semibold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+            <span class="material-symbols-outlined mr-2">search</span> Find Doctors
+        </a>
+        <a href="{{ path('app_patient_dashboard') }}" class="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-6 py-3 rounded-lg font-semibold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+            <span class="material-symbols-outlined mr-2">dashboard</span> Back to Dashboard
+        </a>
+    </div>
+
+    <-v /client/input:/workspace/input
+-v Appointments List -->
+    <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+        <div class="p-6 border-b border-slate-100 dark:border-slate-800">
+            <h3 class="text-xl font-black text-slate-900 dark:text-white">Your Appointments</h3>
+            <p class="text-slate-500 text-sm mt-1">All your scheduled appointments</p>
+        </div>
+
+        <div class="p-6">
+            {% if appointments is defined and appointments is not empty %}
+                <div class="space-y-4">
+                    {% for appointment in appointments %}
+                        <div class="flex items-center justify-between p-6 bg-slate-50 dark:bg-slate-800/50 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                            <div class="flex items-center gap-4">
+                                <div class="size-12 bg-blue-50 dark:bg-blue-900/20 text-blue-600 rounded-2xl flex items-center justify-center">
+                                    <span class="material-symbols-outlined">calendar_month</span>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-slate-900 dark:text-white">
+                                        {% if appointment.patient %}{{ appointment.patient.name }}{% else %}Patient{% endif %}
+                                        {% if appointment.doctor %} with Dr. {{ appointment.doctor.name }}{% endif %}
+                                    </p>
+                                    <p class="text-sm text-slate-500">
+                                        {{ appointment.scheduledAt ? appointment.scheduledAt|date('l, F j, Y \\a\\t g:i A') : 'Date not set' }}
+                                    </p>
+                                    <p class="text-xs text-slate-400 mt-1">
+                                        Status: <span class="px-2 py-1 bg-{{ appointment.status == 'CONFIRMED' ? 'green' : appointment.status == 'PENDING' ? 'yellow' : 'gray' }}-100 text-{{ appointment.status == 'CONFIRMED' ? 'green' : appointment.status == 'PENDING' ? 'yellow' : 'gray' }}-800 rounded-full text-xs font-medium">{{ appointment.status|lower }}</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                {% if appointment.teleconsultation %}
+                                    <a href="{{ path('app_teleconsultation_room', { id: appointment.teleconsultation.id }) }}" class="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 transition-colors">
+                                        <span class="material-symbols-outlined mr-1">videocam</span> Join Call
+                                    </a>
+                                {% endif %}
+                                <a href="{{ path('app_appointment_show', { id: appointment.id }) }}" class="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-4 py-2 rounded-lg font-semibold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+                                    View Details
+                                </a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-12">
+                    <div class="size-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="material-symbols-outlined text-3xl text-slate-400">calendar_month</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">No appointments yet</h3>
+                    <p class="text-slate-500 mb-6">You haven't scheduled any appointments. Book your first appointment to get started.</p>
+                    <a href="{{ path('app_doctor_search') }}" class="bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors inline-flex items-center gap-2">
+                        <span class="material-symbols-outlined">search</span> Find a Doctor
+                    </a>
+                </div>
+            {% endif %}
+        </div>
     </div>
 </div>
 {% endblock %}

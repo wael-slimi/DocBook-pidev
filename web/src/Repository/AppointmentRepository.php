@@ -74,6 +74,23 @@ class AppointmentRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * Find all appointments for a given user (as patient or doctor).
+     *
+     * @return Appointment[]
+     */
+    public function findByUser($user): array
+    {
+        return $this->createQueryBuilder('a')
+            ->leftJoin('a.patient', 'p')
+            ->leftJoin('a.doctor', 'd')
+            ->andWhere('p.id = :user OR d.id = :user')
+            ->setParameter('user', $user)
+            ->orderBy('a.scheduledAt', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
     //    /**
     //     * @return Appointment[] Returns an array of Appointment objects
     //     */

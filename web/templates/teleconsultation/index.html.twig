@@ -3,54 +3,90 @@
 {% block title %}Teleconsultations - DOCBOOK{% endblock %}
 
 {% block body %}
-<div class="layout-content-container flex flex-col w-full max-w-[1200px] px-6 lg:px-10 mx-auto">
-    <div class="flex flex-wrap justify-between items-end gap-4 mb-6">
-        <div class="flex min-w-72 flex-col gap-1">
-            <p class="text-slate-900 dark:text-white text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]">Teleconsultations</p>
-            <p class="text-slate-500 dark:text-slate-400 text-sm md:text-base font-normal leading-normal">Manage and join your active teleconsultation rooms linked to appointments.</p>
-        </div>
+<div class="max-w-6xl mx-auto space-y-8">
+    <div class="flex flex-col gap-1">
+        <h1 class="text-4xl font-black text-slate-900 dark:text-white">Teleconsultations</h1>
+        <p class="text-slate-500">Manage and join your active teleconsultation rooms linked to appointments.</p>
     </div>
 
-    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
-        <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3">
-            <h2 class="text-slate-900 dark:text-white text-lg font-bold">Active Sessions</h2>
-            <p class="text-xs text-slate-400 font-bold uppercase tracking-[0.2em]">{{ teleconsultations|length }} TOTAL</p>
+    <-v /client/input:/workspace/input
+-v Action Buttons -->
+    <div class="flex flex-wrap gap-4">
+        <a href="{{ path('app_appointment_index') }}" class="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-6 py-3 rounded-lg font-semibold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+            <span class="material-symbols-outlined mr-2">calendar_month</span> View Appointments
+        </a>
+        <a href="{{ path('app_doctor_search') }}" class="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-6 py-3 rounded-lg font-semibold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+            <span class="material-symbols-outlined mr-2">search</span> Find Doctors
+        </a>
+        <a href="{{ path('app_patient_dashboard') }}" class="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-6 py-3 rounded-lg font-semibold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+            <span class="material-symbols-outlined mr-2">dashboard</span> Back to Dashboard
+        </a>
+    </div>
+
+    <-v /client/input:/workspace/input
+-v Teleconsultations List -->
+    <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+        <div class="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3">
+            <div>
+                <h3 class="text-xl font-black text-slate-900 dark:text-white">Active Sessions</h3>
+                <p class="text-slate-500 text-sm mt-1">{{ teleconsultations|length }} total sessions</p>
+            </div>
         </div>
+
         <div class="overflow-x-auto">
-            <table class="w-full text-left">
-                <thead class="bg-slate-50 dark:bg-slate-800/50">
-                    <tr class="text-slate-500 text-xs font-bold uppercase tracking-wider">
-                        <th class="px-6 py-3">ID</th>
-                        <th class="px-6 py-3">Appointment</th>
-                        <th class="px-6 py-3">Patient</th>
-                        <th class="px-6 py-3">Video Link</th>
-                        <th class="px-6 py-3 text-right">Action</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
-                    {% if teleconsultations is not empty %}
-                        {% for teleconsultation in teleconsultations %}
-                            <tr>
-                                <td class="px-6 py-3 text-sm text-slate-600 dark:text-slate-300">#{{ teleconsultation.id }}</td>
-                                <td class="px-6 py-3 text-sm">
-                                    {% if teleconsultation.appointment %}
-                                        <a href="{{ path('app_appointment_show', { id: teleconsultation.appointment.id }) }}" class="text-primary font-semibold hover:text-primary/80">Appointment #{{ teleconsultation.appointment.id }}</a>
-                                    {% else %}<span class="text-slate-400">—</span>{% endif %}
-                                </td>
-                                <td class="px-6 py-3 text-sm text-slate-700 dark:text-slate-200">
-                                    {% if teleconsultation.appointment and teleconsultation.appointment.patient %}{{ teleconsultation.appointment.patient.name }}{% else %}<span class="text-slate-400">Unknown</span>{% endif %}
-                                </td>
-                                <td class="px-6 py-3 text-xs text-slate-500 max-w-xs">{% if teleconsultation.videoLink %}<span class="truncate block" title="{{ teleconsultation.videoLink }}">{{ teleconsultation.videoLink }}</span>{% else %}<span class="text-slate-400">Not set</span>{% endif %}</td>
-                                <td class="px-6 py-3 text-right">
-                                    <a href="{{ path('app_teleconsultation_room', { id: teleconsultation.id }) }}" class="inline-flex items-center gap-1 bg-primary text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-primary/90"><span class="material-symbols-outlined text-sm">video_chat</span> Open Room</a>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    {% else %}
-                        <tr><td colspan="5" class="px-6 py-8 text-center text-slate-400 text-sm">No teleconsultations found.</td></tr>
-                    {% endif %}
-                </tbody>
-            </table>
+            {% if teleconsultations is not empty %}
+                <div class="divide-y divide-slate-100 dark:divide-slate-800">
+                    {% for teleconsultation in teleconsultations %}
+                        <div class="flex items-center justify-between p-6 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                            <div class="flex items-center gap-4">
+                                <div class="size-12 bg-green-50 dark:bg-green-900/20 text-green-600 rounded-2xl flex items-center justify-center">
+                                    <span class="material-symbols-outlined">videocam</span>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-slate-900 dark:text-white">
+                                        Session #{{ teleconsultation.id }}
+                                    </p>
+                                    <p class="text-sm text-slate-500">
+                                        {% if teleconsultation.appointment and teleconsultation.appointment.patient %}
+                                            Patient: {{ teleconsultation.appointment.patient.name }}
+                                        {% else %}
+                                            Patient: Unknown
+                                        {% endif %}
+                                    </p>
+                                    <p class="text-xs text-slate-400 mt-1">
+                                        {% if teleconsultation.appointment %}
+                                            <a href="{{ path('app_appointment_show', { id: teleconsultation.appointment.id }) }}" class="text-primary hover:text-primary/80">Appointment #{{ teleconsultation.appointment.id }}</a>
+                                        {% else %}
+                                            No linked appointment
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                {% if teleconsultation.videoLink %}
+                                    <div class="text-xs text-slate-400 max-w-xs truncate" title="{{ teleconsultation.videoLink }}">
+                                        {{ teleconsultation.videoLink }}
+                                    </div>
+                                {% endif %}
+                                <a href="{{ path('app_teleconsultation_room', { id: teleconsultation.id }) }}" class="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 transition-colors inline-flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-sm">video_chat</span> Join Room
+                                </a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-12">
+                    <div class="size-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="material-symbols-outlined text-3xl text-slate-400">videocam_off</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">No active sessions</h3>
+                    <p class="text-slate-500 mb-6">You don't have any active teleconsultation sessions at the moment.</p>
+                    <a href="{{ path('app_appointment_index') }}" class="bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors inline-flex items-center gap-2">
+                        <span class="material-symbols-outlined">calendar_month</span> View Appointments
+                    </a>
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>

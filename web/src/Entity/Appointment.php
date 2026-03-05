@@ -14,6 +14,7 @@ class Appointment
     public const STATUS_CANCELLED = 'CANCELLED';
     public const STATUS_COMPLETED = 'COMPLETED';
     public const STATUS_URGENT = 'URGENT';
+    public const STATUS_EXPIRED = 'EXPIRED';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
