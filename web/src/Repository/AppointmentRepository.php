@@ -3,7 +3,6 @@
 namespace App\Repository;
 
 use App\Entity\Appointment;
-use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -18,22 +17,85 @@ class AppointmentRepository extends ServiceEntityRepository
     }
 
     /**
+     * Check if the given doctor already has an appointment at the same datetime.
+     * Optionally exclude an appointment (e.g. when editing).
+     */
+    public function findConflict(string $doctor, \DateTimeInterface $scheduledAt, ?int $excludeAppointmentId = null): ?Appointment
+    {
+        $qb = $this->createQueryBuilder('a')
+            ->andWhere('a.doctor = :doctor')
+            ->andWhere('a.scheduledAt = :scheduledAt')
+            ->setParameter('doctor', $doctor)
+            ->setParameter('scheduledAt', $scheduledAt);
+
+        if ($excludeAppointmentId !== null) {
+            $qb->andWhere('a.id != :excludeId')->setParameter('excludeId', $excludeAppointmentId);
+        }
+
+        return $qb->getQuery()->getOneOrNullResult();
+    }
+
+    /**
+     * Find all appointments that are in the past and still Pending (for archiving).
+     *
      * @return Appointment[]
      */
-    public function findTodayByDoctor(User $doctor): array
+    public function findPastPending(): array
     {
-        $today = (new \DateTime())->setTime(0, 0, 0);
-        $tomorrow = (clone $today)->modify('+1 day');
+        return $this->createQueryBuilder('a')
+            ->andWhere('a.scheduledAt < :now')
+            ->andWhere('a.status = :status')
+            ->setParameter('now', new \DateTimeImmutable())
+            ->setParameter('status', Appointment::STATUS_PENDING)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Find appointments scheduled for today by a given doctor.
+     *
+     * @return Appointment[]
+     */
+    public function findTodayByDoctor(\Stringable|string $doctor): array
+    {
+        $now = new \DateTimeImmutable();
+        $startOfDay = $now->setTime(0, 0, 0);
+        $endOfDay = $now->setTime(23, 59, 59);
 
         return $this->createQueryBuilder('a')
             ->andWhere('a.doctor = :doctor')
             ->andWhere('a.scheduledAt >= :start')
-            ->andWhere('a.scheduledAt < :end')
-            ->setParameter('doctor', $doctor)
-            ->setParameter('start', $today)
-            ->setParameter('end', $tomorrow)
+            ->andWhere('a.scheduledAt <= :end')
+            ->setParameter('doctor', (string) $doctor)
+            ->setParameter('start', $startOfDay)
+            ->setParameter('end', $endOfDay)
             ->orderBy('a.scheduledAt', 'ASC')
             ->getQuery()
             ->getResult();
     }
+
+    //    /**
+    //     * @return Appointment[] Returns an array of Appointment objects
+    //     */
+    //    public function findByExampleField($value): array
+    //    {
+    //        return $this->createQueryBuilder('a')
+    //            ->andWhere('a.exampleField = :val')
+    //            ->setParameter('val', $value)
+    //            ->orderBy('a.id', 'ASC')
+    //            ->setMaxResults(10)
+    //            ->getQuery()
+    //            ->getResult()
+    //        ;
+    //    }
+
+    //    public function findOneBySomeField($value): ?Appointment
+    //    {
+    //        return $this->createQueryBuilder('a')
+    //            ->andWhere('a.exampleField = :val')
+    //            ->setParameter('val', $value)
+    //            ->getQuery()
+    //            ->getOneOrNullResult()
+    //        ;
+    //    }
 }
