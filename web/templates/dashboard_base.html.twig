@@ -66,9 +66,14 @@
                         <span class="material-symbols-outlined text-slate-400 group-hover:text-primary">groups</span>
                         Patients
                     </a>
+
+                    <a href="{{ path('app_medecin_dossier_index') }}" class="flex items-center gap-3 px-4 py-3 {{ app.request.attributes.get('_route') starts with 'app_medecin_dossier' ? 'bg-primary/5 text-primary' : 'text-slate-600 dark:text-slate-400' }} hover:bg-slate-50 dark:hover:bg-slate-800 rounded-2xl font-bold transition-all group">
+                        <span class="material-symbols-outlined text-slate-400 group-hover:text-primary">folder_shared</span>
+                        Medical Records
+                    </a>
                 {% endif %}
 
-                <a href="#" class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-2xl font-bold transition-all group">
+                <a href="{{ path('app_appointment_index') }}" class="flex items-center gap-3 px-4 py-3 {{ app.request.attributes.get('_route') starts with 'app_appointment' ? 'bg-primary/5 text-primary' : 'text-slate-600 dark:text-slate-400' }} hover:bg-slate-50 dark:hover:bg-slate-800 rounded-2xl font-bold transition-all group">
                     <span class="material-symbols-outlined text-slate-400 group-hover:text-primary">calendar_month</span>
                     Appointments
                 </a>

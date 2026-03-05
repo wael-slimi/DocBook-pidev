@@ -47,6 +47,16 @@ app_doctor_settings:
     controller: App\Controller\DoctorController::settings
     methods: [GET, POST]
 
+app_patient_dashboard:
+    path: /patient
+    controller: App\Controller\PatientController::dashboard
+    methods: [GET]
+
+app_medecin_dossier_index:
+    path: /doctor/medical-records
+    controller: App\Controller\DoctorController::listRecords
+    methods: [GET]
+
 app_doctor_dashboard:
     path: /doctor/dashboard
     controller: App\Controller\DoctorController::index 
