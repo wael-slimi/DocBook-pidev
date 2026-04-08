@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Reset your password{% endblock %}
+
+{% block body %}
+    <main class="container mx-auto mt-10 p-6 max-w-lg bg-white dark:bg-slate-900 shadow-md rounded-lg">
+        <h1 class="text-2xl font-bold mb-4 dark:text-white">Reset your password</h1>
+
+        {{ form_start(resetForm) }}
+            {# This line is CRITICAL: It displays global errors and field errors #}
+            <div class="text-red-600 font-bold mb-4">
+                {{ form_errors(resetForm.plainPassword.first) }}
+                {{ form_errors(resetForm) }}
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block mb-2 text-sm font-medium dark:text-white">New Password</label>
+                    {{ form_widget(resetForm.plainPassword.first, {'attr': {'class': 'w-full p-2 border rounded dark:bg-slate-800 dark:text-white'}}) }}
+                </div>
+
+                <div>
+                    <label class="block mb-2 text-sm font-medium dark:text-white">Repeat Password</label>
+                    {{ form_widget(resetForm.plainPassword.second, {'attr': {'class': 'w-full p-2 border rounded dark:bg-slate-800 dark:text-white'}}) }}
+                </div>
+
+                <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition">
+                    Change Password
+                </button>
+            </div>
+        {{ form_end(resetForm) }}
+    </main>
+{% endblock %}

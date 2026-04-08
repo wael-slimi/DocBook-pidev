@@ -1,0 +1,95 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Registration: Verify Your Account - DOCBOOK{% endblock %}
+
+{% block body %}
+    {% include 'components/navbar.html.twig' %}
+
+    <main class="flex flex-1 justify-center py-10 px-4">
+        <div class="layout-content-container flex flex-col max-w-[560px] flex-1">
+            
+            <div class="flex flex-col gap-3 p-4 mb-6 bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800">
+                <div class="flex gap-6 justify-between">
+                    <p class="text-slate-900 dark:text-slate-100 text-base font-medium">Registration Progress</p>
+                    <p class="text-primary text-sm font-bold">100%</p>
+                </div>
+                <div class="rounded-full bg-slate-200 dark:bg-slate-700 h-2.5 overflow-hidden">
+                    <div class="h-full rounded-full bg-primary" style="width: 100%;"></div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary text-sm">verified_user</span>
+                    <p class="text-primary text-sm font-medium">Final Step: Identity Verification</p>
+                </div>
+            </div>
+
+            <div class="flex w-full p-4 mb-2">
+                <div class="w-full aspect-[16/9] rounded-xl flex items-center justify-center bg-primary/5 dark:bg-primary/10">
+                    <div class="flex flex-col items-center justify-center gap-4 text-primary">
+                        <span class="material-symbols-outlined text-8xl" style="font-variation-settings: 'FILL' 0, 'wght' 200">mark_email_read</span>
+                    </div>
+                </div>
+            </div>
+
+            <h1 class="text-slate-900 dark:text-white text-[32px] font-bold text-center pb-3">Verify your account</h1>
+            <p class="text-slate-600 dark:text-slate-400 text-base text-center pb-8 px-4">
+                We've sent a 6-digit verification code to your email. Please enter it below to complete your setup.
+            </p>
+
+            <form action="{{ path('app_register_verification') }}" method="POST" class="flex flex-col gap-6">
+                <div class="flex justify-center gap-3 px-4 pb-8">
+                    {# Using name="otp[]" allows PHP to receive all numbers as an array #}
+                    <input class="w-12 h-14 text-center text-2xl font-bold border-2 border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-lg focus:border-primary outline-none" maxlength="1" type="text" name="otp[]" required />
+                    <input class="w-12 h-14 text-center text-2xl font-bold border-2 border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-lg focus:border-primary outline-none" maxlength="1" type="text" name="otp[]" required />
+                    <input class="w-12 h-14 text-center text-2xl font-bold border-2 border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-lg focus:border-primary outline-none" maxlength="1" type="text" name="otp[]" required />
+                    <div class="flex items-center text-slate-400 font-bold mx-1">-</div>
+                    <input class="w-12 h-14 text-center text-2xl font-bold border-2 border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-lg focus:border-primary outline-none" maxlength="1" type="text" name="otp[]" required />
+                    <input class="w-12 h-14 text-center text-2xl font-bold border-2 border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-lg focus:border-primary outline-none" maxlength="1" type="text" name="otp[]" required />
+                    <input class="w-12 h-14 text-center text-2xl font-bold border-2 border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-lg focus:border-primary outline-none" maxlength="1" type="text" name="otp[]" required />
+                </div>
+
+                <div class="flex flex-col gap-4 px-4">
+                    <button type="submit" class="w-full bg-primary hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2">
+                        <span>Verify & Complete</span>
+                        <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+                    </button>
+                    
+                    <div class="flex flex-col items-center gap-2 pt-2">
+                        <p class="text-slate-500 text-sm">Didn't receive the code?</p>
+                        
+                        {# Change this to a link that points to a new route #}
+                        <a href="{{ path('app_register_resend_code') }}" 
+                           class="text-primary font-semibold text-sm hover:underline flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[18px]">refresh</span> 
+                            Resend Code
+                        </a>
+                    </div>
+                </div>
+            </form>
+
+            <div class="pt-12 text-center">
+                <a class="text-slate-500 hover:text-slate-700 text-sm flex items-center justify-center gap-1" href="{{ path('app_register_security') }}">
+                    <span class="material-symbols-outlined text-[18px]">arrow_back</span> Back to security
+                </a>
+            </div>
+        </div>
+    </main>
+
+    {% include 'components/footer.html.twig' %}
+
+    <script>
+        // Auto-focus next input script
+        const inputs = document.querySelectorAll('input[name="otp[]"]');
+        inputs.forEach((input, index) => {
+            input.addEventListener('input', () => {
+                if (input.value.length === 1 && index < inputs.length - 1) {
+                    inputs[index + 1].focus();
+                }
+            });
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && input.value === '' && index > 0) {
+                    inputs[index - 1].focus();
+                }
+            });
+        });
+    </script>
+{% endblock %}

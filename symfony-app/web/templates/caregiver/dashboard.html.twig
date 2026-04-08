@@ -1,0 +1,79 @@
+{% extends 'dashboard_base.html.twig' %}
+
+{% block title %}Caregiver Dashboard - DOCBOOK{% endblock %}
+
+{% block body %}
+<div class="layout-content-container flex flex-col max-w-[1200px] flex-1 px-4 mx-auto">
+    <div class="flex flex-wrap justify-between items-end gap-4 pb-8">
+        <div class="flex flex-col gap-1">
+            <h1 class="text-slate-900 dark:text-white text-4xl font-black leading-tight tracking-tight">Caregiver Dashboard</h1>
+            <p class="text-slate-500 dark:text-slate-400 text-lg">Central management for your assigned patients.</p>
+        </div>
+        <button class="flex items-center justify-center gap-2 rounded-lg bg-primary text-white font-bold py-3 px-6 shadow-lg">
+            <span class="material-symbols-outlined">add_circle</span>
+            <span>Register New Patient</span>
+        </button>
+    </div>
+
+    <div class="flex flex-wrap gap-4 pb-8">
+        <div class="flex min-w-[200px] flex-1 flex-col gap-2 rounded-xl p-6 bg-white dark:bg-slate-900 border border-slate-200 shadow-sm">
+            <p class="text-slate-500 text-sm font-bold uppercase">Total Patients</p>
+            <p class="text-slate-900 dark:text-white text-3xl font-black">24</p>
+        </div>
+        <div class="flex min-w-[200px] flex-1 flex-col gap-2 rounded-xl p-6 bg-white dark:bg-slate-900 border border-slate-200 shadow-sm">
+            <p class="text-slate-500 text-sm font-bold uppercase">Critical Alerts</p>
+            <p class="text-red-600 text-3xl font-black">3</p>
+        </div>
+    </div>
+
+    <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 overflow-hidden shadow-sm mb-8">
+        <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center">
+            <h3 class="text-slate-900 dark:text-white text-xl font-bold">Managed Patients</h3>
+        </div>
+        <table class="w-full text-left">
+            <thead class="bg-slate-50 dark:bg-slate-800/50">
+                <tr>
+                    <th class="px-6 py-4 text-xs font-bold uppercase">Patient Name</th>
+                    <th class="px-6 py-4 text-xs font-bold uppercase">Status</th>
+                    <th class="px-6 py-4 text-xs font-bold uppercase text-right">Action</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+                <tr>
+                    <td class="px-6 py-4 font-bold text-slate-900 dark:text-white">John Doe</td>
+                    <td class="px-6 py-4">
+                        <span class="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">Stable</span>
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                        <button class="text-primary font-bold text-sm">Manage</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="px-6 py-4 font-bold text-slate-900 dark:text-white">Robert Brown</td>
+                    <td class="px-6 py-4">
+                        <span class="px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700">Critical</span>
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                        <button class="text-primary font-bold text-sm">ATTEND NOW</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 p-8 shadow-sm">
+        <h3 class="text-slate-900 dark:text-white text-2xl font-black mb-6">Daily Metrics Entry</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="flex flex-col gap-3">
+                <label class="text-sm font-bold text-slate-500">BLOOD PRESSURE</label>
+                <input class="w-full h-16 text-2xl font-black text-center rounded-xl border-2 bg-slate-50 dark:bg-slate-800" placeholder="120/80" type="text"/>
+            </div>
+            <div class="flex flex-col gap-3">
+                <label class="text-sm font-bold text-slate-500">GLUCOSE LEVEL</label>
+                <input class="w-full h-16 text-2xl font-black text-center rounded-xl border-2 bg-slate-50 dark:bg-slate-800" placeholder="105" type="number"/>
+            </div>
+        </div>
+        <button class="w-full mt-8 bg-primary text-white font-black text-xl py-5 rounded-xl shadow-lg">SUBMIT METRICS</button>
+    </div>
+</div>
+{% endblock %}
