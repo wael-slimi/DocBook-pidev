@@ -1,19 +1,18 @@
-package org.example.util;
+package org.docbook.util;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class myDataBase {
-    // UPDATED: Changed 'pidev_test' to 'pidev' to match your pgAdmin
-    private static final String URL = "jdbc:postgresql://127.0.0.1:32770/pidev";
+public class DBConnection {
+    private static final String URL = "jdbc:postgresql://127.0.0.1:32771/pidev";
     private static final String USER = "pidev";
     private static final String PASSWORD = "pidev";
 
-    private static myDataBase instance;
+    private static DBConnection instance;
     private Connection connection;
 
-    private myDataBase() throws SQLException {
+    private DBConnection() throws SQLException {
         try {
             Class.forName("org.postgresql.Driver");
             this.connection = DriverManager.getConnection(URL, USER, PASSWORD);
@@ -23,11 +22,9 @@ public class myDataBase {
         }
     }
 
-    public static myDataBase getInstance() throws SQLException {
-        if (instance == null) {
-            instance = new myDataBase();
-        } else if (instance.getConnection().isClosed()) {
-            instance = new myDataBase();
+    public static DBConnection getInstance() throws SQLException {
+        if (instance == null || instance.getConnection() == null || instance.getConnection().isClosed()) {
+            instance = new DBConnection();
         }
         return instance;
     }
@@ -35,4 +32,6 @@ public class myDataBase {
     public Connection getConnection() {
         return connection;
     }
+
 }
+//syng

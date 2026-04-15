@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.docbook.controllers.doctor.DoctorController"
+            stylesheets="/css/style.css"
+            prefHeight="800.0" prefWidth="1200.0">
+
+    <!-- Left Sidebar -->
+    <left>
+        <VBox styleClass="dashboard-sidebar" prefWidth="250" spacing="20">
+            <VBox alignment="CENTER" spacing="10">
+                <Text text="DocBook" style="-fx-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;"/>
+                <Text text="Espace Médecin" style="-fx-fill: #94a3b8;"/>
+            </VBox>
+            
+            <Separator style="-fx-opacity: 0.2;"/>
+            
+            <VBox spacing="10">
+                <Button text="Dossiers Patients" styleClass="nav-link, nav-link-active" prefWidth="210"/>
+                <Button text="Documents" styleClass="nav-link" prefWidth="210" onAction="#openDocumentView"/>
+                <Button text="Historique Adhérence" styleClass="nav-link" prefWidth="210" onAction="#openAdherenceHistory"/>
+            </VBox>
+            
+            <Region VBox.vgrow="ALWAYS" />
+            
+            <Button text="Déconnexion" onAction="#logout" style="-fx-background-color: transparent; -fx-text-fill: #fca5a5;"/>
+        </VBox>
+    </left>
+
+    <!-- Main Content -->
+    <center>
+        <VBox spacing="25" style="-fx-padding: 30;">
+            <HBox alignment="CENTER_LEFT" spacing="20">
+                <Text text="Dossiers Médicaux" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+                <Region HBox.hgrow="ALWAYS" />
+            </HBox>
+            
+            <!-- Statistics Row -->
+            <HBox spacing="20">
+                <VBox style="-fx-background-color: #dbeafe; -fx-background-radius: 10; -fx-padding: 20;" prefWidth="250">
+                    <Text text="Patients Actifs" style="-fx-fill: #1e40af;"/>
+                    <Label fx:id="totalPatientsLabel" text="124" style="-fx-font-size: 32px; -fx-font-weight: bold;"/>
+                </VBox>
+                <VBox style="-fx-background-color: #dcfce7; -fx-background-radius: 10; -fx-padding: 20;" prefWidth="250">
+                    <Text text="Consultations ce jour" style="-fx-fill: #166534;"/>
+                    <Text text="8" style="-fx-font-size: 32px; -fx-font-weight: bold;"/>
+                </VBox>
+            </HBox>
+            
+            <!-- Table and Form Container -->
+            <HBox spacing="20" VBox.vgrow="ALWAYS">
+                <VBox HBox.hgrow="ALWAYS" style="-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 0; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5);">
+                    <TableView fx:id="patientTable" VBox.vgrow="ALWAYS" styleClass="table-view">
+                        <columns>
+                            <TableColumn fx:id="numCol" text="N° Dossier" prefWidth="100"/>
+                            <TableColumn fx:id="nameCol" text="Nom" prefWidth="120"/>
+                            <TableColumn fx:id="firstNameCol" text="Prénom" prefWidth="120"/>
+                            <TableColumn fx:id="emailCol" text="Email" prefWidth="180"/>
+                            <TableColumn fx:id="actionCol" text="Actions" prefWidth="100"/>
+                        </columns>
+                    </TableView>
+                </VBox>
+                
+                <!-- Forms Container -->
+                <VBox prefWidth="400" style="-fx-background-color: white; -fx-background-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5);" VBox.vgrow="ALWAYS">
+                    <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;">
+                        <VBox spacing="15" style="-fx-padding: 20;">
+                            <Text text="Informations du Dossier" style="-fx-font-weight: bold; -fx-font-size: 16px;"/>
+                            <VBox spacing="2"><TextField fx:id="numDossierField" promptText="N° Dossier"/><Text fx:id="numDossierError" style="-fx-fill: #ef4444; -fx-font-size: 11px;"/></VBox>
+                            <VBox spacing="2"><TextField fx:id="nomField" promptText="Nom patient"/><Text fx:id="nomError" style="-fx-fill: #ef4444; -fx-font-size: 11px;"/></VBox>
+                            <VBox spacing="2"><TextField fx:id="prenomField" promptText="Prénom patient"/><Text fx:id="prenomError" style="-fx-fill: #ef4444; -fx-font-size: 11px;"/></VBox>
+                            <VBox spacing="2"><DatePicker fx:id="dateNaissanceField" promptText="Date Naissance" maxWidth="Infinity"/><Text fx:id="dateNaissanceError" style="-fx-fill: #ef4444; -fx-font-size: 11px;"/></VBox>
+                            <VBox spacing="2"><TextField fx:id="genreField" promptText="Genre (M/F)"/><Text fx:id="genreError" style="-fx-fill: #ef4444; -fx-font-size: 11px;"/></VBox>
+                            <VBox spacing="2"><TextField fx:id="emailPatientField" promptText="Email"/><Text fx:id="emailError" style="-fx-fill: #ef4444; -fx-font-size: 11px;"/></VBox>
+                            <VBox spacing="2"><TextField fx:id="telephoneField" promptText="Téléphone"/><Text fx:id="telephoneError" style="-fx-fill: #ef4444; -fx-font-size: 11px;"/></VBox>
+                            <VBox spacing="2"><TextField fx:id="adresseField" promptText="Adresse"/><Text fx:id="adresseError" style="-fx-fill: #ef4444; -fx-font-size: 11px;"/></VBox>
+                            <TextArea fx:id="remarquesField" promptText="Remarques..." prefHeight="70" wrapText="true"/>
+                            
+                            <HBox spacing="10">
+                                <Button text="Créer" styleClass="doctor-btn" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#addDossierPanel"/>
+                                <Button text="Mettre à jour" style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 20;" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#updateDossierPanel"/>
+                            </HBox>
+                            <Button text="Vider les champs" style="-fx-background-color: transparent; -fx-text-fill: #94a3b8;" maxWidth="Infinity" onAction="#clearDossierPanel"/>
+                        </VBox>
+                    </ScrollPane>
+                </VBox>
+            </HBox>
+        </VBox>
+    </center>
+</BorderPane>
+
+

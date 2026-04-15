@@ -1,4 +1,4 @@
-package org.example.util;
+package org.docbook.util;
 
 import org.mindrot.jbcrypt.BCrypt;
 

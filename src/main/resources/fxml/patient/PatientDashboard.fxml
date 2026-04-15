@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.docbook.controllers.patient.PatientController"
+            stylesheets="/css/style.css"
+            prefHeight="800.0" prefWidth="1200.0">
+
+    <!-- Left Sidebar -->
+    <left>
+        <VBox styleClass="dashboard-sidebar" prefWidth="250" spacing="20">
+            <VBox alignment="CENTER" spacing="10">
+                <Text text="DocBook" style="-fx-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;"/>
+                <Text text="Espace Patient" style="-fx-fill: #94a3b8;"/>
+            </VBox>
+            
+            <Separator style="-fx-opacity: 0.2;"/>
+            
+            <VBox spacing="10">
+                <Button text="Tableau de bord" styleClass="nav-link, nav-link-active" prefWidth="210"/>
+                <Button text="Mes Prescriptions" styleClass="nav-link" prefWidth="210" onAction="#openPrescriptions"/>
+
+                <Button text="Profil" styleClass="nav-link" prefWidth="210"/>
+            </VBox>
+            
+            <Region VBox.vgrow="ALWAYS" />
+            
+            <Button text="Déconnexion" onAction="#logout" style="-fx-background-color: transparent; -fx-text-fill: #fca5a5;"/>
+        </VBox>
+    </left>
+
+    <!-- Main Content -->
+    <center>
+        <VBox spacing="25" style="-fx-padding: 30;">
+            <VBox spacing="5">
+                <Text text="Bonjour, Patient !" style="-fx-font-size: 28px; -fx-font-weight: bold;"/>
+                <Text text="Consultez vos dossiers et vos documents ici." style="-fx-fill: #64748b;"/>
+            </VBox>
+
+            <ScrollPane fitToWidth="true" styleClass="edge-to-edge" VBox.vgrow="ALWAYS">
+                <content>
+                    <VBox fx:id="dossiersContainer" spacing="15"/>
+                </content>
+            </ScrollPane>
+        </VBox>
+    </center>
+</BorderPane>
+
+

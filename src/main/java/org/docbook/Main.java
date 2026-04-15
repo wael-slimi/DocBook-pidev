@@ -1,9 +1,9 @@
-package org.example;
+package org.docbook;
 
-import org.example.entities.User;
-import org.example.entities.Doctor;
-import org.example.services.UserService;
-import org.example.services.DoctorService;
+import org.docbook.entities.users.User;
+import org.docbook.entities.users.Doctor;
+import org.docbook.services.users.UserService;
+import org.docbook.services.users.DoctorService;
 import java.util.Scanner;
 import java.util.List;
 

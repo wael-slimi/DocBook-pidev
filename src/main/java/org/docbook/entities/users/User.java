@@ -1,4 +1,4 @@
-package org.example.entities;
+package org.docbook.entities.users;
 
 public class User {
     private int id;

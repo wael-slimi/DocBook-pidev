@@ -1,4 +1,4 @@
-package org.example.entities;
+package org.docbook.entities.users;
 
 public class Doctor extends User {
     private String specialty;

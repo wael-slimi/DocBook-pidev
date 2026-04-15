@@ -1,9 +1,9 @@
-package org.example.services;
+package org.docbook.services.users;
 
-import org.example.entities.User;
-import org.example.services.ICrud;
-import org.example.util.myDataBase;
-import org.example.util.PasswordUtil;
+import org.docbook.entities.users.User;
+import org.docbook.interfaces.ICrud;
+import org.docbook.util.DBConnection;
+import org.docbook.util.PasswordUtil;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,8 +13,14 @@ public class UserService implements ICrud<User> {
 
     public UserService() {
         try {
-            conn = myDataBase.getInstance().getConnection();
+            // Get the instance and immediately get the connection
+            this.conn = DBConnection.getInstance().getConnection();
+
+            if (this.conn == null) {
+                System.err.println("CRITICAL: DBConnection returned a null connection!");
+            }
         } catch (SQLException e) {
+            System.err.println("FATAL: Could not initialize UserService because database is unreachable.");
             e.printStackTrace();
         }
     }
@@ -63,6 +69,10 @@ public class UserService implements ICrud<User> {
     }
 
     public User login(String email, String password) {
+        if (this.conn == null) {
+            System.err.println("Login failed: No database connection available.");
+            return null;
+        }
         String sql = "SELECT * FROM \"user\" WHERE email = ?";
         try (PreparedStatement pst = conn.prepareStatement(sql)) {
             pst.setString(1, email);

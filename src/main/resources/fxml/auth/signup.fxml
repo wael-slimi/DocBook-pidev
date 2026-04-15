@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="650.0" prefWidth="900.0" stylesheets="@../../css/style.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.docbook.controllers.auth.SignupController">
+    <children>
+        <VBox alignment="CENTER" spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <children>
+                <VBox maxWidth="500.0" spacing="25.0" styleClass="layout-content-container">
+                    <children>
+                        <HBox alignment="CENTER_LEFT">
+                            <children>
+                                <Label style="-fx-text-fill: #0d7ff2; -fx-font-weight: bold;" text="Step 1 of 2" />
+                                <Region HBox.hgrow="ALWAYS" />
+                                <Label style="-fx-text-fill: #4573a1;" text="50% Complete" />
+                            </children>
+                        </HBox>
+                        <ProgressBar maxWidth="1.7976931348623157E308" progress="0.5" />
+                        <VBox spacing="5.0">
+                            <Label styleClass="headline" text="Let's get started" />
+                            <Label styleClass="body-text" text="Provide your basic details to set up your profile." />
+                        </VBox>
+                        <VBox spacing="15.0">
+                            <VBox spacing="5.0">
+                                <Label styleClass="form-label" text="Full Name" />
+                                <TextField fx:id="nameField" promptText="Wael Slimi" styleClass="form-input" />
+                            </VBox>
+                            <VBox spacing="5.0">
+                                <Label styleClass="form-label" text="Email Address" />
+                                <TextField fx:id="emailField" promptText="wael.slimi@esprit.tn" styleClass="form-input" />
+                            </VBox>
+                            <VBox spacing="5.0">
+                                <Label styleClass="form-label" text="Password" />
+                                <PasswordField fx:id="passwordField" promptText="••••••••" styleClass="form-input" />
+                            </VBox>
+                        </VBox>
+                        <HBox alignment="CENTER_RIGHT" spacing="15.0">
+                            <Button onAction="#goToLogin" prefWidth="100.0" styleClass="btn-outline" text="Cancel" />
+                            <Button onAction="#handleRegistration" prefWidth="180.0" styleClass="btn-primary" text="Complete Setup" />
+                        </HBox>
+                    </children>
+                </VBox>
+            </children>
+        </VBox>
+    </children>
+</AnchorPane>

@@ -1,7 +1,7 @@
-package org.example.services;
+package org.docbook.services.users;
 
-import org.example.entities.Doctor;
-import org.example.util.myDataBase;
+import org.docbook.entities.users.Doctor;
+import org.docbook.util.DBConnection;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +11,7 @@ public class DoctorService {
 
     public DoctorService() {
         try {
-            conn = myDataBase.getInstance().getConnection();
+            conn = DBConnection.getInstance().getConnection();
         } catch (SQLException e) {
             e.printStackTrace();
         }

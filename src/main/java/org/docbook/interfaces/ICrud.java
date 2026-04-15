@@ -1,4 +1,4 @@
-package org.example.services;
+package org.docbook.interfaces;
 
 import java.util.List;
 
