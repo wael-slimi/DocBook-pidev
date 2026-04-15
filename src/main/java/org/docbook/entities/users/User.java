@@ -36,4 +36,6 @@ public class User {
     public void setDtype(String dtype) { this.dtype = dtype; }
     public boolean isIsActive() { return isActive; }
     public void setIsActive(boolean isActive) { this.isActive = isActive; }
+
+
 }

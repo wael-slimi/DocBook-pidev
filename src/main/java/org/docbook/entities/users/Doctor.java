@@ -13,6 +13,7 @@ public class Doctor extends User {
         this.setRole("ROLE_DOCTOR");
     }
 
+
     // Getters and Setters
     public String getSpecialty() { return specialty; }
     public void setSpecialty(String specialty) { this.specialty = specialty; }

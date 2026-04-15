@@ -1,5 +1,6 @@
 package org.docbook.services.users;
 
+import org.docbook.entities.users.Doctor;
 import org.docbook.entities.users.User;
 import org.docbook.interfaces.ICrud;
 import org.docbook.util.DBConnection;
@@ -9,41 +10,32 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserService implements ICrud<User> {
-    private Connection conn;
 
     public UserService() {
-        try {
-            // Get the instance and immediately get the connection
-            this.conn = DBConnection.getInstance().getConnection();
+        // No longer pre-loading a single connection to avoid closure bugs
+    }
 
-            if (this.conn == null) {
-                System.err.println("CRITICAL: DBConnection returned a null connection!");
-            }
-        } catch (SQLException e) {
-            System.err.println("FATAL: Could not initialize UserService because database is unreachable.");
-            e.printStackTrace();
-        }
+    private Connection getConnection() throws SQLException {
+        return DBConnection.getInstance().getConnection();
     }
 
     @Override
     public void update(User user) {
-        // 1. Fetch current record to avoid overwriting with nulls
         User current = read(user.getId());
         if (current == null) return;
 
         String sql = "UPDATE \"user\" SET name=?, email=? WHERE id=?";
-        try (PreparedStatement pst = conn.prepareStatement(sql)) {
-            // 2. Logic: (NewValue is not null/empty) ? NewValue : CurrentValue
+        try (Connection conn = getConnection();
+             PreparedStatement pst = conn.prepareStatement(sql)) {
+
             pst.setString(1, (user.getName() != null && !user.getName().trim().isEmpty())
                     ? user.getName() : current.getName());
-
             pst.setString(2, (user.getEmail() != null && !user.getEmail().trim().isEmpty())
                     ? user.getEmail() : current.getEmail());
-
             pst.setInt(3, user.getId());
 
             pst.executeUpdate();
-            System.out.println("User account updated. Unchanged fields were preserved.");
+            System.out.println("User account updated.");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -52,7 +44,8 @@ public class UserService implements ICrud<User> {
     @Override
     public User read(int id) {
         String sql = "SELECT * FROM \"user\" WHERE id = ?";
-        try (PreparedStatement pst = conn.prepareStatement(sql)) {
+        try (Connection conn = getConnection();
+             PreparedStatement pst = conn.prepareStatement(sql)) {
             pst.setInt(1, id);
             ResultSet rs = pst.executeQuery();
             if (rs.next()) {
@@ -69,12 +62,9 @@ public class UserService implements ICrud<User> {
     }
 
     public User login(String email, String password) {
-        if (this.conn == null) {
-            System.err.println("Login failed: No database connection available.");
-            return null;
-        }
         String sql = "SELECT * FROM \"user\" WHERE email = ?";
-        try (PreparedStatement pst = conn.prepareStatement(sql)) {
+        try (Connection conn = getConnection();
+             PreparedStatement pst = conn.prepareStatement(sql)) {
             pst.setString(1, email);
             ResultSet rs = pst.executeQuery();
             if (rs.next()) {
@@ -97,7 +87,8 @@ public class UserService implements ICrud<User> {
     public void create(User user) {
         String userSql = "INSERT INTO \"user\" (name, email, password, role, is_active, is_verified, is2fa_enabled, creation_date, dtype) " +
                 "VALUES (?, ?, ?, ?, true, true, false, NOW(), ?) RETURNING id";
-        try {
+
+        try (Connection conn = getConnection()) {
             conn.setAutoCommit(false);
             try (PreparedStatement pst = conn.prepareStatement(userSql)) {
                 pst.setString(1, user.getName());
@@ -110,33 +101,96 @@ public class UserService implements ICrud<User> {
                 if (rs.next()) {
                     int userId = rs.getInt(1);
                     if ("doctor".equalsIgnoreCase(user.getDtype())) {
-                        conn.prepareStatement("INSERT INTO doctor (id, total_reviews) VALUES (" + userId + ", 0)").executeUpdate();
+                        try (PreparedStatement pstDoc = conn.prepareStatement("INSERT INTO doctor (id, total_reviews) VALUES (?, 0)")) {
+                            pstDoc.setInt(1, userId);
+                            pstDoc.executeUpdate();
+                        }
                     } else {
-                        conn.prepareStatement("INSERT INTO patient (id) VALUES (" + userId + ")").executeUpdate();
+                        try (PreparedStatement pstPat = conn.prepareStatement("INSERT INTO patient (id) VALUES (?)")) {
+                            pstPat.setInt(1, userId);
+                            pstPat.executeUpdate();
+                        }
                     }
                     conn.commit();
+                    System.out.println("User and sub-role record created successfully.");
                 }
-            } catch (SQLException e) { conn.rollback(); throw e; }
-            finally { conn.setAutoCommit(true); }
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
+            } finally {
+                conn.setAutoCommit(true);
+            }
         } catch (SQLException e) { e.printStackTrace(); }
     }
 
     @Override
     public void delete(int id) {
-        // In PostgreSQL, if you have ON DELETE CASCADE, this is simple.
-        // Otherwise, we delete from child tables first.
-        try {
+        try (Connection conn = getConnection()) {
             conn.setAutoCommit(false);
             try {
-                conn.prepareStatement("DELETE FROM doctor WHERE id = " + id).executeUpdate();
-                conn.prepareStatement("DELETE FROM patient WHERE id = " + id).executeUpdate();
-                conn.prepareStatement("DELETE FROM \"user\" WHERE id = " + id).executeUpdate();
+                try (PreparedStatement pst1 = conn.prepareStatement("DELETE FROM doctor WHERE id = ?")) {
+                    pst1.setInt(1, id);
+                    pst1.executeUpdate();
+                }
+                try (PreparedStatement pst2 = conn.prepareStatement("DELETE FROM patient WHERE id = ?")) {
+                    pst2.setInt(1, id);
+                    pst2.executeUpdate();
+                }
+                try (PreparedStatement pst3 = conn.prepareStatement("DELETE FROM \"user\" WHERE id = ?")) {
+                    pst3.setInt(1, id);
+                    pst3.executeUpdate();
+                }
                 conn.commit();
-                System.out.println("Account and associated data deleted.");
-            } catch (SQLException e) { conn.rollback(); throw e; }
-            finally { conn.setAutoCommit(true); }
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
+            } finally {
+                conn.setAutoCommit(true);
+            }
         } catch (SQLException e) { e.printStackTrace(); }
     }
 
     @Override public List<User> getAll() { return new ArrayList<>(); }
+
+    public List<Doctor> getAllDoctors() {
+        List<Doctor> doctors = new ArrayList<>();
+        // JOIN is necessary to get the consultationFee from the doctor table
+        String sql = "SELECT u.*, d.consultation_fee, d.specialty FROM \"user\" u " +
+                "JOIN doctor d ON u.id = d.id WHERE u.dtype = 'doctor'";
+
+        try (Connection conn = getConnection();
+             PreparedStatement pst = conn.prepareStatement(sql)) {
+
+            ResultSet rs = pst.executeQuery();
+            while (rs.next()) {
+                Doctor d = new Doctor();
+                d.setId(rs.getInt("id"));
+                d.setName(rs.getString("name"));
+                d.setEmail(rs.getString("email"));
+                d.setSpecialty(rs.getString("specialty"));
+                d.setConsultationFee(rs.getDouble("consultation_fee"));
+                doctors.add(d);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return doctors;
+    }
+
+    public boolean emailExists(String email) {
+        String query = "SELECT COUNT(*) FROM \"user\" WHERE email = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setString(1, email);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            System.err.println("Database error: " + e.getMessage());
+        }
+        return false;
+    }
 }

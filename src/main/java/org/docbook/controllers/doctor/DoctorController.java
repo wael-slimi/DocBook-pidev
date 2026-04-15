@@ -103,21 +103,21 @@ public class DoctorController {
      */
     private boolean validateDossierForm() {
         boolean isValid = true;
-        
+
         if (numDossierField.getText() == null || numDossierField.getText().trim().isEmpty()) { numDossierError.setText("Champ obligatoire."); isValid = false; } else { numDossierError.setText(""); }
-        
+
         if (nomField.getText() == null || !nomField.getText().matches("[a-zA-ZÀ-ÿ\\s]+")) { nomError.setText("Nom invalide."); isValid = false; } else { nomError.setText(""); }
-        
+
         if (prenomField.getText() == null || !prenomField.getText().matches("[a-zA-ZÀ-ÿ\\s]+")) { prenomError.setText("Prénom invalide."); isValid = false; } else { prenomError.setText(""); }
-        
+
         if (dateNaissanceField.getValue() == null) { dateNaissanceError.setText("Veuillez choisir une date."); isValid = false; } else { dateNaissanceError.setText(""); }
-        
+
         if (genreField.getText() == null || !genreField.getText().matches("[MFmf]")) { genreError.setText("M ou F uniquement."); isValid = false; } else { genreError.setText(""); }
-        
+
         if (emailPatientField.getText() == null || !emailPatientField.getText().matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) { emailError.setText("Email invalide."); isValid = false; } else { emailError.setText(""); }
-        
+
         if (telephoneField.getText() == null || !telephoneField.getText().matches("\\d{8,}")) { telephoneError.setText("Numéro invalide (min 8 chiffres)."); isValid = false; } else { telephoneError.setText(""); }
-        
+
         if (adresseField.getText() == null || adresseField.getText().trim().isEmpty()) { adresseError.setText("Adresse obligatoire."); isValid = false; } else { adresseError.setText(""); }
 
         return isValid;
@@ -158,7 +158,7 @@ public class DoctorController {
             return;
         }
         if (!validateDossierForm()) return;
-        
+
         selected.setNumeroDossier(numDossierField.getText());
         selected.setPatientNom(nomField.getText());
         selected.setPatientPrenom(prenomField.getText());
@@ -190,7 +190,7 @@ public class DoctorController {
         adresseField.clear();
         remarquesField.clear();
         patientTable.getSelectionModel().clearSelection();
-        
+
         numDossierError.setText("");
         nomError.setText("");
         prenomError.setText("");
@@ -223,7 +223,32 @@ public class DoctorController {
      */
     @FXML
     private void logout(ActionEvent event) {
-        loadView(event, "/fxml/MainView.fxml", "DocBook");
+        System.out.println("Session cleared. Redirecting to Login...");
+        org.docbook.util.AppState.setCurrentUser(null);
+
+        try {
+            // Updated to match your exact file system path and casing
+            String loginPath = "/fxml/auth/login.fxml";
+
+            java.net.URL resource = getClass().getResource(loginPath);
+
+            if (resource == null) {
+                System.err.println("Still can't find it! Ensure the path starts with / and matches casing.");
+                return;
+            }
+
+            Parent root = FXMLLoader.load(resource);
+            Stage stage = (Stage) ((javafx.scene.Node) event.getSource()).getScene().getWindow();
+
+            stage.setScene(new Scene(root));
+            stage.setTitle("DocBook - Authentification");
+            stage.centerOnScreen();
+            stage.show();
+
+        } catch (IOException e) {
+            System.err.println("Navigation Error: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     /**

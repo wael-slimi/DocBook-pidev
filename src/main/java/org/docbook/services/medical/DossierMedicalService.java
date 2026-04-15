@@ -21,6 +21,44 @@ public class DossierMedicalService implements IService<DossierMedical> {
         }
     }
     /**
+     * Met a jour un dossier medical existant par son identifiant.
+     * Tous les champs metier sont remplaces et la date de modification est actualisee.
+     *
+     * @param dm dossier medical a modifier (id valide requis)
+     */
+    @Override
+    public void update(DossierMedical dm) {
+        // 1. Re-check the ID in case the email was changed
+        Integer linkedId = null;
+        String findUserSql = "SELECT id FROM \"user\" WHERE LOWER(email) = LOWER(?)";
+        try (PreparedStatement pst = connection.prepareStatement(findUserSql)) {
+            pst.setString(1, dm.getEmail());
+            ResultSet rs = pst.executeQuery();
+            if (rs.next()) linkedId = rs.getInt("id");
+        } catch (SQLException e) { e.printStackTrace(); }
+
+        // 2. Update the record
+        String sql = "UPDATE dossier_medical SET numero_dossier=?, patient_nom=?, patient_prenom=?, " +
+                "date_naissance=?, genre=?, email=?, telephone=?, adresse=?, remarques=?, " +
+                "date_modification=?, patient_id=? WHERE id=?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, dm.getNumeroDossier());
+            ps.setString(2, dm.getPatientNom());
+            ps.setString(3, dm.getPatientPrenom());
+            ps.setDate(4, dm.getDateNaissance() != null ? Date.valueOf(dm.getDateNaissance()) : null);
+            ps.setString(5, dm.getGenre());
+            ps.setString(6, dm.getEmail());
+            ps.setString(7, dm.getTelephone());
+            ps.setString(8, dm.getAdresse());
+            ps.setString(9, dm.getRemarques());
+            ps.setTimestamp(10, Timestamp.valueOf(java.time.LocalDateTime.now()));
+            ps.setObject(11, linkedId, java.sql.Types.INTEGER);
+            ps.setInt(12, dm.getId());
+            ps.executeUpdate();
+        } catch (SQLException e) { e.printStackTrace(); }
+    }
+
+    /**
      * Insere un dossier medical dans la table {@code dossier_medical}.
      * La date de creation est fixee automatiquement et l'identifiant genere
      * est reinjecte dans l'objet {@code dm}.
@@ -29,54 +67,62 @@ public class DossierMedicalService implements IService<DossierMedical> {
      */
     @Override
     public void add(DossierMedical dm) {
-        String sql = "INSERT INTO dossier_medical (numero_dossier, patient_nom, patient_prenom, date_naissance, genre, email, telephone, adresse, remarques, date_creation) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        // 1. Find the User ID by the email the doctor typed
+        Integer linkedId = null;
+        String findUserSql = "SELECT id FROM \"user\" WHERE LOWER(email) = LOWER(?)";
+
+        try (PreparedStatement pst = connection.prepareStatement(findUserSql)) {
+            pst.setString(1, dm.getEmail());
+            ResultSet rs = pst.executeQuery();
+            if (rs.next()) {
+                linkedId = rs.getInt("id");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error linking patient account: " + e.getMessage());
+        }
+
+        // 2. Insert the dossier with all fields + the linked patient_id
+        String sql = "INSERT INTO dossier_medical (" +
+                "numero_dossier, patient_nom, patient_prenom, date_naissance, " +
+                "genre, email, telephone, adresse, remarques, " +
+                "date_creation, patient_id) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
         try (PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, dm.getNumeroDossier());
             ps.setString(2, dm.getPatientNom());
             ps.setString(3, dm.getPatientPrenom());
-            ps.setDate(4, Date.valueOf(dm.getDateNaissance()));
+
+            // Handle LocalDate to SQL Date conversion
+            ps.setDate(4, dm.getDateNaissance() != null ? Date.valueOf(dm.getDateNaissance()) : null);
+
             ps.setString(5, dm.getGenre());
             ps.setString(6, dm.getEmail());
             ps.setString(7, dm.getTelephone());
             ps.setString(8, dm.getAdresse());
             ps.setString(9, dm.getRemarques());
-            ps.setTimestamp(10, Timestamp.valueOf(LocalDateTime.now()));
+
+            // Automatic timestamp for creation
+            ps.setTimestamp(10, Timestamp.valueOf(java.time.LocalDateTime.now()));
+
+            // The Linked ID (Secret Fix)
+            // We use setObject with Types.INTEGER so it can be NULL if the email isn't registered
+            ps.setObject(11, linkedId, java.sql.Types.INTEGER);
+
             ps.executeUpdate();
 
+            // 3. Retrieve the generated ID and set it back to the object
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
                     dm.setId(rs.getInt(1));
                 }
             }
-        } catch (SQLException e) {
-            System.err.println("Error adding dossier medical: " + e.getMessage());
-        }
-    }
 
-    /**
-     * Met a jour un dossier medical existant par son identifiant.
-     * Tous les champs metier sont remplaces et la date de modification est actualisee.
-     *
-     * @param dm dossier medical a modifier (id valide requis)
-     */
-    @Override
-    public void update(DossierMedical dm) {
-        String sql = "UPDATE dossier_medical SET numero_dossier=?, patient_nom=?, patient_prenom=?, date_naissance=?, genre=?, email=?, telephone=?, adresse=?, remarques=?, date_modification=? WHERE id=?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, dm.getNumeroDossier());
-            ps.setString(2, dm.getPatientNom());
-            ps.setString(3, dm.getPatientPrenom());
-            ps.setDate(4, Date.valueOf(dm.getDateNaissance()));
-            ps.setString(5, dm.getGenre());
-            ps.setString(6, dm.getEmail());
-            ps.setString(7, dm.getTelephone());
-            ps.setString(8, dm.getAdresse());
-            ps.setString(9, dm.getRemarques());
-            ps.setTimestamp(10, Timestamp.valueOf(LocalDateTime.now()));
-            ps.setInt(11, dm.getId());
-            ps.executeUpdate();
+            System.out.println("Dossier added successfully. Linked to User ID: " + (linkedId != null ? linkedId : "None"));
+
         } catch (SQLException e) {
-            System.err.println("Error updating dossier medical: " + e.getMessage());
+            System.err.println("Error inserting dossier medical: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -163,6 +209,23 @@ public class DossierMedicalService implements IService<DossierMedical> {
         Timestamp modification = rs.getTimestamp("date_modification");
         if (modification != null) dm.setDateModification(modification.toLocalDateTime());
         return dm;
+    }
+
+    public List<DossierMedical> getByPatientId(int patientId) {
+        List<DossierMedical> list = new ArrayList<>();
+        // We only select rows where the patient_id matches the logged-in user
+        String sql = "SELECT * FROM dossier_medical WHERE patient_id = ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, patientId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                list.add(mapResultSetToDossier(rs)); // Use your existing mapping helper
+            }
+        } catch (SQLException e) {
+            System.err.println("Error filtering for patient: " + e.getMessage());
+        }
+        return list;
     }
 }
 

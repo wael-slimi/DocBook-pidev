@@ -8,10 +8,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import org.docbook.entities.records.DossierMedical;
@@ -22,38 +19,77 @@ import org.docbook.util.AppState;
 import java.io.IOException;
 import java.util.List;
 
-
 public class PatientController {
 
     @FXML
     private VBox dossiersContainer;
 
-    private final DossierMedicalService dossierMedicalService = new DossierMedicalService();
+    @FXML
+    private StackPane contentArea; // Matches fx:id in PatientDashboard.fxml
+
+    private final DossierMedicalService dossierService = new DossierMedicalService();
     private final DocumentService documentService = new DocumentService();
 
     /**
-     * Initialise le tableau de bord patient en chargeant les cartes des dossiers.
+     * Initialise le tableau de bord patient.
      */
     @FXML
     public void initialize() {
-        loadDossierCards();
-    }
-
-    /**
-     * Recupere tous les dossiers et construit dynamiquement les cartes d'affichage.
-     */
-    private void loadDossierCards() {
-        dossiersContainer.getChildren().clear();
-        List<DossierMedical> dossiers = dossierMedicalService.getAll();
-
-        for (DossierMedical dossier : dossiers) {
-            int documentCount = documentService.getByDossierId(dossier.getId()).size();
-            dossiersContainer.getChildren().add(createDossierCard(dossier, documentCount));
+        // Only load cards if we are currently looking at the dashboard home
+        if (dossiersContainer != null) {
+            loadDossierCards();
         }
     }
 
     /**
-     * Construit une carte visuelle pour un dossier avec un bouton vers ses documents.
+     * Navigation vers la recherche de docteurs.
+     * Injecte la vue dans le contentArea (StackPane).
+     */
+    @FXML
+    private void handleSearchNav() {
+        try {
+            Parent view = FXMLLoader.load(getClass().getResource("/fxml/patient/search_doctors.fxml"));
+            contentArea.getChildren().setAll(view);
+        } catch (IOException e) {
+            System.err.println("Error loading search_doctors.fxml: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Retourne à la vue d'accueil du dashboard (Bonjour !).
+     */
+    @FXML
+    private void showHome(ActionEvent event) {
+        try {
+            // Reload the dashboard shell to reset the content area
+            Parent root = FXMLLoader.load(getClass().getResource("/fxml/patient/PatientDashboard.fxml"));
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(root));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Récupère tous les dossiers et construit dynamiquement les cartes d'affichage.
+     */
+    private void loadDossierCards() {
+        dossiersContainer.getChildren().clear();
+
+        if (AppState.getCurrentUser() != null) {
+            int myId = AppState.getCurrentUser().getId();
+            List<DossierMedical> myDossiers = dossierService.getByPatientId(myId);
+
+            for (DossierMedical d : myDossiers) {
+                int docCount = documentService.getByDossierId(d.getId()).size();
+                dossiersContainer.getChildren().add(createDossierCard(d, docCount));
+            }
+        }
+    }
+
+    /**
+     * Construit une carte visuelle pour un dossier.
      */
     private VBox createDossierCard(DossierMedical dossier, int documentCount) {
         VBox card = new VBox(10);
@@ -82,43 +118,38 @@ public class PatientController {
         return card;
     }
 
-    /**
-     * Memorise le dossier selectionne puis ouvre la vue des documents associes.
-     */
     private void openDocumentsForDossier(ActionEvent event, int dossierId) {
         AppState.setSelectedDossierId(dossierId);
         loadView(event, "/fxml/doctor/PrescriptionView.fxml", "Mes Documents");
     }
 
-    /**
-     * Ouvre la vue des prescriptions du patient.
-     */
     @FXML
     private void openPrescriptions(ActionEvent event) {
         AppState.setSelectedDossierId(null);
         loadView(event, "/fxml/doctor/PrescriptionView.fxml", "Mes Prescriptions");
     }
 
-    /**
-     * Deconnecte l'utilisateur et retourne vers la vue principale.
-     */
     @FXML
     private void logout(ActionEvent event) {
-        loadView(event, "/fxml/MainView.fxml", "DocBook");
+        AppState.setCurrentUser(null);
+        try {
+            Parent root = FXMLLoader.load(getClass().getResource("/fxml/auth/login.fxml"));
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("DocBook - Authentification");
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
-     * Charge une vue FXML et remplace la scene courante.
+     * Charge une vue FXML et remplace la scène courante (utilisée pour logout/prescriptions).
      */
     private void loadView(ActionEvent event, String fxmlPath, String title) {
         try {
             java.net.URL resource = getClass().getResource(fxmlPath);
-
-            if (resource == null) {
-                System.err.println("FXML NOT FOUND: " + fxmlPath);
-                System.err.println("Check case-sensitivity and folder structure in src/main/resources");
-                return;
-            }
+            if (resource == null) return;
 
             Parent root = FXMLLoader.load(resource);
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
@@ -126,10 +157,7 @@ public class PatientController {
             stage.setTitle(title);
             stage.show();
         } catch (IOException e) {
-            System.err.println("FXML LOAD ERROR: The file exists, but there is an error INSIDE the FXML or its Controller.");
             e.printStackTrace();
         }
     }
 }
-
-
