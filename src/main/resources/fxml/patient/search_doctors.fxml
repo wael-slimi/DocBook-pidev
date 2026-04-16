@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
@@ -8,22 +9,28 @@
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
     <children>
-        <Label text="Rechercher un Spécialiste" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
+        <Label text="Rechercher un Spécialiste" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1f2937;" />
 
-        <HBox spacing="15.0">
+        <HBox spacing="15.0" alignment="BOTTOM_LEFT">
             <children>
-                <VBox HBox.hgrow="ALWAYS">
-                    <Label text="Nom du docteur" />
-                    <TextField fx:id="nameSearchField" promptText="Rechercher par nom..." />
+                <VBox HBox.hgrow="ALWAYS" spacing="5.0">
+                    <Label text="Nom du docteur" style="-fx-font-weight: bold;"/>
+                    <TextField fx:id="nameSearchField" promptText="Ex: Jean Dupont" prefHeight="35.0" />
                 </VBox>
-                <VBox>
-                    <Label text="Prix Maximum (DT)" />
-                    <TextField fx:id="priceSearchField" prefWidth="120.0" promptText="Ex: 60" />
+
+                <VBox HBox.hgrow="ALWAYS" spacing="5.0">
+                    <Label text="Spécialité" style="-fx-font-weight: bold;"/>
+                    <TextField fx:id="specialtySearchField" promptText="Ex: Cardiologue" prefHeight="35.0" />
+                </VBox>
+
+                <VBox spacing="5.0">
+                    <Label text="Prix Max (DT)" style="-fx-font-weight: bold;"/>
+                    <TextField fx:id="priceSearchField" prefWidth="100.0" promptText="Ex: 80" prefHeight="35.0" />
                 </VBox>
             </children>
         </HBox>
 
-        <TableView fx:id="doctorTable" VBox.vgrow="ALWAYS">
+        <TableView fx:id="doctorTable" VBox.vgrow="ALWAYS" style="-fx-background-radius: 5; -fx-border-radius: 5;">
             <columns>
                 <TableColumn fx:id="colName" prefWidth="200.0" text="Nom" />
                 <TableColumn fx:id="colEmail" prefWidth="200.0" text="Email" />
@@ -34,5 +41,9 @@
                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
             </columnResizePolicy>
         </TableView>
+
+        <HBox alignment="CENTER_RIGHT">
+            <Label text="Astuce: Cliquez sur les colonnes pour trier par prix ou par nom." style="-fx-text-fill: #6b7280; -fx-font-style: italic;" />
+        </HBox>
     </children>
 </VBox>

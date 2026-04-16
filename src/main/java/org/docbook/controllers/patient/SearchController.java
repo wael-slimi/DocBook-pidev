@@ -17,6 +17,7 @@ import java.util.ResourceBundle;
 public class SearchController implements Initializable {
 
     @FXML private TextField nameSearchField;
+    @FXML private TextField specialtySearchField; // Added for specialty filtering
     @FXML private TextField priceSearchField;
     @FXML private TableView<Doctor> doctorTable;
 
@@ -25,7 +26,6 @@ public class SearchController implements Initializable {
     @FXML private TableColumn<Doctor, String> colRole;
     @FXML private TableColumn<Doctor, Double> colPrice;
 
-    // This handles the database connection for you!
     private final UserService userService = new UserService();
     private final ObservableList<Doctor> doctorList = FXCollections.observableArrayList();
 
@@ -37,13 +37,15 @@ public class SearchController implements Initializable {
         colRole.setCellValueFactory(new PropertyValueFactory<>("specialty"));
         colPrice.setCellValueFactory(new PropertyValueFactory<>("consultationFee"));
 
-        // 2. Load Data from Service
+        // 2. Load Data
         loadDoctorData();
 
         // 3. Setup Filtering Logic
         FilteredList<Doctor> filteredData = new FilteredList<>(doctorList, p -> true);
 
+        // Listen to all three fields
         nameSearchField.textProperty().addListener((obs, oldVal, newVal) -> applyFilters(filteredData));
+        specialtySearchField.textProperty().addListener((obs, oldVal, newVal) -> applyFilters(filteredData));
         priceSearchField.textProperty().addListener((obs, oldVal, newVal) -> applyFilters(filteredData));
 
         // 4. Setup Sorting
@@ -55,7 +57,6 @@ public class SearchController implements Initializable {
 
     private void loadDoctorData() {
         doctorList.clear();
-        // The SQL logic is inside this method in UserService.java
         doctorList.addAll(userService.getAllDoctors());
     }
 
@@ -65,6 +66,10 @@ public class SearchController implements Initializable {
             String nameFilter = nameSearchField.getText() == null ? "" : nameSearchField.getText().toLowerCase().trim();
             boolean matchesName = doctor.getName().toLowerCase().contains(nameFilter);
 
+            // Specialty Filter (The new requirement)
+            String specFilter = specialtySearchField.getText() == null ? "" : specialtySearchField.getText().toLowerCase().trim();
+            boolean matchesSpecialty = doctor.getSpecialty() != null && doctor.getSpecialty().toLowerCase().contains(specFilter);
+
             // Price Filter
             String priceFilter = priceSearchField.getText() == null ? "" : priceSearchField.getText().trim();
             boolean matchesPrice = true;
@@ -73,11 +78,11 @@ public class SearchController implements Initializable {
                     double maxPrice = Double.parseDouble(priceFilter);
                     matchesPrice = doctor.getConsultationFee() <= maxPrice;
                 } catch (NumberFormatException e) {
-                    matchesPrice = true; // Skip filtering if input is invalid
+                    matchesPrice = true;
                 }
             }
 
-            return matchesName && matchesPrice;
+            return matchesName && matchesSpecialty && matchesPrice;
         });
     }
 }

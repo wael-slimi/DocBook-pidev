@@ -221,6 +221,35 @@ public class UserService implements ICrud<User> {
         return false;
     }
 
+    public List<Doctor> searchDoctors(String specialty) {
+        List<Doctor> doctors = new ArrayList<>();
+        // Using ILIKE for case-insensitive partial matching in PostgreSQL
+        String sql = "SELECT u.*, d.specialty, d.consultation_fee, d.bio FROM \"user\" u " +
+                "JOIN doctor d ON u.id = d.id " +
+                "WHERE u.dtype = 'doctor' AND d.specialty ILIKE ?";
+
+        try (Connection conn = DBConnection.getInstance().getConnection();
+             PreparedStatement pst = conn.prepareStatement(sql)) {
+
+            pst.setString(1, "%" + specialty + "%");
+            ResultSet rs = pst.executeQuery();
+
+            while (rs.next()) {
+                Doctor d = new Doctor();
+                d.setId(rs.getInt("id"));
+                d.setName(rs.getString("name"));
+                d.setEmail(rs.getString("email"));
+                d.setSpecialty(rs.getString("specialty"));
+                d.setConsultationFee(rs.getDouble("consultation_fee"));
+                d.setBio(rs.getString("bio"));
+                doctors.add(d);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return doctors;
+    }
+
     public void updateProfile(User user) throws SQLException {
         String sqlUser = "UPDATE \"user\" SET name = ?, password = ? WHERE id = ?";
         try (Connection conn = getConnection()) {
