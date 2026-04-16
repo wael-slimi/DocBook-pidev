@@ -10,6 +10,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import org.docbook.entities.records.DossierMedical;
 import org.docbook.services.medical.DossierMedicalService;
@@ -18,6 +19,8 @@ import java.io.IOException;
 import java.util.List;
 
 public class DoctorController {
+
+    @FXML private StackPane contentArea;
 
     @FXML
     private TableView<DossierMedical> patientTable;
@@ -86,6 +89,19 @@ public class DoctorController {
         });
 
         loadPatients();
+    }
+
+    // Inside DoctorController.java
+    @FXML
+    private void handleProfileNav() {
+        try {
+            // Make sure this path matches your folder structure exactly
+            Parent root = FXMLLoader.load(getClass().getResource("/fxml/profile.fxml"));
+            contentArea.getChildren().setAll(root);
+        } catch (IOException e) {
+            System.err.println("Error loading profile: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -250,6 +266,8 @@ public class DoctorController {
             e.printStackTrace();
         }
     }
+
+
 
     /**
      * Charge une vue FXML et met a jour la fenetre courante.

@@ -24,7 +24,7 @@
                 <Button text="🔍 Trouver un Docteur" onAction="#handleSearchNav" styleClass="nav-link" prefWidth="210" style="-fx-alignment: CENTER_LEFT;"/>
                 <Button text="Mes Dossiers" styleClass="nav-link" prefWidth="210" style="-fx-alignment: CENTER_LEFT;"/>
                 <Button text="Mes Prescriptions" styleClass="nav-link" prefWidth="210" onAction="#openPrescriptions" style="-fx-alignment: CENTER_LEFT;"/>
-                <Button text="Mon Profil" styleClass="nav-link" prefWidth="210" style="-fx-alignment: CENTER_LEFT;"/>
+                <Button text="Mon Profil" onAction="#handleProfileNav" styleClass="nav-link" prefWidth="210" style="-fx-alignment: CENTER_LEFT;"/>
             </VBox>
 
             <Region VBox.vgrow="ALWAYS" />

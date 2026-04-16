@@ -43,18 +43,32 @@ public class UserService implements ICrud<User> {
 
     @Override
     public User read(int id) {
-        String sql = "SELECT * FROM \"user\" WHERE id = ?";
+        // We use a LEFT JOIN to get doctor details if they exist
+        String sql = "SELECT u.*, d.specialty, d.consultation_fee, d.bio FROM \"user\" u " +
+                "LEFT JOIN doctor d ON u.id = d.id WHERE u.id = ?";
         try (Connection conn = getConnection();
              PreparedStatement pst = conn.prepareStatement(sql)) {
             pst.setInt(1, id);
             ResultSet rs = pst.executeQuery();
             if (rs.next()) {
-                User u = new User();
+                User u;
+                String dtype = rs.getString("dtype");
+
+                if ("doctor".equalsIgnoreCase(dtype)) {
+                    Doctor d = new Doctor();
+                    d.setSpecialty(rs.getString("specialty"));
+                    d.setConsultationFee(rs.getDouble("consultation_fee"));
+                    d.setBio(rs.getString("bio"));
+                    u = d;
+                } else {
+                    u = new User();
+                }
+
                 u.setId(rs.getInt("id"));
                 u.setName(rs.getString("name"));
                 u.setEmail(rs.getString("email"));
                 u.setRole(rs.getString("role"));
-                u.setDtype(rs.getString("dtype"));
+                u.setDtype(dtype);
                 return u;
             }
         } catch (SQLException e) { e.printStackTrace(); }
@@ -62,7 +76,8 @@ public class UserService implements ICrud<User> {
     }
 
     public User login(String email, String password) {
-        String sql = "SELECT * FROM \"user\" WHERE email = ?";
+        String sql = "SELECT u.*, d.specialty, d.consultation_fee, d.bio FROM \"user\" u " +
+                "LEFT JOIN doctor d ON u.id = d.id WHERE u.email = ?";
         try (Connection conn = getConnection();
              PreparedStatement pst = conn.prepareStatement(sql)) {
             pst.setString(1, email);
@@ -70,11 +85,23 @@ public class UserService implements ICrud<User> {
             if (rs.next()) {
                 String hashedFromDb = rs.getString("password");
                 if (PasswordUtil.verify(password, hashedFromDb)) {
-                    User u = new User();
+                    User u;
+                    String dtype = rs.getString("dtype");
+
+                    if ("doctor".equalsIgnoreCase(dtype)) {
+                        Doctor d = new Doctor();
+                        d.setSpecialty(rs.getString("specialty"));
+                        d.setConsultationFee(rs.getDouble("consultation_fee"));
+                        d.setBio(rs.getString("bio"));
+                        u = d;
+                    } else {
+                        u = new User();
+                    }
+
                     u.setId(rs.getInt("id"));
                     u.setName(rs.getString("name"));
                     u.setEmail(rs.getString("email"));
-                    u.setDtype(rs.getString("dtype"));
+                    u.setDtype(dtype);
                     u.setRole(rs.getString("role"));
                     return u;
                 }
@@ -192,5 +219,27 @@ public class UserService implements ICrud<User> {
             System.err.println("Database error: " + e.getMessage());
         }
         return false;
+    }
+
+    public void updateProfile(User user) throws SQLException {
+        String sqlUser = "UPDATE \"user\" SET name = ?, password = ? WHERE id = ?";
+        try (Connection conn = getConnection()) {
+            PreparedStatement st = conn.prepareStatement(sqlUser);
+            st.setString(1, user.getName());
+            st.setString(2, user.getPassword());
+            st.setInt(3, user.getId());
+            st.executeUpdate();
+
+            if (user instanceof Doctor) {
+                Doctor d = (Doctor) user;
+                String sqlDoc = "UPDATE doctor SET specialty = ?, consultation_fee = ?, bio = ? WHERE id = ?";
+                PreparedStatement stDoc = conn.prepareStatement(sqlDoc);
+                stDoc.setString(1, d.getSpecialty());
+                stDoc.setDouble(2, d.getConsultationFee());
+                stDoc.setString(3, d.getBio());
+                stDoc.setInt(4, d.getId());
+                stDoc.executeUpdate();
+            }
+        }
     }
 }

@@ -143,6 +143,25 @@ public class PatientController {
         }
     }
 
+
+    @FXML
+    private void handleProfileNav() {
+        try {
+            // Path must match exactly!
+            // Use "/fxml/profile.fxml" if it's in resources/fxml/
+            Parent view = FXMLLoader.load(getClass().getResource("/fxml/profile.fxml"));
+
+            if (contentArea != null) {
+                contentArea.getChildren().setAll(view);
+            } else {
+                System.err.println("Critical Error: contentArea StackPane is null!");
+            }
+        } catch (IOException e) {
+            System.err.println("Error: Could not load profile.fxml. check path and casing.");
+            e.printStackTrace();
+        }
+    }
+
     /**
      * Charge une vue FXML et remplace la scène courante (utilisée pour logout/prescriptions).
      */
