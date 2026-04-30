@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Circle?>
+<ScrollPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="tn.esprit.controller.DashboardController"
+            fitToWidth="true"
+            style="-fx-padding: 0; -fx-border-color: transparent;">
+
+    <VBox spacing="20" style="-fx-padding: 30; -fx-background-color: #ecf0f1;">
+
+        <!-- Header -->
+        <VBox spacing="10" styleClass="top-bar" style="-fx-background-color: white; -fx-padding: 20; -fx-border-radius: 12; -fx-margin: 0;">
+            <Label text="Dashboard" styleClass="title-label"/>
+            <Label text="Welcome to your healthcare management system" style="-fx-text-fill: #7f8c8d; -fx-font-size: 13px;"/>
+        </VBox>
+
+        <!-- Statistics Cards Row -->
+        <HBox spacing="20" style="-fx-margin: 10 0 0 0;">
+
+            <!-- Total Appointments Card -->
+            <VBox styleClass="stat-card" HBox.hgrow="ALWAYS" spacing="10" style="-fx-alignment: center; -fx-padding: 25;">
+                <Label text="📋" style="-fx-font-size: 32px;"/>
+                <Label text="Total Appointments" styleClass="stat-card-title"/>
+                <Label fx:id="lblTotalAppointments" text="0" styleClass="stat-card-value"/>
+                <Label text="Active and completed" style="-fx-font-size: 10px; -fx-text-fill: #95a5a6;"/>
+            </VBox>
+
+            <!-- Active Consultations Card -->
+            <VBox styleClass="stat-card" HBox.hgrow="ALWAYS" spacing="10" style="-fx-alignment: center; -fx-padding: 25;">
+                <Label text="🎥" style="-fx-font-size: 32px;"/>
+                <Label text="Active Consultations" styleClass="stat-card-title"/>
+                <Label fx:id="lblActiveConsultations" text="0" styleClass="stat-card-value"/>
+                <Label text="Ongoing sessions" style="-fx-font-size: 10px; -fx-text-fill: #95a5a6;"/>
+            </VBox>
+
+            <!-- Today's Schedule Card -->
+            <VBox styleClass="stat-card" HBox.hgrow="ALWAYS" spacing="10" style="-fx-alignment: center; -fx-padding: 25;">
+                <Label text="📅" style="-fx-font-size: 32px;"/>
+                <Label text="Today's Schedule" styleClass="stat-card-title"/>
+                <Label fx:id="lblTodayAppointments" text="0" styleClass="stat-card-value"/>
+                <Label text="For today" style="-fx-font-size: 10px; -fx-text-fill: #95a5a6;"/>
+            </VBox>
+
+        </HBox>
+
+        <!-- Analytics Section - PieChart and Widgets Row -->
+        <HBox spacing="20" VBox.vgrow="ALWAYS">
+            <!-- Charts Container (PieChart) -->
+            <VBox fx:id="chartsContainer" 
+                  styleClass="card-container" 
+                  HBox.hgrow="ALWAYS"
+                  spacing="15" 
+                  style="-fx-padding: 25;">
+                <Label text="📊 Analytics" styleClass="subtitle-label"/>
+            </VBox>
+
+            <!-- Widgets Container (Weather + Calendar) -->
+            <HBox fx:id="widgetsContainer"
+                  HBox.hgrow="ALWAYS"
+                  spacing="15"
+                  style="-fx-padding: 0;">
+            </HBox>
+        </HBox>
+
+        <!-- Quick Actions -->
+        <VBox spacing="15" styleClass="card-container" style="-fx-padding: 25;">
+            <Label text="Quick Actions" styleClass="subtitle-label"/>
+            <HBox spacing="15">
+                <Button text="+ New Appointment" styleClass="btn-primary" onAction="#onNewAppointment"/>
+                <Button text="+ New Consultation" styleClass="btn-primary" onAction="#onNewConsultation"/>
+                <Button text="View All Appointments" styleClass="btn-success" onAction="#onViewAllAppointments"/>
+                <Button text="View All Consultations" styleClass="btn-success" onAction="#onViewAllConsultations"/>
+            </HBox>
+            <HBox spacing="15">
+                <Button fx:id="btnOpenChat"
+                        text="🤖 AI Chat Assistant"
+                        style="-fx-padding: 10 20; -fx-font-size: 12; -fx-background-color: #4CAF50; -fx-text-fill: white; -fx-cursor: hand; -fx-border-radius: 4;"
+                        onAction="#openChatWindow"/>
+                <Button fx:id="btnTestNotification"
+                        text="🔔 Test Notification"
+                        style="-fx-padding: 10 20; -fx-font-size: 12; -fx-background-color: #FF9800; -fx-text-fill: white; -fx-cursor: hand; -fx-border-radius: 4;"
+                        onAction="#onTestNotification"/>
+            </HBox>
+        </VBox>
+
+        <!-- Recent Appointments -->
+        <VBox spacing="15" styleClass="card-container" style="-fx-padding: 25;">
+            <HBox spacing="15" alignment="CENTER_LEFT">
+                <Label text="Recent Appointments" styleClass="subtitle-label" HBox.hgrow="ALWAYS"/>
+                <Button text="View All →" styleClass="btn-icon"/>
+            </HBox>
+            <VBox fx:id="recentAppointmentsContainer" spacing="10" style="-fx-padding: 10 0;">
+                <Label text="No recent appointments" style="-fx-text-fill: #95a5a6; -fx-font-size: 12px;"/>
+            </VBox>
+        </VBox>
+
+        <!-- System Status -->
+        <HBox spacing="20">
+            <VBox styleClass="card-container" HBox.hgrow="ALWAYS" spacing="10" style="-fx-padding: 20;">
+                <Label text="Database Status" styleClass="subtitle-label"/>
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Circle fill="green" radius="6"/>
+                    <Label text="Connected" style="-fx-font-size: 12px; -fx-text-fill: #27ae60;"/>
+                </HBox>
+            </VBox>
+
+            <VBox styleClass="card-container" HBox.hgrow="ALWAYS" spacing="10" style="-fx-padding: 20;">
+                <Label text="System Performance" styleClass="subtitle-label"/>
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Circle fill="#3498db" radius="6"/>
+                    <Label text="Optimal" style="-fx-font-size: 12px; -fx-text-fill: #3498db;"/>
+                </HBox>
+            </VBox>
+        </HBox>
+
+    </VBox>
+
+</ScrollPane>

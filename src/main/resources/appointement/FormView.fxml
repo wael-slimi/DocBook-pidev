@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="tn.esprit.controller.AppointmentFormController"
+            prefWidth="500" prefHeight="600"
+            style="-fx-background-color: white;">
+
+    <!-- TOP: Title -->
+    <top>
+        <VBox style="-fx-padding: 20; -fx-border-color: #ecf0f1; -fx-border-width: 0 0 1 0;">
+            <Label fx:id="formTitle" text="New Appointment" styleClass="title-label"/>
+            <Label fx:id="formSubtitle" text="Fill in the details below" style="-fx-text-fill: #7f8c8d; -fx-font-size: 12px; -fx-padding: 5 0 0 0;"/>
+        </VBox>
+    </top>
+
+    <!-- CENTER: Form Fields -->
+    <center>
+        <ScrollPane fitToWidth="true" style="-fx-padding: 0; -fx-border-color: transparent;">
+            <VBox spacing="15" styleClass="form-container">
+
+                <!-- Scheduled Date/Time -->
+                <VBox spacing="5">
+                    <Label text="Scheduled Date &amp; Time" styleClass="form-label"/>
+                    <DatePicker fx:id="dpScheduledDate" styleClass="form-field" prefWidth="450"/>
+                </VBox>
+
+                <!-- Time Picker -->
+                <VBox spacing="5">
+                    <Label text="Time (HH:mm)" styleClass="form-label"/>
+                    <TextField fx:id="tfTime"
+                               styleClass="form-field"
+                               promptText="14:30"
+                               prefWidth="450"/>
+                </VBox>
+
+                <!-- Department -->
+                <VBox spacing="5">
+                    <Label text="Department" styleClass="form-label"/>
+                    <ComboBox fx:id="cbDepartment"
+                              styleClass="form-field"
+                              prefWidth="450"
+                              promptText="Select Department"/>
+                </VBox>
+
+                <!-- Doctor Name -->
+                <VBox spacing="5">
+                    <Label text="Doctor Name" styleClass="form-label"/>
+                    <TextField fx:id="tfDoctor"
+                               styleClass="form-field"
+                               promptText="Enter doctor name"
+                               prefWidth="450"/>
+                </VBox>
+
+                <!-- Status -->
+                <VBox spacing="5">
+                    <Label text="Status" styleClass="form-label"/>
+                    <ComboBox fx:id="cbStatus"
+                              styleClass="form-field"
+                              prefWidth="450"
+                              promptText="Select Status"/>
+                </VBox>
+
+                <!-- Message -->
+                <VBox spacing="5">
+                    <Label text="Message / Notes" styleClass="form-label"/>
+                    <TextArea fx:id="taMessage"
+                              styleClass="form-field"
+                              wrapText="true"
+                              prefHeight="120"
+                              prefWidth="450"
+                              promptText="Enter any additional notes or message..."/>
+                </VBox>
+
+                <!-- Validation Message -->
+                <Label fx:id="lblErrorMessage"
+                       style="-fx-text-fill: #e74c3c; -fx-font-size: 11px; -fx-padding: 5 0;"
+                       text=""/>
+
+            </VBox>
+        </ScrollPane>
+    </center>
+
+    <!-- BOTTOM: Action Buttons -->
+    <bottom>
+        <HBox spacing="10"
+              alignment="CENTER_RIGHT"
+              style="-fx-padding: 20; -fx-border-color: #ecf0f1; -fx-border-width: 1 0 0 0;">
+            <Button fx:id="btnCancel"
+                    text="Cancel"
+                    styleClass="btn-icon"
+                    onAction="#onCancel"
+                    style="-fx-text-fill: #7f8c8d; -fx-font-weight: bold;"/>
+            <Button fx:id="btnSave"
+                    text="Save Appointment"
+                    styleClass="btn-primary"
+                    onAction="#onSave"/>
+        </HBox>
+    </bottom>
+
+</BorderPane>
