@@ -1,0 +1,160 @@
+/* --- Global Variables & Root --- */
+.root {
+    -fx-font-family: "Public Sans", "Inter", "Segoe UI", sans-serif;
+    -fx-background-color: #f7f9fb; /* light grey-blue background */
+}
+
+/* --- Sidebar Styling (New) --- */
+.sidebar {
+    -fx-background-color: white;
+    -fx-border-color: #eceef0;
+    -fx-border-width: 0 1 0 0;
+}
+
+.logo-container {
+    -fx-background-color: #86f2e4; /* secondary-container */
+    -fx-background-radius: 8;
+}
+
+.nav-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #45464d; /* on-surface-variant */
+    -fx-font-size: 13px;
+    -fx-padding: 12 15;
+    -fx-cursor: hand;
+}
+
+.nav-button-active {
+    -fx-background-color: #f1f5f9;
+    -fx-text-fill: #006a61; /* Clinical Teal */
+    -fx-border-color: #006a61;
+    -fx-border-width: 0 4 0 0; /* Right-side highlight like in your HTML */
+    -fx-font-weight: bold;
+}
+
+/* --- TableView Styling (The Core of Admin Portal) --- */
+.table-view {
+    -fx-background-color: transparent;
+    -fx-border-color: #e0e3e5;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #f8fafc;
+    -fx-background-radius: 8 8 0 0;
+}
+
+.table-view .column-header, .table-view .filler {
+    -fx-background-color: transparent;
+    -fx-border-color: #e0e3e5;
+    -fx-border-width: 0 0 1 0;
+}
+
+.table-row-cell:hover {
+    -fx-background-color: #f1f5f9;
+}
+
+/* --- Modern Card Containers --- */
+.layout-content-container {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-padding: 24;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 2);
+}
+
+/* --- Buttons Updated to Teal --- */
+.btn-primary {
+    -fx-background-color: #006a61; /* Updated to Teal */
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-padding: 10 20;
+    -fx-cursor: hand;
+}
+
+.btn-primary:hover { -fx-background-color: #005049; }
+
+.btn-outline {
+    -fx-background-color: transparent;
+    -fx-border-color: #006a61;
+    -fx-text-fill: #006a61;
+    -fx-background-radius: 8;
+    -fx-font-weight: bold;
+}
+
+/* --- Stats Cards (The "Bento" look) --- */
+.stat-card-teal {
+    -fx-background-color: #006a61;
+    -fx-background-radius: 12;
+    -fx-padding: 20;
+}
+
+.stat-card-white {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-border-color: #e0e3e5;
+    -fx-padding: 20;
+}
+
+.stat-label-white { -fx-text-fill: #e6f7f5; -fx-font-size: 12px; -fx-font-weight: bold; }
+.stat-value-white { -fx-text-fill: white; -fx-font-size: 28px; -fx-font-weight: bold; }
+
+.progress-teal { -fx-accent: #006a61; }
+.progress-amber { -fx-accent: #f59e0b; }
+.progress-indigo { -fx-accent: #6366f1; }
+
+.main-scroll-pane {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.main-scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+.table-container {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-border-color: #e0e3e5;
+    -fx-padding: 0;
+}
+
+.table-container .table-view {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+}
+
+.filters-container {
+    -fx-background-color: white;
+    -fx-background-radius: 8;
+    -fx-border-color: #e0e3e5;
+}
+
+.body-md {
+    -fx-text-fill: #6b7280;
+    -fx-font-size: 14px;
+}
+
+.h2 {
+    -fx-text-fill: #111827;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
+
+.version-title {
+    -fx-text-fill: #374151;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+}
+
+.version-tag {
+    -fx-text-fill: #9ca3af;
+    -fx-font-size: 11px;
+}
+
+.label-caps-sm {
+    -fx-text-fill: #6b7280;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}

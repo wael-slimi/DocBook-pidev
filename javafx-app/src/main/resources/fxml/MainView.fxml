@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.docbook.controllers.records.MainController"
+      styleClass="main-container" stylesheets="@../css/style.css"
+      prefHeight="700.0" prefWidth="1000.0" spacing="40">
+
+    <VBox alignment="CENTER" spacing="10">
+        <Text text="DocBook" styleClass="title-text"/>
+        <Text text="La plateforme moderne de suivi de santé connectée" styleClass="subtitle-text"/>
+    </VBox>
+
+    <HBox alignment="CENTER" spacing="50">
+        <!-- Doctor Card -->
+        <VBox styleClass="card" alignment="CENTER" spacing="20" fx:id="doctorCard" onMouseClicked="#openDoctorDashboardCard">
+            <Label text="👨‍⚕️" style="-fx-font-size: 64px;"/>
+            <VBox alignment="CENTER" spacing="5">
+                <Text text="Espace Médecin" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-fill: #1e293b;"/>
+                <Text text="Gérez vos dossiers patients, prescriptions et suivis SOAP." textAlignment="CENTER" style="-fx-font-size: 14px; -fx-fill: #64748b;" wrappingWidth="200"/>
+            </VBox>
+            <Button text="Accéder" styleClass="doctor-btn" onAction="#openDoctorDashboard"/>
+        </VBox>
+
+        <!-- Patient Card -->
+        <VBox styleClass="card" alignment="CENTER" spacing="20" fx:id="patientCard" onMouseClicked="#openPatientDashboardCard">
+            <Label text="👤" style="-fx-font-size: 64px;"/>
+            <VBox alignment="CENTER" spacing="5">
+                <Text text="Espace Patient" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-fill: #1e293b;"/>
+                <Text text="Consultez vos ordonnances et suivez votre santé au quotidien." textAlignment="CENTER" style="-fx-font-size: 14px; -fx-fill: #64748b;" wrappingWidth="200"/>
+            </VBox>
+            <Button text="Accéder" styleClass="patient-btn" onAction="#openPatientDashboard"/>
+        </VBox>
+    </HBox>
+    
+    <Text text="Connectez-vous pour une expérience de santé optimisée." styleClass="subtitle-text" textAlignment="CENTER"/>
+    
+</VBox>
+
+

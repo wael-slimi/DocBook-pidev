@@ -1,0 +1,29 @@
+.nav-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #475569;
+    -fx-font-family: "Public Sans";
+    -fx-font-size: 13px;
+    -fx-padding: 10 20;
+    -fx-cursor: hand;
+}
+
+.nav-button:hover {
+    -fx-background-color: #f1f5f9;
+}
+
+/* The "Active" state like your HTML border-r-2 */
+.nav-button-active {
+    -fx-background-color: #f1f5f9;
+    -fx-text-fill: #0d9488;
+    -fx-border-color: #0d9488;
+    -fx-border-width: 0 4 0 0;
+}
+
+.icon-verified {
+    -fx-shape: "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z";
+    -fx-background-color: #0d9488;
+    -fx-min-width: 16px;
+    -fx-min-height: 16px;
+    -fx-max-width: 16px;
+    -fx-max-height: 16px;
+}

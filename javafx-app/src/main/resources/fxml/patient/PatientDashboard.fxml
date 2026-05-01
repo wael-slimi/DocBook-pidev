@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.docbook.controllers.patient.PatientController"
+            stylesheets="/css/style.css"
+            prefHeight="800.0" prefWidth="1200.0">
+
+    <left>
+        <VBox styleClass="dashboard-sidebar" prefWidth="250" spacing="20" style="-fx-background-color: #1e293b; -fx-padding: 20;">
+            <VBox alignment="CENTER" spacing="10">
+                <Text text="DocBook" style="-fx-fill: white; -fx-font-size: 26px; -fx-font-weight: bold;"/>
+                <Text text="Espace Patient" style="-fx-fill: #94a3b8;"/>
+            </VBox>
+
+            <Separator style="-fx-opacity: 0.1;"/>
+
+            <VBox spacing="10">
+                <Button text="Tableau de Bord" onAction="#showHome" styleClass="nav-link" prefWidth="210" style="-fx-alignment: CENTER_LEFT;"/>
+                <Button text="🔍 Trouver un Docteur" onAction="#handleSearchNav" styleClass="nav-link" prefWidth="210" style="-fx-alignment: CENTER_LEFT;"/>
+                <Button text="Mes Dossiers" styleClass="nav-link" prefWidth="210" style="-fx-alignment: CENTER_LEFT;"/>
+                <Button text="Mes Prescriptions" styleClass="nav-link" prefWidth="210" onAction="#openPrescriptions" style="-fx-alignment: CENTER_LEFT;"/>
+                <Button text="Mon Profil" onAction="#handleProfileNav" styleClass="nav-link" prefWidth="210" style="-fx-alignment: CENTER_LEFT;"/>
+            </VBox>
+
+            <Region VBox.vgrow="ALWAYS" />
+
+            <Button text="Déconnexion" onAction="#logout"
+                    style="-fx-background-color: #334155; -fx-text-fill: #fca5a5; -fx-background-radius: 8; -fx-padding: 10; -fx-cursor: hand;"
+                    prefWidth="210"/>
+        </VBox>
+    </left>
+
+    <center>
+        <StackPane fx:id="contentArea">
+            <VBox spacing="30" style="-fx-padding: 40; -fx-background-color: #f8fafc;">
+                <VBox spacing="10">
+                    <Text text="Bonjour !" style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-fill: #1e293b;"/>
+                    <Text text="Voici vos dossiers médicaux et documents partagés." style="-fx-font-size: 16px; -fx-fill: #64748b;"/>
+                </VBox>
+                <Separator/>
+                <VBox spacing="20" VBox.vgrow="ALWAYS">
+                    <Text text="Historique Médical" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-fill: #334155;"/>
+                    <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" VBox.vgrow="ALWAYS">
+                        <VBox fx:id="dossiersContainer" spacing="20">
+                            <padding>
+                                <Insets bottom="20" left="5" right="15" top="5"/>
+                            </padding>
+                        </VBox>
+                    </ScrollPane>
+                </VBox>
+            </VBox>
+        </StackPane>
+    </center>
+</BorderPane>

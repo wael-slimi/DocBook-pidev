@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.docbook.controllers.doctor.PrescriptionController"
+      stylesheets="/css/style.css"
+      spacing="20" style="-fx-padding: 30;">
+
+    <HBox alignment="CENTER_LEFT" spacing="20">
+        <Button text="← Retour" onAction="#goBack" style="-fx-background-color: transparent;"/>
+        <Text text="Mes Ordonnances &amp; Suivi" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+    </HBox>
+
+    <TableView fx:id="prescriptionTable" VBox.vgrow="ALWAYS" styleClass="table-view">
+        <columns>
+            <TableColumn fx:id="dateCol" text="Date" prefWidth="120"/>
+            <TableColumn fx:id="titleCol" text="Titre" prefWidth="200"/>
+            <TableColumn fx:id="contentCol" text="Contenu / Médicaments" prefWidth="350"/>
+            <TableColumn fx:id="fileCol" text="Fichier Joint" prefWidth="150"/>
+        </columns>
+    </TableView>
+</VBox>
+
+

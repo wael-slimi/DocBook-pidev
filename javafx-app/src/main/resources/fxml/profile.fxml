@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+
+<VBox spacing="25" style="-fx-padding: 40; -fx-background-color: #f8fafc;"
+      xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.docbook.controllers.ProfileController">
+
+    <VBox spacing="10">
+        <Text text="Mon Profil" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-fill: #1e293b;"/>
+        <Text text="Mettez à jour vos informations personnelles et professionnelles ci-dessous." style="-fx-fill: #64748b; -fx-font-size: 14px;"/>
+    </VBox>
+
+    <Separator/>
+
+    <HBox spacing="30">
+        <VBox spacing="20" HBox.hgrow="ALWAYS">
+
+            <VBox spacing="15" style="-fx-background-color: white; -fx-padding: 25; -fx-background-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5);">
+                <Text text="Informations Générales" style="-fx-font-weight: bold; -fx-font-size: 16px; -fx-fill: #334155;"/>
+
+                <VBox spacing="10" alignment="CENTER">
+                    <ImageView fx:id="avatarImage" fitHeight="120" fitWidth="120" preserveRatio="true" style="-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 10, 0, 0, 3);"/>
+                    <HBox spacing="10" alignment="CENTER">
+                        <Button text="Upload Photo"
+                                onAction="#handleUploadAvatar"
+                                style="-fx-background-color: #6366f1; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 16; -fx-background-radius: 6; -fx-cursor: hand;"/>
+                        <Button text="Generate AI Avatar"
+                                onAction="#handleGenerateAvatar"
+                                style="-fx-background-color: #10b981; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 16; -fx-background-radius: 6; -fx-cursor: hand;"/>
+                    </HBox>
+                    <TextField fx:id="avatarPromptField" promptText="Describe your avatar (e.g. a doctor with glasses)" visible="false" managed="false" maxWidth="280"/>
+                </VBox>
+
+                <VBox spacing="5">
+                    <Label text="Nom Complet" style="-fx-font-weight: bold;"/>
+                    <TextField fx:id="nameField" promptText="Entrez votre nom"/>
+                </VBox>
+
+                <VBox spacing="5">
+                    <Label text="Adresse Email" style="-fx-font-weight: bold;"/>
+                    <TextField fx:id="emailField" editable="false" style="-fx-background-color: #f1f5f9; -fx-text-fill: #64748b;"/>
+                </VBox>
+
+                <VBox spacing="5">
+                    <Label text="Nouveau mot de passe" style="-fx-font-weight: bold;"/>
+                    <PasswordField fx:id="passwordField" promptText="Laissez vide pour ne pas changer"/>
+                </VBox>
+            </VBox>
+
+            <VBox fx:id="doctorExtraFields" spacing="15" style="-fx-background-color: white; -fx-padding: 25; -fx-background-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5);">
+                <Text text="Informations Professionnelles" style="-fx-font-weight: bold; -fx-font-size: 16px; -fx-fill: #334155;"/>
+
+                <VBox spacing="5">
+                    <Label text="Spécialité" style="-fx-font-weight: bold;"/>
+                    <TextField fx:id="specialtyField" promptText="ex: Cardiologue, Généraliste..."/>
+                </VBox>
+
+                <VBox spacing="5">
+                    <Label text="Prix de la Consultation (TND)" style="-fx-font-weight: bold;"/>
+                    <TextField fx:id="priceField" promptText="ex: 70.0"/>
+                </VBox>
+
+                <VBox spacing="5">
+                    <Label text="Biographie / Description" style="-fx-font-weight: bold;"/>
+                    <TextArea fx:id="bioArea" prefHeight="120" wrapText="true" promptText="Décrivez votre expérience..."/>
+                </VBox>
+            </VBox>
+        </VBox>
+
+        <VBox spacing="20" prefWidth="350">
+            <VBox spacing="20" style="-fx-background-color: white; -fx-padding: 25; -fx-background-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5);">
+                <Text text="Actions" style="-fx-font-weight: bold; -fx-fill: #334155;"/>
+
+                <Separator/>
+
+                <Button text="Enregistrer les modifications"
+                        onAction="#handleSave"
+                        maxWidth="Infinity"
+                        style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 12; -fx-background-radius: 8; -fx-cursor: hand;"/>
+                <Button text="Toggle Theme"
+                        onAction="#handleToggleTheme"
+                        maxWidth="Infinity"
+                        style="-fx-background-color: #64748b; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10; -fx-background-radius: 8; -fx-cursor: hand;"/>
+
+                <Label fx:id="statusLabel" wrapText="true" textAlignment="CENTER" maxWidth="Infinity" style="-fx-font-size: 13px;"/>
+            </VBox>
+        </VBox>
+    </HBox>
+</VBox>
