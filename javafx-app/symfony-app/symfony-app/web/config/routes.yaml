@@ -1,0 +1,52 @@
+# yaml-language-server: $schema=../vendor/symfony/routing/Loader/schema/routing.schema.json
+
+# This file is the entry point to configure the routes of your app.
+# Methods with the #[Route] attribute are automatically imported.
+# See also https://symfony.com/doc/current/routing.html
+
+# To list all registered routes, run the following command:
+#   bin/console debug:router
+
+controllers:
+    resource:
+        path: ../src/Controller/
+        namespace: App\Controller
+    type: attribute
+
+app_doctor_complete_profile:
+    path: /doctor/complete-profile
+    controller: App\Controller\DoctorController::completeProfile
+
+app_patient_settings:
+    path: /patient/settings
+    controller: App\Controller\PatientController::settings
+    methods: [GET, POST]
+
+app_doctor_search:
+    path: /patient/search
+    controller: App\Controller\PatientController::search
+    methods: [GET]
+
+app_2fa_toggle_settings:
+    path: /settings/2fa/toggle
+    controller: App\Controller\TwoFactorSettingsController::toggle2fa
+    methods: [POST]
+
+app_2fa_confirm:
+    path: /settings/2fa/confirm
+    controller: App\Controller\TwoFactorSettingsController::confirmEnable
+    methods: [POST]
+
+app_2fa_login_verify:
+    path: /login/2fa-verify
+    controller: App\Controller\TwoFactorSettingsController::verifyLogin
+    methods: [GET, POST]
+
+app_doctor_settings:
+    path: /doctor/settings
+    controller: App\Controller\DoctorController::settings
+    methods: [GET, POST]
+
+app_doctor_dashboard:
+    path: /doctor/dashboard
+    controller: App\Controller\DoctorController::index 

@@ -1,0 +1,5 @@
+framework:
+    mailer:
+        #dsn: 'smtp://8d3be37f1cdcfe:ee2ee1a305f473@sandbox.smtp.mailtrap.io:2525'
+        
+        dsn: 'smtp://wslimi35@gmail.com:tblzvpfjjpyoyngs@smtp.gmail.com:587'

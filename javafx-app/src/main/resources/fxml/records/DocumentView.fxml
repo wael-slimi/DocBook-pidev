@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.docbook.controllers.records.DocumentController"
+            stylesheets="/css/style.css"
+            prefHeight="800.0" prefWidth="1200.0">
+
+    <!-- Left Sidebar -->
+    <left>
+        <VBox styleClass="dashboard-sidebar" prefWidth="250" spacing="20">
+            <VBox alignment="CENTER" spacing="10">
+                <Text text="DocBook" style="-fx-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;"/>
+                <Text text="Espace Médecin" style="-fx-fill: #94a3b8;"/>
+            </VBox>
+            
+            <Separator style="-fx-opacity: 0.2;"/>
+            
+            <VBox spacing="10">
+                <Button text="Dossiers Patients" styleClass="nav-link" prefWidth="210" onAction="#openDoctorDashboard"/>
+                <Button text="Documents" styleClass="nav-link, nav-link-active" prefWidth="210"/>
+                <Button text="Historique Adhérence" styleClass="nav-link" prefWidth="210" onAction="#openAdherenceHistory"/>
+            </VBox>
+            
+            <Region VBox.vgrow="ALWAYS" />
+            
+            <Button text="Déconnexion" onAction="#logout" style="-fx-background-color: transparent; -fx-text-fill: #fca5a5;"/>
+        </VBox>
+    </left>
+
+    <!-- Main Content -->
+    <center>
+        <VBox spacing="25" style="-fx-padding: 30;">
+            <HBox alignment="CENTER_LEFT" spacing="20">
+                <Text text="Documents et Prescriptions" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+            </HBox>
+            
+            <!-- Table and Form Container -->
+            <HBox spacing="20" VBox.vgrow="ALWAYS">
+                <VBox HBox.hgrow="ALWAYS" style="-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 0; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5);">
+                    <TableView fx:id="documentTable" VBox.vgrow="ALWAYS" styleClass="table-view">
+                        <columns>
+
+                            <TableColumn fx:id="titreCol" text="Titre" prefWidth="180"/>
+                            <TableColumn fx:id="typeCol" text="Type" prefWidth="120"/>
+                            <TableColumn fx:id="dateCol" text="Date" prefWidth="120"/>
+                            <TableColumn fx:id="fileCol" text="Fichier Actif" prefWidth="100"/>
+                        </columns>
+                    </TableView>
+                </VBox>
+                
+                <!-- Document Form -->
+                <VBox prefWidth="400" style="-fx-background-color: white; -fx-background-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5);" VBox.vgrow="ALWAYS">
+                    <ScrollPane fitToWidth="true" styleClass="edge-to-edge">
+                        <VBox spacing="15" style="-fx-padding: 20;">
+                            <Text text="Détails du Document" style="-fx-font-weight: bold; -fx-font-size: 16px;"/>
+                            <VBox spacing="2"><ComboBox fx:id="dossierIdCombo" promptText="Dossier Patient (Requis)" maxWidth="Infinity"/><Text fx:id="dossierIdError" style="-fx-fill: #ef4444; -fx-font-size: 11px;"/></VBox>
+                            <VBox spacing="2"><TextField fx:id="titreField" promptText="Titre de la consultation"/><Text fx:id="titreError" style="-fx-fill: #ef4444; -fx-font-size: 11px;"/></VBox>
+                            <VBox spacing="2"><ComboBox fx:id="typeCombo" promptText="Type de Document" maxWidth="Infinity"/><Text fx:id="typeError" style="-fx-fill: #ef4444; -fx-font-size: 11px;"/></VBox>
+                            <VBox spacing="2"><DatePicker fx:id="dateField" promptText="Date du Document" maxWidth="Infinity"/><Text fx:id="dateError" style="-fx-fill: #ef4444; -fx-font-size: 11px;"/></VBox>
+                            <VBox spacing="2"><TextArea fx:id="contenuField" promptText="Contenu (SOAP / Description)..." prefHeight="150" wrapText="true"/><Text fx:id="contenuError" style="-fx-fill: #ef4444; -fx-font-size: 11px;"/></VBox>
+                            
+                            <!-- File Upload Section -->
+                            <VBox spacing="5" alignment="CENTER_LEFT" style="-fx-background-color: #f8fafc; -fx-padding: 10; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;">
+                                <HBox spacing="10" alignment="CENTER_LEFT">
+                                    <Button text="Joindre PDF/Image" style="-fx-background-color: #64748b; -fx-text-fill: white;" onAction="#uploadFile"/>
+                                    <Text fx:id="fileNameText" text="Aucun fichier" style="-fx-fill: #94a3b8;"/>
+                                </HBox>
+                            </VBox>
+
+                            <HBox spacing="10" style="-fx-padding: 10 0 0 0;">
+                                <Button text="Ajouter" styleClass="patient-btn" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#addDocument"/>
+                                <Button text="Modifier" styleClass="doctor-btn" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#updateDocument"/>
+                            </HBox>
+                            <HBox spacing="10">
+                                <Button text="Supprimer" style="-fx-background-color: #ef4444; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#deleteDocument"/>
+                                <Button text="Vider" style="-fx-background-color: transparent; -fx-text-fill: #94a3b8;" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#clearForm"/>
+                            </HBox>
+                            <Text fx:id="statusText" style="-fx-fill: #10b981; -fx-font-size: 12px;"/>
+                        </VBox>
+                    </ScrollPane>
+                </VBox>
+            </HBox>
+        </VBox>
+    </center>
+</BorderPane>
+
+

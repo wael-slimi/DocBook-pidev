@@ -1,0 +1,60 @@
+#
+# A fatal error has been detected by the Java Runtime Environment:
+#
+#  SIGSEGV (0xb) at pc=0x00007f1254010f1f, pid=24740, tid=24769
+#
+# JRE version: OpenJDK Runtime Environment (23.0.1+11) (build 23.0.1+11-39)
+# Java VM: OpenJDK 64-Bit Server VM (23.0.1+11-39, mixed mode, tiered, compressed oops, compressed class ptrs, g1 gc, linux-amd64)
+# Problematic frame:
+# C  [libGLdispatch.so.0+0x2f1f]
+#
+# Core dump will be written. Default location: Core dumps may be processed with "/usr/lib/systemd/systemd-coredump %P %u %g %s %t %c %h %d %F" (or dumping to /home/zven/DocBook-pidev/javafx-app/core.24740)
+#
+# If you would like to submit a bug report, please visit:
+#   https://bugreport.java.com/bugreport/crash.jsp
+# The crash happened outside the Java Virtual Machine in native code.
+# See problematic frame for where to report the bug.
+#
+
+---------------  S U M M A R Y ------------
+
+Command Line: -Djpackage.app-version=23.0.1 -Djdk.gtk.version=2 --add-opens=javafx.fxml/javafx.fxml=ALL-UNNAMED -Djava.library.path=/opt/scenebuilder/lib/runtime/bin:/opt/scenebuilder/lib/runtime/lib -Djpackage.app-path=/opt/scenebuilder/bin/SceneBuilder com.oracle.javafx.scenebuilder.app.SceneBuilderApp
+
+Host: 13th Gen Intel(R) Core(TM) i7-13620H, 16 cores, 15G, Arch Linux
+Time: Mon Apr 13 10:31:00 2026 CET elapsed time: 2.109757 seconds (0d 0h 0m 2s)
+
+---------------  T H R E A D  ---------------
+
+Current thread (0x00007f126c3c2520):  JavaThread "QuantumRenderer-0" [_thread_in_native, id=24769, stack(0x00007f121bafc000,0x00007f121bbfc000) (1024K)]
+
+Stack: [0x00007f121bafc000,0x00007f121bbfc000],  sp=0x00007f121bbf9bc0,  free space=1014k
+Native frames: (J=compiled Java code, j=interpreted, Vv=VM code, C=native code)
+C  [libGLdispatch.so.0+0x2f1f]
+C  [libGLdispatch.so.0+0x3d2c]  __glDispatchMakeCurrent+0x8c
+C  [libGLX.so.0+0x15ba4]
+C  [libGLX.so.0+0x18c08]
+C  [libprism_es2.so+0x89ec]  Java_com_sun_prism_es2_X11GLFactory_nInitialize+0x1cc
+j  com.sun.prism.es2.X11GLFactory.nInitialize([I)J+0 javafx.graphics@23.0.1
+j  com.sun.prism.es2.X11GLFactory.initialize(Ljava/lang/Class;Lcom/sun/prism/es2/GLPixelFormat$Attributes;)Z+73 javafx.graphics@23.0.1
+j  com.sun.prism.es2.ES2Pipeline.<clinit>()V+52 javafx.graphics@23.0.1
+v  ~StubRoutines::call_stub 0x00007f126445fc86
+V  [libjvm.so+0x8cfb5b]  JavaCalls::call_helper(JavaValue*, methodHandle const&, JavaCallArguments*, JavaThread*)+0x2db
+V  [libjvm.so+0x8a68cf]  InstanceKlass::call_class_initializer(JavaThread*)+0x2ef
+V  [libjvm.so+0x8a7a37]  InstanceKlass::initialize_impl(JavaThread*)+0x7b7
+V  [libjvm.so+0x9ac99d]  find_class_from_class_loader(JNIEnv_*, Symbol*, unsigned char, Handle, Handle, unsigned char, JavaThread*)+0x7d
+V  [libjvm.so+0x9b7c15]  JVM_FindClassFromCaller+0x125
+C  [libjava.so+0xe4f5]  Java_java_lang_Class_forName0+0xd5
+j  java.lang.Class.forName0(Ljava/lang/String;ZLjava/lang/ClassLoader;Ljava/lang/Class;)Ljava/lang/Class;+0 java.base@23.0.1
+j  java.lang.Class.forName(Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/Class;+19 java.base@23.0.1
+j  java.lang.Class.forName(Ljava/lang/String;)Ljava/lang/Class;+6 java.base@23.0.1
+j  com.sun.prism.GraphicsPipeline.createPipeline()Lcom/sun/prism/GraphicsPipeline;+183 javafx.graphics@23.0.1
+j  com.sun.javafx.tk.quantum.QuantumRenderer$PipelineRunnable.init()V+0 javafx.graphics@23.0.1
+j  com.sun.javafx.tk.quantum.QuantumRenderer$PipelineRunnable.run()V+1 javafx.graphics@23.0.1
+j  java.lang.Thread.runWith(Ljava/lang/Object;Ljava/lang/Runnable;)V+5 java.base@23.0.1
+j  java.lang.Thread.run()V+19 java.base@23.0.1
+v  ~StubRoutines::call_stub 0x00007f126445fc86
+V  [libjvm.so+0x8cfb5b]  JavaCalls::call_helper(JavaValue*, methodHandle const&, JavaCallArguments*, JavaThread*)+0x2db
+V  [libjvm.so+0x8d142f]  JavaCalls::call_virtual(JavaValue*, Handle, Klass*, Symbol*, Symbol*, JavaThread*)+0x1bf
+V  [libjvm.so+0x9a987c]  thread_entry(JavaThread*, JavaThread*)+0x8c
+V  [libjvm.so+0x8e6328]  JavaThread::thread_main_inner() [clone .part.0]+0xb8
+V  [libjvm.so+0xeaa58f]

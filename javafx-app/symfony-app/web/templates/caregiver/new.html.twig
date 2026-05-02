@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Caregiver{% endblock %}
+
+{% block body %}
+    <h1>Create new Caregiver</h1>
+
+    {{ include('caregiver/_form.html.twig') }}
+
+    <a href="{{ path('app_caregiver_index') }}">back to list</a>
+{% endblock %}

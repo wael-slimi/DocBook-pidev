@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="25.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
+    <padding>
+        <Insets bottom="30.0" left="30.0" right="30.0" top="20.0" />
+    </padding>
+
+    <HBox alignment="BOTTOM_LEFT">
+        <VBox HBox.hgrow="ALWAYS">
+            <Label style="-fx-text-fill: #64748b; -fx-font-size: 12;" text="Admin Hub &gt; Doctor Approvals" />
+            <Label style="-fx-font-size: 32; -fx-font-weight: 700;" text="Doctor Approvals" />
+            <Label style="-fx-text-fill: #64748b;" text="Review and verify medical credentials." />
+        </VBox>
+        <HBox spacing="10.0">
+            <Button fx:id="refreshBtn" prefHeight="35.0" style="-fx-background-color: white; -fx-border-color: #e2e8f0; -fx-border-radius: 8;" text="Refresh" />
+        </HBox>
+    </HBox>
+
+    <HBox spacing="15.0">
+        <VBox prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #e2e8f0; -fx-border-radius: 12;" HBox.hgrow="ALWAYS">
+            <padding><Insets bottom="15.0" left="15.0" right="15.0" top="15.0" /></padding>
+            <Label style="-fx-text-fill: #64748b; -fx-font-weight: bold; -fx-font-size: 11;" text="PENDING REVIEW" />
+            <Label fx:id="pendingCountLabel" style="-fx-font-size: 28; -fx-font-weight: bold;" text="0" />
+        </VBox>
+    </HBox>
+
+    <VBox style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #e2e8f0; -fx-border-radius: 12;" VBox.vgrow="ALWAYS">
+        <TableView fx:id="userTable" prefHeight="400.0">
+            <columns>
+                <TableColumn fx:id="colName" id="colName" prefWidth="250.0" text="Doctor Information" />
+                <TableColumn fx:id="colEmail" id="colEmail" prefWidth="200.0" text="Email" />
+                <TableColumn fx:id="colStatus" prefWidth="150.0" text="Status" />
+                <TableColumn fx:id="colAction" prefWidth="250.0" text="Actions" />
+            </columns>
+        </TableView>
+    </VBox>
+</VBox>

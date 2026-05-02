@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}PatientCaregiver{% endblock %}
+
+{% block body %}
+    <h1>PatientCaregiver</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ patient_caregiver.id }}</td>
+            </tr>
+            <tr>
+                <th>Permissions</th>
+                <td>{{ patient_caregiver.permissions }}</td>
+            </tr>
+            <tr>
+                <th>Status</th>
+                <td>{{ patient_caregiver.status }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_patient_caregiver_index') }}">back to list</a>
+
+    <a href="{{ path('app_patient_caregiver_edit', {'id': patient_caregiver.id}) }}">edit</a>
+
+    {{ include('patient_caregiver/_delete_form.html.twig') }}
+{% endblock %}
