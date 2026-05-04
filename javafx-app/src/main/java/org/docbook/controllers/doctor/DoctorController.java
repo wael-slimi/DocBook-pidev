@@ -235,6 +235,22 @@ public class DoctorController {
     }
 
     /**
+     * Ouvre la vue des statistiques.
+     */
+    @FXML
+    private void openStatsView(ActionEvent event) {
+        loadView(event, "/fxml/doctor/StatsView.fxml", "Statistiques");
+    }
+
+    /**
+     * Ouvre la vue de la carte.
+     */
+    @FXML
+    private void openMapView(ActionEvent event) {
+        loadView(event, "/fxml/records/MapView.fxml", "Carte");
+    }
+
+    /**
      * Deconnecte l'utilisateur et retourne a la page d'accueil.
      */
     @FXML

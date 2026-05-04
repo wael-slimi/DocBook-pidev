@@ -23,6 +23,8 @@
                 <Button text="Dossiers Patients" styleClass="nav-link, nav-link-active" prefWidth="210" style="-fx-alignment: CENTER_LEFT;"/>
                 <Button text="Documents" styleClass="nav-link" prefWidth="210" onAction="#openDocumentView" style="-fx-alignment: CENTER_LEFT;"/>
                 <Button text="Historique Adhérence" styleClass="nav-link" prefWidth="210" onAction="#openAdherenceHistory" style="-fx-alignment: CENTER_LEFT;"/>
+                <Button text="📊 Statistiques" styleClass="nav-link" prefWidth="210" onAction="#openStatsView" style="-fx-alignment: CENTER_LEFT;"/>
+                <Button text="🗺️ Carte" styleClass="nav-link" prefWidth="210" onAction="#openMapView" style="-fx-alignment: CENTER_LEFT;"/>
                 <Button text="Mon Profil" styleClass="nav-link" prefWidth="210" onAction="#handleProfileNav" style="-fx-alignment: CENTER_LEFT;"/>
             </VBox>
 

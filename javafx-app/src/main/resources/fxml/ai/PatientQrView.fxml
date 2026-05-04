@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.docbook.controllers.ai.PatientQrController"
+      spacing="20" alignment="CENTER"
+      style="-fx-background-color: #0f172a; -fx-padding: 30; -fx-border-color: #3b82f6; -fx-border-width: 2; -fx-border-radius: 15; -fx-background-radius: 15;">
+
+    <VBox alignment="CENTER" spacing="5">
+        <Text fx:id="patientNameText" style="-fx-fill: white; -fx-font-size: 22px; -fx-font-weight: bold;"/>
+        <Text fx:id="dossierNumText" style="-fx-fill: #94a3b8; -fx-font-size: 14px;"/>
+    </VBox>
+
+    <StackPane style="-fx-background-color: white; -fx-padding: 10; -fx-background-radius: 10;">
+        <ImageView fx:id="qrImageView" fitWidth="200" fitHeight="200" preserveRatio="true"/>
+    </StackPane>
+
+    <Text text="Scannez pour accéder au dossier mobile" style="-fx-fill: #60a5fa; -fx-font-size: 12px; -fx-font-style: italic;"/>
+
+    <VBox spacing="10" style="-fx-background-color: #1e293b; -fx-padding: 15; -fx-background-radius: 10;" fillWidth="true">
+        <Label text="RÉSUMÉ MÉDICAL" style="-fx-text-fill: #94a3b8; -fx-font-size: 10px; -fx-font-weight: bold;"/>
+        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent; -fx-max-height: 150;">
+            <VBox fx:id="detailsContainer" spacing="8">
+            </VBox>
+        </ScrollPane>
+    </VBox>
+
+    <Button text="Fermer" onAction="#close"
+            style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 30; -fx-background-radius: 8; -fx-cursor: hand;"/>
+
+</VBox>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.docbook.controllers.ai.SnapshotController"
+      spacing="20" prefWidth="550" prefHeight="500"
+      style="-fx-background-color: white; -fx-padding: 35; -fx-background-radius: 15;">
+
+    <HBox alignment="CENTER_LEFT" spacing="15">
+        <StackPane style="-fx-background-color: #3b82f6; -fx-background-radius: 12; -fx-padding: 12;">
+            <Text text="📸" style="-fx-font-size: 24px;"/>
+        </StackPane>
+        <VBox>
+            <Text text="Snapshot Médical AI" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-fill: #1e293b;"/>
+            <Text fx:id="patientNameText" text="Patient: Nom Prénom" style="-fx-fill: #64748b; -fx-font-size: 14px;"/>
+        </VBox>
+    </HBox>
+
+    <Separator style="-fx-opacity: 0.5;"/>
+
+    <VBox spacing="10" VBox.vgrow="ALWAYS">
+        <Text text="Résumé du Dossier" style="-fx-font-weight: bold; -fx-font-size: 15px; -fx-fill: #3b82f6;"/>
+        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;">
+            <Label fx:id="snapshotLabel" wrapText="true" 
+                   style="-fx-font-size: 15px; -fx-line-spacing: 6; -fx-text-fill: #334155; -fx-font-style: italic;" 
+                   maxWidth="480"/>
+        </ScrollPane>
+    </VBox>
+
+    <HBox spacing="15" alignment="CENTER_RIGHT">
+        <Button text="Fermer" onAction="#close" 
+                style="-fx-background-color: #f1f5f9; -fx-text-fill: #475569; -fx-padding: 8 20; -fx-background-radius: 8; -fx-font-weight: bold;"/>
+        <Button text="📥 Enregistrer PDF" onAction="#downloadPDF" 
+                style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-padding: 8 20; -fx-background-radius: 8; -fx-font-weight: bold;"/>
+    </HBox>
+
+</VBox>

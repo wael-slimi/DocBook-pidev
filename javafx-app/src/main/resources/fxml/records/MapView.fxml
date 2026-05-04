@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.web.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.text.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.docbook.controllers.records.MapController"
+      spacing="15" prefWidth="700" prefHeight="600"
+      style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 15;">
+
+    <HBox alignment="CENTER_LEFT" spacing="15">
+        <StackPane style="-fx-background-color: #10b981; -fx-background-radius: 10; -fx-padding: 8;">
+            <Text text="🗺️" style="-fx-font-size: 20px;"/>
+        </StackPane>
+        <VBox>
+            <Text text="Sélecteur de Localisation" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-fill: #1e293b;"/>
+            <Text text="Cliquez sur la carte pour définir l'adresse du patient" style="-fx-fill: #64748b; -fx-font-size: 12px;"/>
+        </VBox>
+    </HBox>
+
+    <WebView fx:id="mapWebView" VBox.vgrow="ALWAYS" style="-fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10;"/>
+
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <Button text="Annuler" onAction="#close" style="-fx-background-color: #f1f5f9; -fx-text-fill: #64748b; -fx-padding: 8 20; -fx-background-radius: 8;"/>
+        <Button text="Confirmer l'Adresse" onAction="#confirmAddress" style="-fx-background-color: #10b981; -fx-text-fill: white; -fx-padding: 8 20; -fx-background-radius: 8; -fx-font-weight: bold;"/>
+    </HBox>
+
+</VBox>

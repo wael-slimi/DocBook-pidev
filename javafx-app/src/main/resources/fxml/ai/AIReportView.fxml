@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.docbook.controllers.ai.AIReportController"
+      spacing="20" prefWidth="600" prefHeight="700"
+      style="-fx-background-color: white; -fx-padding: 40;">
+
+    <HBox alignment="CENTER_LEFT" spacing="15">
+        <StackPane style="-fx-background-color: #8b5cf6; -fx-background-radius: 10; -fx-padding: 10;">
+            <Text text="🧠" style="-fx-font-size: 24px;"/>
+        </StackPane>
+        <VBox>
+            <Text text="Rapport Co-pilote AI" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-fill: #1e293b;"/>
+            <Text fx:id="patientNameText" text="Patient: Nom Prénom" style="-fx-fill: #64748b; -fx-font-size: 14px;"/>
+        </VBox>
+    </HBox>
+
+    <Separator/>
+
+    <ScrollPane VBox.vgrow="ALWAYS" fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;">
+        <VBox spacing="15">
+            <Text text="Analyse et Recommandations" style="-fx-font-weight: bold; -fx-font-size: 16px; -fx-fill: #334155;"/>
+            <Label fx:id="aiContentLabel" wrapText="true" style="-fx-font-size: 14px; -fx-line-spacing: 5; -fx-text-fill: #475569;" maxWidth="500"/>
+        </VBox>
+    </ScrollPane>
+
+    <HBox spacing="15" alignment="CENTER_RIGHT">
+        <Button text="Fermer" onAction="#close" styleClass="btn-secondary" style="-fx-background-color: #f1f5f9; -fx-text-fill: #475569;"/>
+        <Button text="📥 Télécharger PDF" onAction="#downloadPDF" styleClass="btn-primary" style="-fx-background-color: #8b5cf6; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20; -fx-background-radius: 8;"/>
+    </HBox>
+
+</VBox>

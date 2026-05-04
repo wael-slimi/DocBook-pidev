@@ -1,0 +1,46 @@
+/* Styles pour les Graphiques DocBook */
+
+.chart {
+    -fx-padding: 10px;
+}
+
+.chart-content {
+    -fx-padding: 10px;
+}
+
+/* Forcer les couleurs des barres (fini l'orange !) */
+.default-color0.chart-bar { -fx-bar-fill: #3b82f6; } /* Bleu Indigo */
+.default-color1.chart-bar { -fx-bar-fill: #8b5cf6; } /* Violet */
+.default-color2.chart-bar { -fx-bar-fill: #10b981; } /* Vert */
+
+/* Couleurs pour AreaChart */
+.default-color0.chart-area-symbol { -fx-background-color: #3b82f6, white; }
+.default-color0.chart-series-area-line { -fx-stroke: #3b82f6; }
+.default-color0.chart-series-area-fill { -fx-fill: rgba(59, 130, 246, 0.2); }
+
+/* Rendre les AXES très lisibles */
+.axis {
+    -fx-tick-label-fill: #475569;
+    -fx-tick-label-font-size: 11px;
+}
+
+.axis-label {
+    -fx-text-fill: #1e293b;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+}
+
+/* Cacher les symboles moches sur les lignes */
+.chart-line-symbol {
+    -fx-background-radius: 0;
+    -fx-padding: 0;
+}
+
+.chart-legend {
+   -fx-background-color: transparent;
+   -fx-padding: 15px;
+}
+
+.chart-legend-item {
+    -fx-text-fill: #475569;
+}
