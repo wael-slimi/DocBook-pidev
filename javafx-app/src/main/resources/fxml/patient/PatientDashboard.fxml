@@ -3,6 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
+<?import javafx.scene.image.*?>
 
 <BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml"
             fx:controller="org.docbook.controllers.patient.PatientController"
@@ -39,8 +40,9 @@
             <!-- User Info -->
             <VBox style="-fx-padding: 16 20; -fx-background-color: #f1f5f9;" spacing="8">
                 <HBox spacing="12" alignment="CENTER_LEFT">
-                    <StackPane style="-fx-background-color: #e0e7ff; -fx-background-radius: 20;" prefWidth="36" prefHeight="36">
-                        <Text text="PN" style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-fill: #0058be;"/>
+                    <StackPane prefWidth="36" prefHeight="36" style="-fx-background-color: #e0e7ff; -fx-background-radius: 18;">
+                        <ImageView fx:id="sidebarProfileImage" fitWidth="36" fitHeight="36" preserveRatio="true"/>
+                        <Text fx:id="sidebarInitials" style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-fill: #0058be;"/>
                     </StackPane>
                     <VBox spacing="2">
                         <Label fx:id="patientNameText" text="Patient" style="-fx-font-size: 13px; -fx-font-weight: 600; -fx-text-fill: #1e293b;"/>

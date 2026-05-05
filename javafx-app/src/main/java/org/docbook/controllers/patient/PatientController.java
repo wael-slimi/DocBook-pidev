@@ -10,6 +10,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -22,6 +24,7 @@ import org.docbook.services.users.PatientService;
 import org.docbook.util.AppState;
 import org.docbook.util.ThemeManager;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -55,6 +58,12 @@ public class PatientController {
     private Label profileNameText;
 
     @FXML
+    private ImageView sidebarProfileImage;
+
+    @FXML
+    private Text sidebarInitials;
+
+    @FXML
     private VBox appointmentsContainer;
 
     private final DossierMedicalService dossierService = new DossierMedicalService();
@@ -83,6 +92,8 @@ public class PatientController {
         if (patientNameText != null) patientNameText.setText(name);
         if (profileNameText != null) profileNameText.setText(name);
 
+        loadSidebarProfile(currentUser);
+
         if (dossiersCountLabel != null) {
             List<DossierMedical> dossiers = dossierService.getByPatientId(currentUser.getId());
             dossiersCountLabel.setText(String.valueOf(dossiers.size()));
@@ -107,6 +118,37 @@ public class PatientController {
 
         if (allergiesLabel != null) {
             allergiesLabel.setText("Aucune");
+        }
+    }
+
+    private void loadSidebarProfile(User user) {
+        if (user == null) return;
+
+        if (sidebarInitials != null && user.getName() != null) {
+            String[] parts = user.getName().split(" ");
+            if (parts.length >= 2) {
+                sidebarInitials.setText(parts[0].substring(0, 1) + parts[1].substring(0, 1));
+            } else if (parts.length == 1 && parts[0].length() > 0) {
+                sidebarInitials.setText(parts[0].substring(0, Math.min(2, parts[0].length())));
+            }
+        }
+
+        if (sidebarProfileImage != null) {
+            String photoPath = user.getAvatarUrl();
+            if (photoPath != null && !photoPath.isEmpty()) {
+                File file = new File(photoPath);
+                if (file.exists()) {
+                    Image image = new Image(file.toURI().toString());
+                    sidebarProfileImage.setImage(image);
+                    if (sidebarInitials != null) sidebarInitials.setVisible(false);
+                } else {
+                    sidebarProfileImage.setImage(null);
+                    if (sidebarInitials != null) sidebarInitials.setVisible(true);
+                }
+            } else {
+                sidebarProfileImage.setImage(null);
+                if (sidebarInitials != null) sidebarInitials.setVisible(true);
+            }
         }
     }
 
