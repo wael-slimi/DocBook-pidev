@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.docbook.controllers.patient.PatientDocumentController"
+            stylesheets="/css/style.css"
+            prefHeight="800.0" prefWidth="1200.0">
+
+    <!-- Left Sidebar - Patient Version -->
+    <left>
+        <VBox styleClass="patient-sidebar" prefWidth="260" minWidth="260" maxWidth="260" spacing="0">
+            <!-- Logo -->
+            <HBox alignment="CENTER_LEFT" style="-fx-padding: 20 20 16 20;" spacing="12">
+                <StackPane style="-fx-background-color: #0058be; -fx-background-radius: 10;" minWidth="40" minHeight="40" prefWidth="40" prefHeight="40">
+                    <Text text="✚" style="-fx-font-size: 20px; -fx-fill: white;"/>
+                </StackPane>
+                <Text text="DocBook" style="-fx-font-size: 22px; -fx-font-weight: 700; -fx-fill: #1e293b;"/>
+            </HBox>
+            
+            <!-- Navigation -->
+            <VBox styleClass="sidebar-nav" spacing="2" style="-fx-padding: 8 12;">
+                <Button text="🏠  Dashboard" onAction="#goToDashboard" styleClass="nav-link" prefWidth="220" 
+                        style="-fx-alignment: CENTER_LEFT; -fx-padding: 14 16; -fx-font-size: 14px;"/>
+                <Button text="📄  Documents" styleClass="nav-link-active" prefWidth="220" 
+                        style="-fx-alignment: CENTER_LEFT; -fx-padding: 14 16; -fx-font-size: 14px;"/>
+                <Button text="🔍  Médecins" onAction="#goToSearch" styleClass="nav-link" prefWidth="220" 
+                        style="-fx-alignment: CENTER_LEFT; -fx-padding: 14 16; -fx-font-size: 14px;"/>
+                <Button text="🗺️  Carte" onAction="#goToMap" styleClass="nav-link" prefWidth="220" 
+                        style="-fx-alignment: CENTER_LEFT; -fx-padding: 14 16; -fx-font-size: 14px;"/>
+                <Button text="👤  Mon Profil" onAction="#handleProfileNav" styleClass="nav-link" prefWidth="220" 
+                        style="-fx-alignment: CENTER_LEFT; -fx-padding: 14 16; -fx-font-size: 14px;"/>
+            </VBox>
+            
+            <Region VBox.vgrow="ALWAYS"/>
+            
+            <!-- User Info -->
+            <VBox style="-fx-padding: 16 20; -fx-background-color: #f1f5f9;" spacing="8">
+                <HBox spacing="12" alignment="CENTER_LEFT">
+                    <StackPane style="-fx-background-color: #e0e7ff; -fx-background-radius: 20;" prefWidth="36" prefHeight="36">
+                        <Text text="PN" style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-fill: #0058be;"/>
+                    </StackPane>
+                    <VBox spacing="2">
+                        <Label text="Patient" style="-fx-font-size: 13px; -fx-font-weight: 600; -fx-text-fill: #1e293b;"/>
+                        <Text text="Patient" style="-fx-font-size: 11px; -fx-fill: #64748b;"/>
+                    </VBox>
+                </HBox>
+                <Button text="Déconnexion" onAction="#logout"
+                        style="-fx-background-color: #fee2e2; -fx-text-fill: #dc2626; -fx-background-radius: 8; 
+                               -fx-font-size: 12px; -fx-padding: 8 12; -fx-cursor: hand;"
+                        prefWidth="220"/>
+            </VBox>
+        </VBox>
+    </left>
+
+    <!-- Main Content - Patient View Only (Read-Only Table) -->
+    <center>
+        <VBox spacing="25" style="-fx-padding: 30;">
+            <HBox alignment="CENTER_LEFT" spacing="20">
+                <Text text="Mes Documents et Prescriptions" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+            </HBox>
+            
+            <!-- Documents Table - View Only -->
+            <VBox HBox.hgrow="ALWAYS" style="-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 0; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5);">
+                <TableView fx:id="documentTable" VBox.vgrow="ALWAYS" styleClass="table-view">
+                    <columns>
+                        <TableColumn fx:id="titreCol" text="Titre" prefWidth="200"/>
+                        <TableColumn fx:id="typeCol" text="Type" prefWidth="150"/>
+                        <TableColumn fx:id="dateCol" text="Date" prefWidth="150"/>
+                        <TableColumn fx:id="fileCol" text="Fichier" prefWidth="200"/>
+                    </columns>
+                </TableView>
+            </VBox>
+            
+            <!-- Info Message -->
+            <Text text="Vous pouvez uniquement consulter vos documents. Pour toute question, contactez votre médecin." 
+                  style="-fx-fill: #64748b; -fx-font-size: 14px;"/>
+        </VBox>
+    </center>
+</BorderPane>

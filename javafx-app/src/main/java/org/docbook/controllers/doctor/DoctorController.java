@@ -111,15 +111,8 @@ public class DoctorController {
 
     // Inside DoctorController.java
     @FXML
-    private void handleProfileNav() {
-        try {
-            // Make sure this path matches your folder structure exactly
-            Parent root = FXMLLoader.load(getClass().getResource("/fxml/profile.fxml"));
-            contentArea.getChildren().setAll(root);
-        } catch (IOException e) {
-            System.err.println("Error loading profile: " + e.getMessage());
-            e.printStackTrace();
-        }
+    private void handleProfileNav(ActionEvent event) {
+        loadView(event, "/fxml/profile.fxml", "Mon Profil");
     }
 
     /**

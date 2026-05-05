@@ -15,7 +15,16 @@ public class MapController {
     @FXML private WebView mapWebView;
     private String selectedAddress = "";
     private java.util.function.Consumer<String> onAddressSelected;
-    private String previousView = "/fxml/doctor/DoctorDashboard.fxml";
+    private String previousView;
+
+    public MapController() {
+        org.docbook.entities.users.User currentUser = org.docbook.util.AppState.getCurrentUser();
+        if (currentUser != null && currentUser.getRole() != null && currentUser.getRole().toUpperCase().contains("PATIENT")) {
+            previousView = "/fxml/patient/PatientDashboard.fxml";
+        } else {
+            previousView = "/fxml/patient/PatientDashboard.fxml";
+        }
+    }
 
     public void setPreviousView(String view) {
         this.previousView = view;

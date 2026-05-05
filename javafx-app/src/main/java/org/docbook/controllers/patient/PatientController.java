@@ -208,7 +208,7 @@ public class PatientController {
 
     @FXML
     private void openDocuments(ActionEvent event) {
-        loadView(event, "/fxml/records/DocumentView.fxml", "Mes Documents");
+        loadView(event, "/fxml/patient/PatientDocuments.fxml", "Mes Documents");
     }
 
     @FXML

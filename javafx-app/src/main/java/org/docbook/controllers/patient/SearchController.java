@@ -115,7 +115,7 @@ public class SearchController implements Initializable {
 
     @FXML
     private void goToProfile(ActionEvent event) throws IOException {
-        switchView(event, "/fxml/patient/PatientProfile.fxml");
+        switchView(event, "/fxml/profile.fxml");
     }
 
     private void switchView(ActionEvent event, String fxmlPath) throws IOException {

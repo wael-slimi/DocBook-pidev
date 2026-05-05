@@ -24,8 +24,6 @@
                         style="-fx-alignment: CENTER_LEFT; -fx-padding: 12 16;"/>
                 <Button text="📊 Statistiques" styleClass="nav-link-active" prefWidth="210" 
                         style="-fx-alignment: CENTER_LEFT; -fx-padding: 12 16;"/>
-                <Button text="🗺️ Carte" onAction="#openMapView" styleClass="nav-link" prefWidth="210" 
-                        style="-fx-alignment: CENTER_LEFT; -fx-padding: 12 16;"/>
                 <Button text="Mon Profil" onAction="#handleProfileNav" styleClass="nav-link" prefWidth="210" 
                         style="-fx-alignment: CENTER_LEFT; -fx-padding: 12 16;"/>
             </VBox>

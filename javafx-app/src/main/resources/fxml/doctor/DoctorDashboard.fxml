@@ -44,8 +44,6 @@
                         style="-fx-alignment: CENTER_LEFT; -fx-padding: 14 16; -fx-font-size: 14px;"/>
                 <Button text="📊  Statistiques" styleClass="nav-link" prefWidth="220" onAction="#openStatsView" 
                         style="-fx-alignment: CENTER_LEFT; -fx-padding: 14 16; -fx-font-size: 14px;"/>
-                <Button text="🗺️  Carte" styleClass="nav-link" prefWidth="220" onAction="#openMapView" 
-                        style="-fx-alignment: CENTER_LEFT; -fx-padding: 14 16; -fx-font-size: 14px;"/>
                 <Button text="🤖  AI Snapshot" styleClass="nav-link" prefWidth="220" onAction="#generatePatientSnapshot" 
                         style="-fx-alignment: CENTER_LEFT; -fx-padding: 14 16; -fx-font-size: 14px;"/>
                 <Button text="💡  AI Assistant" styleClass="nav-link" prefWidth="220" onAction="#runDiagnosticAssistant" 

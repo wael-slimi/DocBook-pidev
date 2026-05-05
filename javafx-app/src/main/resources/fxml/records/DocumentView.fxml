@@ -10,7 +10,7 @@
             stylesheets="/css/style.css"
             prefHeight="800.0" prefWidth="1200.0">
 
-<!-- Left Sidebar -->
+<!-- Left Sidebar - Doctor Version -->
     <left>
         <VBox styleClass="patient-sidebar" prefWidth="260" minWidth="260" maxWidth="260" spacing="0">
             <!-- Logo -->
@@ -21,15 +21,28 @@
                 <Text text="DocBook" style="-fx-font-size: 22px; -fx-font-weight: 700; -fx-fill: #1e293b;"/>
             </HBox>
             
+            <!-- Doctor Info -->
+            <HBox alignment="CENTER" spacing="12" style="-fx-padding: 8 20;">
+                <StackPane style="-fx-background-color: #e0e7ff; -fx-background-radius: 20;" prefWidth="40" prefHeight="40">
+                    <Text text="DR" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-fill: #0058be;"/>
+                </StackPane>
+                <VBox spacing="2">
+                    <Label fx:id="doctorNameLabel" text="Dr. Médecin" style="-fx-font-size: 13px; -fx-font-weight: 600; -fx-text-fill: #1e293b;"/>
+                    <Text text="Médecin" style="-fx-font-size: 11px; -fx-fill: #64748b;"/>
+                </VBox>
+            </HBox>
+            
             <!-- Navigation -->
             <VBox styleClass="sidebar-nav" spacing="2" style="-fx-padding: 8 12;">
-                <Button text="🏠  Dashboard" onAction="#goToDashboard" styleClass="nav-link" prefWidth="220" 
+                <Button text="🏠  Dashboard" onAction="#goToDoctorDashboard" styleClass="nav-link" prefWidth="220" 
                         style="-fx-alignment: CENTER_LEFT; -fx-padding: 14 16; -fx-font-size: 14px;"/>
                 <Button text="📄  Documents" styleClass="nav-link-active" prefWidth="220" 
                         style="-fx-alignment: CENTER_LEFT; -fx-padding: 14 16; -fx-font-size: 14px;"/>
-                <Button text="🔍  Médecins" onAction="#goToSearch" styleClass="nav-link" prefWidth="220" 
+                <Button text="📊  Statistiques" onAction="#openStatsView" styleClass="nav-link" prefWidth="220" 
                         style="-fx-alignment: CENTER_LEFT; -fx-padding: 14 16; -fx-font-size: 14px;"/>
-                <Button text="🗺️  Carte" onAction="#goToMap" styleClass="nav-link" prefWidth="220" 
+                <Button text="🤖  AI Snapshot" onAction="#generatePatientSnapshot" styleClass="nav-link" prefWidth="220" 
+                        style="-fx-alignment: CENTER_LEFT; -fx-padding: 14 16; -fx-font-size: 14px;"/>
+                <Button text="💡  AI Assistant" onAction="#runDiagnosticAssistant" styleClass="nav-link" prefWidth="220" 
                         style="-fx-alignment: CENTER_LEFT; -fx-padding: 14 16; -fx-font-size: 14px;"/>
                 <Button text="👤  Mon Profil" onAction="#handleProfileNav" styleClass="nav-link" prefWidth="220" 
                         style="-fx-alignment: CENTER_LEFT; -fx-padding: 14 16; -fx-font-size: 14px;"/>
@@ -39,15 +52,13 @@
             
             <!-- User Info -->
             <VBox style="-fx-padding: 16 20; -fx-background-color: #f1f5f9;" spacing="8">
-                <HBox spacing="12" alignment="CENTER_LEFT">
-                    <StackPane style="-fx-background-color: #e0e7ff; -fx-background-radius: 20;" prefWidth="36" prefHeight="36">
-                        <Text text="PN" style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-fill: #0058be;"/>
-                    </StackPane>
-                    <VBox spacing="2">
-                        <Label text="Patient" style="-fx-font-size: 13px; -fx-font-weight: 600; -fx-text-fill: #1e293b;"/>
-                        <Text text="Patient" style="-fx-font-size: 11px; -fx-fill: #64748b;"/>
-                    </VBox>
-                </HBox>
+                <Button text="Déconnexion" onAction="#logout"
+                        style="-fx-background-color: #fee2e2; -fx-text-fill: #dc2626; -fx-background-radius: 8; 
+                               -fx-font-size: 12px; -fx-padding: 8 12; -fx-cursor: hand;"
+                        prefWidth="220"/>
+            </VBox>
+        </VBox>
+    </left>
                 <Button text="Déconnexion" onAction="#logout"
                         style="-fx-background-color: #fee2e2; -fx-text-fill: #dc2626; -fx-background-radius: 8; 
                                -fx-font-size: 12px; -fx-padding: 8 12; -fx-cursor: hand;"
