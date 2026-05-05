@@ -213,9 +213,9 @@ public class ProfileController {
             String fxmlPath;
             User user = AppState.getCurrentUser();
             
-            if (user != null && "DOCTOR".equals(user.getRole())) {
+            if (user != null && user.getDtype() != null && user.getDtype().equalsIgnoreCase("doctor")) {
                 fxmlPath = "/fxml/doctor/DoctorDashboard.fxml";
-            } else if (user != null && "ADMIN".equals(user.getRole())) {
+            } else if (user != null && user.getDtype() != null && user.getDtype().equalsIgnoreCase("admin")) {
                 fxmlPath = "/fxml/admin/admin_dashboard.fxml";
             } else {
                 fxmlPath = "/fxml/patient/PatientDashboard.fxml";
