@@ -8,12 +8,17 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import org.docbook.entities.records.DossierMedical;
+import org.docbook.entities.users.Patient;
+import org.docbook.entities.users.User;
 import org.docbook.services.medical.DocumentService;
 import org.docbook.services.medical.DossierMedicalService;
+import org.docbook.services.users.PatientService;
 import org.docbook.util.AppState;
 import org.docbook.util.ThemeManager;
 
@@ -26,50 +31,99 @@ public class PatientController {
     private VBox dossiersContainer;
 
     @FXML
-    private StackPane contentArea; // Matches fx:id in PatientDashboard.fxml
+    private StackPane contentArea;
+
+    @FXML
+    private Label dossiersCountLabel;
+
+    @FXML
+    private Label prescriptionsCountLabel;
+
+    @FXML
+    private Label appointmentsCountLabel;
+
+    @FXML
+    private Label bloodTypeLabel;
+
+    @FXML
+    private Label allergiesLabel;
+
+    @FXML
+    private Label patientNameText;
+
+    @FXML
+    private Label profileNameText;
+
+    @FXML
+    private VBox appointmentsContainer;
 
     private final DossierMedicalService dossierService = new DossierMedicalService();
     private final DocumentService documentService = new DocumentService();
+    private final PatientService patientService = new PatientService();
 
     /**
      * Initialise le tableau de bord patient.
      */
     @FXML
     public void initialize() {
-        // Only load cards if we are currently looking at the dashboard home
+        loadPatientData();
         if (dossiersContainer != null) {
             loadDossierCards();
         }
     }
 
     /**
-     * Navigation vers la recherche de docteurs.
-     * Injecte la vue dans le contentArea (StackPane).
+     * Load real patient data from database.
      */
-    @FXML
-    private void handleSearchNav() {
-        try {
-            Parent view = FXMLLoader.load(getClass().getResource("/fxml/patient/search_doctors.fxml"));
-            contentArea.getChildren().setAll(view);
-        } catch (IOException e) {
-            System.err.println("Error loading search_doctors.fxml: " + e.getMessage());
-            e.printStackTrace();
+    private void loadPatientData() {
+        User currentUser = AppState.getCurrentUser();
+        if (currentUser == null) return;
+
+        String name = currentUser.getName() != null ? currentUser.getName() : "Patient";
+        if (patientNameText != null) patientNameText.setText(name);
+        if (profileNameText != null) profileNameText.setText(name);
+
+        if (dossiersCountLabel != null) {
+            List<DossierMedical> dossiers = dossierService.getByPatientId(currentUser.getId());
+            dossiersCountLabel.setText(String.valueOf(dossiers.size()));
+        }
+
+        if (prescriptionsCountLabel != null) {
+            int count = 0;
+            List<DossierMedical> dossiers = dossierService.getByPatientId(currentUser.getId());
+            for (DossierMedical d : dossiers) {
+                count += documentService.getByDossierId(d.getId()).size();
+            }
+            prescriptionsCountLabel.setText(String.valueOf(count));
+        }
+
+        if (appointmentsCountLabel != null) {
+            appointmentsCountLabel.setText("0");
+        }
+
+        if (bloodTypeLabel != null) {
+            bloodTypeLabel.setText("-");
+        }
+
+        if (allergiesLabel != null) {
+            allergiesLabel.setText("Aucune");
         }
     }
 
     /**
-     * Retourne à la vue d'accueil du dashboard (Bonjour !).
+     * Navigation vers la recherche de docteurs.
+     */
+    @FXML
+    private void handleSearchNav(ActionEvent event) {
+        loadView(event, "/fxml/patient/search_doctors.fxml", "Recherche Médecins");
+    }
+
+    /**
+     * Retourne à la vue d'accueil du dashboard.
      */
     @FXML
     private void showHome(ActionEvent event) {
-        try {
-            // Reload the dashboard shell to reset the content area
-            Parent root = FXMLLoader.load(getClass().getResource("/fxml/patient/PatientDashboard.fxml"));
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(root));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        loadView(event, "/fxml/patient/PatientDashboard.fxml", "Dashboard");
     }
 
     /**
@@ -148,25 +202,22 @@ public class PatientController {
 
 
     @FXML
-    private void handleProfileNav() {
-        try {
-            // Path must match exactly!
-            // Use "/fxml/profile.fxml" if it's in resources/fxml/
-            Parent view = FXMLLoader.load(getClass().getResource("/fxml/profile.fxml"));
+    private void handleProfileNav(ActionEvent event) {
+        loadView(event, "/fxml/profile.fxml", "Mon Profil");
+    }
 
-            if (contentArea != null) {
-                contentArea.getChildren().setAll(view);
-            } else {
-                System.err.println("Critical Error: contentArea StackPane is null!");
-            }
-        } catch (IOException e) {
-            System.err.println("Error: Could not load profile.fxml. check path and casing.");
-            e.printStackTrace();
-        }
+    @FXML
+    private void openDocuments(ActionEvent event) {
+        loadView(event, "/fxml/records/DocumentView.fxml", "Mes Documents");
+    }
+
+    @FXML
+    private void openMap(ActionEvent event) {
+        loadView(event, "/fxml/records/MapView.fxml", "Carte");
     }
 
     /**
-     * Charge une vue FXML et remplace la scène courante (utilisée pour logout/prescriptions).
+     * Charge une vue FXML et remplace la scène courante.
      */
     private void loadView(ActionEvent event, String fxmlPath, String title) {
         try {

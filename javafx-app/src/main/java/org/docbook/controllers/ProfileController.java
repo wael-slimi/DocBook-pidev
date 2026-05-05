@@ -206,4 +206,28 @@ public class ProfileController {
             statusLabel.setStyle("-fx-text-fill: #ef4444;");
         }
     }
+
+    @FXML
+    private void goBack(javafx.event.ActionEvent event) {
+        try {
+            String fxmlPath;
+            User user = AppState.getCurrentUser();
+            
+            if (user != null && "DOCTOR".equals(user.getRole())) {
+                fxmlPath = "/fxml/doctor/DoctorDashboard.fxml";
+            } else if (user != null && "ADMIN".equals(user.getRole())) {
+                fxmlPath = "/fxml/admin/admin_dashboard.fxml";
+            } else {
+                fxmlPath = "/fxml/patient/PatientDashboard.fxml";
+            }
+            
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource(fxmlPath));
+            javafx.scene.Parent root = loader.load();
+            javafx.stage.Stage stage = (javafx.stage.Stage) ((javafx.scene.Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new javafx.scene.Scene(root));
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

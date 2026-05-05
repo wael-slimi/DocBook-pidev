@@ -1,81 +1,145 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 <?import javafx.scene.chart.*?>
 <?import javafx.geometry.Insets?>
 
-<VBox xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml"
-      fx:controller="org.docbook.controllers.doctor.StatsController"
-      stylesheets="/css/stats.css"
-      spacing="30" style="-fx-background-color: #f8fafc; -fx-padding: 30;">
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.docbook.controllers.doctor.StatsController"
+            stylesheets="/css/style.css"
+            prefHeight="800.0" prefWidth="1200.0">
 
-    <!-- Summary Tiles -->
-    <HBox spacing="25" alignment="CENTER">
-        <VBox style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 15; -fx-pref-width: 250; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5);">
-            <Text text="👥 Total Patients" style="-fx-fill: #64748b; -fx-font-size: 14px;"/>
-            <Label fx:id="totalPatientsLabel" text="0" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #3b82f6;"/>
+    <!-- LEFT SIDEBAR -->
+    <left>
+        <VBox styleClass="dashboard-sidebar" prefWidth="250" spacing="0">
+            <Text text="DocBook" styleClass="sidebar-logo" style="-fx-padding: 24 24 16 24;"/>
+            
+            <VBox styleClass="sidebar-nav" spacing="4" style="-fx-padding: 8 0;">
+                <Button text="Dossiers Patients" onAction="#openDoctorDashboard" styleClass="nav-link" prefWidth="210" 
+                        style="-fx-alignment: CENTER_LEFT; -fx-padding: 12 16;"/>
+                <Button text="Documents" onAction="#openDocumentView" styleClass="nav-link" prefWidth="210" 
+                        style="-fx-alignment: CENTER_LEFT; -fx-padding: 12 16;"/>
+                <Button text="📊 Statistiques" styleClass="nav-link-active" prefWidth="210" 
+                        style="-fx-alignment: CENTER_LEFT; -fx-padding: 12 16;"/>
+                <Button text="🗺️ Carte" onAction="#openMapView" styleClass="nav-link" prefWidth="210" 
+                        style="-fx-alignment: CENTER_LEFT; -fx-padding: 12 16;"/>
+                <Button text="Mon Profil" onAction="#handleProfileNav" styleClass="nav-link" prefWidth="210" 
+                        style="-fx-alignment: CENTER_LEFT; -fx-padding: 12 16;"/>
+            </VBox>
+            
+            <Region VBox.vgrow="ALWAYS"/>
+            
+            <Button text="Déconnexion" onAction="#logout"
+                    style="-fx-background-color: #334155; -fx-text-fill: #fca5a5; -fx-background-radius: 8; 
+                           -fx-padding: 10; -fx-cursor: hand; -fx-margin: 0 16 16 16;"
+                    prefWidth="210" styleClass="logout-btn"/>
         </VBox>
-        <VBox style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 15; -fx-pref-width: 250; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5);">
-            <Text text="📄 Total Documents" style="-fx-fill: #64748b; -fx-font-size: 14px;"/>
-            <Label fx:id="totalDocsLabel" text="0" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #8b5cf6;"/>
+    </left>
+
+    <!-- CENTER CONTENT -->
+    <center>
+        <VBox style="-fx-padding: 24; -fx-background-color: #f9f9ff;" spacing="24">
+            
+            <!-- Header -->
+            <VBox spacing="8">
+                <Text text="Statistiques" styleClass="h1"/>
+                <Text text="Analysez les données de votre cabinet médical." 
+                      styleClass="body" style="-fx-text-fill: #727785;"/>
+            </VBox>
+            
+            <!-- Stat Cards -->
+            <HBox spacing="24">
+                <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                    <HBox spacing="16" alignment="CENTER_LEFT">
+                        <VBox spacing="4" HBox.hgrow="ALWAYS">
+                            <Text text="TOTAL PATIENTS" styleClass="stat-card-label"/>
+                            <Label fx:id="totalPatientsLabel" text="0" styleClass="stat-card-value"/>
+                        </VBox>
+                        <StackPane styleClass="stat-card-icon, stat-card-icon-primary" prefWidth="48" prefHeight="48">
+                            <Text text="👥" style="-fx-font-size: 24px;"/>
+                        </StackPane>
+                    </HBox>
+                </VBox>
+                
+                <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                    <HBox spacing="16" alignment="CENTER_LEFT">
+                        <VBox spacing="4" HBox.hgrow="ALWAYS">
+                            <Text text="DOCUMENTS" styleClass="stat-card-label"/>
+                            <Label fx:id="totalDocsLabel" text="0" styleClass="stat-card-value"/>
+                        </VBox>
+                        <StackPane styleClass="stat-card-icon, stat-card-icon-secondary" prefWidth="48" prefHeight="48">
+                            <Text text="📄" style="-fx-font-size: 24px;"/>
+                        </StackPane>
+                    </HBox>
+                </VBox>
+                
+                <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                    <HBox spacing="16" alignment="CENTER_LEFT">
+                        <VBox spacing="4" HBox.hgrow="ALWAYS">
+                            <Text text="ORDONNANCES IA" styleClass="stat-card-label"/>
+                            <Label fx:id="totalPrescriptionsLabel" text="0" styleClass="stat-card-value"/>
+                        </VBox>
+                        <StackPane styleClass="stat-card-icon, stat-card-icon-tertiary" prefWidth="48" prefHeight="48">
+                            <Text text="💊" style="-fx-font-size: 24px;"/>
+                        </StackPane>
+                    </HBox>
+                </VBox>
+            </HBox>
+            
+            <!-- Charts Grid -->
+            <ScrollPane fitToWidth="true" styleClass="main-scroll-pane">
+                <GridPane hgap="24" vgap="24">
+                    <columnConstraints>
+                        <ColumnConstraints percentWidth="50"/>
+                        <ColumnConstraints percentWidth="50"/>
+                    </columnConstraints>
+                    
+                    <!-- Gender Chart -->
+                    <VBox styleClass="content-card" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                        <Text text="Démographie : Répartition par Sexe" styleClass="h3"/>
+                        <PieChart fx:id="genderChart" prefHeight="300"/>
+                    </VBox>
+                    
+                    <!-- Document Types Chart -->
+                    <VBox styleClass="content-card" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                        <Text text="Catégories : Volume par Type" styleClass="h3"/>
+                        <BarChart fx:id="docTypeChart" prefHeight="300">
+                            <xAxis><CategoryAxis label="Type"/></xAxis>
+                            <yAxis><NumberAxis label="Nombre"/></yAxis>
+                        </BarChart>
+                    </VBox>
+                    
+                    <!-- Growth Chart -->
+                    <VBox styleClass="content-card" GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.columnSpan="2">
+                        <Text text="Tendances : Croissance de la Patientèle" styleClass="h3"/>
+                        <AreaChart fx:id="growthChart" prefHeight="250">
+                            <xAxis><CategoryAxis label="Mois"/></xAxis>
+                            <yAxis><NumberAxis label="Dossiers"/></yAxis>
+                        </AreaChart>
+                    </VBox>
+                    
+                    <!-- Monthly Activity -->
+                    <VBox styleClass="content-card" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                        <Text text="Activité : Documents par Mois" styleClass="h3"/>
+                        <BarChart fx:id="monthlyActivityChart" prefHeight="250">
+                            <xAxis><CategoryAxis label="Mois"/></xAxis>
+                            <yAxis><NumberAxis label="Volume"/></yAxis>
+                        </BarChart>
+                    </VBox>
+                    
+                    <!-- Age Groups -->
+                    <VBox styleClass="content-card" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                        <Text text="Patientèle : Tranches d'Âge" styleClass="h3"/>
+                        <BarChart fx:id="ageGroupChart" prefHeight="250">
+                            <xAxis><CategoryAxis label="Tranche d'âge"/></xAxis>
+                            <yAxis><NumberAxis label="Nombre"/></yAxis>
+                        </BarChart>
+                    </VBox>
+                </GridPane>
+            </ScrollPane>
         </VBox>
-        <VBox style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 15; -fx-pref-width: 250; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5);">
-            <Text text="💊 Ordonnances AI" style="-fx-fill: #64748b; -fx-font-size: 14px;"/>
-            <Label fx:id="totalPrescriptionsLabel" text="0" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #10b981;"/>
-        </VBox>
-    </HBox>
-
-    <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" VBox.vgrow="ALWAYS">
-        <GridPane hgap="30" vgap="30">
-            <columnConstraints>
-                <ColumnConstraints percentWidth="50" />
-                <ColumnConstraints percentWidth="50" />
-            </columnConstraints>
-
-            <VBox style="-fx-background-color: white; -fx-padding: 25; -fx-background-radius: 20; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 15, 0, 0, 8);" GridPane.columnIndex="0" GridPane.rowIndex="0">
-                <Text text="Démographie : Répartition par Sexe" style="-fx-font-weight: bold; -fx-font-size: 16px; -fx-fill: #1e293b;"/>
-                <PieChart fx:id="genderChart" prefHeight="350" legendVisible="true" animated="false" />
-            </VBox>
-
-            <!-- Chart 2: Document Types -->
-            <VBox style="-fx-background-color: white; -fx-padding: 25; -fx-background-radius: 20; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 15, 0, 0, 8);" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                <Text text="Catégories : Volume par Type de Document" style="-fx-font-weight: bold; -fx-font-size: 16px; -fx-fill: #1e293b;"/>
-                <BarChart fx:id="docTypeChart" prefHeight="350" barGap="10" categoryGap="20" animated="false">
-                    <xAxis><CategoryAxis label="Type de Document" fx:id="docTypeXAxis" /></xAxis>
-                    <yAxis><NumberAxis label="Nombre" /></yAxis>
-                </BarChart>
-            </VBox>
-
-            <!-- Chart 3: Growth over time -->
-            <VBox style="-fx-background-color: white; -fx-padding: 25; -fx-background-radius: 20; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 15, 0, 0, 8);" GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.columnSpan="2">
-                <Text text="Tendances : Croissance de la Patientèle" style="-fx-font-weight: bold; -fx-font-size: 16px; -fx-fill: #1e293b;"/>
-                <AreaChart fx:id="growthChart" prefHeight="350" animated="false">
-                    <xAxis><CategoryAxis label="Mois de l'année" fx:id="growthXAxis" /></xAxis>
-                    <yAxis><NumberAxis label="Dossiers Créés" /></yAxis>
-                </AreaChart>
-            </VBox>
-
-            <!-- Chart 4: Monthly Documents -->
-            <VBox style="-fx-background-color: white; -fx-padding: 25; -fx-background-radius: 20; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 15, 0, 0, 8);" GridPane.columnIndex="0" GridPane.rowIndex="2">
-                <Text text="Activité : Documents Générés par Mois" style="-fx-font-weight: bold; -fx-font-size: 16px; -fx-fill: #1e293b;"/>
-                <BarChart fx:id="monthlyActivityChart" prefHeight="350" animated="false">
-                    <xAxis><CategoryAxis label="Mois" fx:id="activityXAxis" /></xAxis>
-                    <yAxis><NumberAxis label="Volume Documentaire" /></yAxis>
-                </BarChart>
-            </VBox>
-
-            <!-- Chart 5: Age Groups -->
-            <VBox style="-fx-background-color: white; -fx-padding: 25; -fx-background-radius: 20; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 15, 0, 0, 8);" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                <Text text="Patientèle : Répartition par Tranche d'Âge" style="-fx-font-weight: bold; -fx-font-size: 16px; -fx-fill: #1e293b;"/>
-                <BarChart fx:id="ageGroupChart" prefHeight="350" animated="false">
-                    <xAxis><CategoryAxis label="Tranche d'âge" fx:id="ageXAxis" /></xAxis>
-                    <yAxis><NumberAxis label="Nombre de Patients" /></yAxis>
-                </BarChart>
-            </VBox>
-
-        </GridPane>
-    </ScrollPane>
-
-</VBox>
+    </center>
+</BorderPane>

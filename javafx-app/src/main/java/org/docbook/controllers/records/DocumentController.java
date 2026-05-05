@@ -306,11 +306,51 @@ public class DocumentController {
     }
 
     /**
+     * Ouvre la vue des statistiques.
+     */
+    @FXML
+    private void openStatsView(ActionEvent event) {
+        loadView(event, "/fxml/doctor/StatsView.fxml", "Statistiques");
+    }
+
+    /**
+     * Ouvre la vue de la carte.
+     */
+    @FXML
+    private void openMapView(ActionEvent event) {
+        loadView(event, "/fxml/records/MapView.fxml", "Carte");
+    }
+
+    /**
+     * Ouvre le profil utilisateur.
+     */
+    @FXML
+    private void handleProfileNav(ActionEvent event) {
+        loadView(event, "/fxml/profile.fxml", "Mon Profil");
+    }
+
+    /**
      * Deconnecte l'utilisateur et charge la vue d'accueil.
      */
     @FXML
     private void logout(ActionEvent event) {
-        loadView(event, "/fxml/MainView.fxml", "DocBook");
+        org.docbook.util.AppState.setCurrentUser(null);
+        loadView(event, "/fxml/auth/login.fxml", "DocBook - Connexion");
+    }
+
+    @FXML
+    private void goToDashboard(ActionEvent event) {
+        loadView(event, "/fxml/patient/PatientDashboard.fxml", "Dashboard Patient");
+    }
+
+    @FXML
+    private void goToSearch(ActionEvent event) {
+        loadView(event, "/fxml/patient/search_doctors.fxml", "Recherche Médecins");
+    }
+
+    @FXML
+    private void goToMap(ActionEvent event) {
+        loadView(event, "/fxml/records/MapView.fxml", "Carte");
     }
 
     /**

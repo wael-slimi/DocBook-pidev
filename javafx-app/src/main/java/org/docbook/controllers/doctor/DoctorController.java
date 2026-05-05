@@ -10,10 +10,18 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.docbook.controllers.ai.AIReportController;
+import org.docbook.controllers.ai.SnapshotController;
 import org.docbook.entities.records.DossierMedical;
+import org.docbook.entities.users.Doctor;
 import org.docbook.services.medical.DossierMedicalService;
+import org.docbook.util.AppState;
+import org.docbook.util.GeminiService;
+import org.docbook.util.QrCodeService;
 
 import java.io.IOException;
 import java.util.List;
@@ -22,6 +30,11 @@ public class DoctorController {
 
     @FXML private StackPane contentArea;
 
+    @FXML private Label doctorNameLabel;
+    @FXML private ImageView doctorAvatarImg;
+
+    private DossierMedical selectedDossier;
+    private final QrCodeService qrCodeService = new QrCodeService();
     @FXML
     private TableView<DossierMedical> patientTable;
     @FXML
@@ -35,10 +48,12 @@ public class DoctorController {
 
     @FXML
     private Label totalPatientsLabel;
+    @FXML private Label todayConsultationsLabel;
+    @FXML private Label activeDossiersLabel;
     @FXML private TextField numDossierField;
     @FXML private TextField nomField;
     @FXML private TextField prenomField;
-    @FXML private DatePicker dateNaissanceField;
+    @FXML private DatePicker dateNaissField;
     @FXML private TextField genreField;
     @FXML private TextField emailPatientField;
     @FXML private TextField telephoneField;
@@ -62,9 +77,12 @@ public class DoctorController {
 
     /**
      * Initialise les colonnes, la selection de ligne et le chargement initial des dossiers.
-     */
+*/
     @FXML
     public void initialize() {
+        // Load doctor info
+        loadDoctorInfo();
+        
         numCol.setCellValueFactory(new PropertyValueFactory<>("numeroDossier"));
         nameCol.setCellValueFactory(new PropertyValueFactory<>("patientNom"));
         firstNameCol.setCellValueFactory(new PropertyValueFactory<>("patientPrenom"));
@@ -76,9 +94,9 @@ public class DoctorController {
                 nomField.setText(newSel.getPatientNom());
                 prenomField.setText(newSel.getPatientPrenom());
                 if (newSel.getDateNaissance() != null) {
-                    dateNaissanceField.setValue(newSel.getDateNaissance());
+                    dateNaissField.setValue(newSel.getDateNaissance());
                 } else {
-                    dateNaissanceField.setValue(null);
+                    dateNaissField.setValue(null);
                 }
                 genreField.setText(newSel.getGenre());
                 emailPatientField.setText(newSel.getEmail());
@@ -112,6 +130,29 @@ public class DoctorController {
         ObservableList<DossierMedical> obsList = FXCollections.observableArrayList(list);
         patientTable.setItems(obsList);
         totalPatientsLabel.setText(String.valueOf(list.size()));
+        
+        // Update stats
+        if (todayConsultationsLabel != null) {
+            todayConsultationsLabel.setText(String.valueOf(list.size()));
+        }
+        if (activeDossiersLabel != null) {
+            activeDossiersLabel.setText(String.valueOf(list.size()));
+        }
+    }
+
+    /**
+     * Charge les informations du médecin connecté.
+     */
+    private void loadDoctorInfo() {
+        org.docbook.entities.users.User currentUser = org.docbook.util.AppState.getCurrentUser();
+        if (currentUser != null && doctorNameLabel != null) {
+            String name = currentUser.getName();
+            if (name != null && !name.isEmpty()) {
+                doctorNameLabel.setText("Dr. " + name);
+            } else {
+                doctorNameLabel.setText("Dr. Médecin");
+            }
+        }
     }
 
     /**
@@ -126,7 +167,7 @@ public class DoctorController {
 
         if (prenomField.getText() == null || !prenomField.getText().matches("[a-zA-ZÀ-ÿ\\s]+")) { prenomError.setText("Prénom invalide."); isValid = false; } else { prenomError.setText(""); }
 
-        if (dateNaissanceField.getValue() == null) { dateNaissanceError.setText("Veuillez choisir une date."); isValid = false; } else { dateNaissanceError.setText(""); }
+        if (dateNaissField.getValue() == null) { dateNaissanceError.setText("Veuillez choisir une date."); isValid = false; } else { dateNaissanceError.setText(""); }
 
         if (genreField.getText() == null || !genreField.getText().matches("[MFmf]")) { genreError.setText("M ou F uniquement."); isValid = false; } else { genreError.setText(""); }
 
@@ -150,7 +191,7 @@ public class DoctorController {
         dm.setNumeroDossier(numDossierField.getText());
         dm.setPatientNom(nomField.getText());
         dm.setPatientPrenom(prenomField.getText());
-        dm.setDateNaissance(dateNaissanceField.getValue() != null ? dateNaissanceField.getValue() : java.time.LocalDate.now());
+        dm.setDateNaissance(dateNaissField.getValue() != null ? dateNaissField.getValue() : java.time.LocalDate.now());
         dm.setGenre(genreField.getText());
         dm.setEmail(emailPatientField.getText());
         dm.setTelephone(telephoneField.getText());
@@ -178,7 +219,7 @@ public class DoctorController {
         selected.setNumeroDossier(numDossierField.getText());
         selected.setPatientNom(nomField.getText());
         selected.setPatientPrenom(prenomField.getText());
-        selected.setDateNaissance(dateNaissanceField.getValue());
+        selected.setDateNaissance(dateNaissField.getValue());
         selected.setGenre(genreField.getText());
         selected.setEmail(emailPatientField.getText());
         selected.setTelephone(telephoneField.getText());
@@ -199,7 +240,7 @@ public class DoctorController {
         numDossierField.clear();
         nomField.clear();
         prenomField.clear();
-        dateNaissanceField.setValue(null);
+        dateNaissField.setValue(null);
         genreField.clear();
         emailPatientField.clear();
         telephoneField.clear();
@@ -306,6 +347,92 @@ public class DoctorController {
         } catch (IOException e) {
             System.err.println("FXML LOAD ERROR: The file exists, but there is an error INSIDE the FXML or its Controller.");
             e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void generatePatientSnapshot(ActionEvent event) {
+        if (selectedDossier == null) {
+            statusText.setText("Sélectionnez un patient d'abord.");
+            return;
+        }
+        
+        statusText.setText("Génération du snapshot AI...");
+        new Thread(() -> {
+            String data = "Remarques: " + selectedDossier.getRemarques();
+            String snapshot = GeminiService.analyzeText(GeminiService.getSnapshotPrompt(), data);
+            javafx.application.Platform.runLater(() -> {
+                try {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/ai/SnapshotView.fxml"));
+                    Parent root = loader.load();
+                    
+                    SnapshotController controller = loader.getController();
+                    controller.setData(selectedDossier.getPatientPrenom() + " " + selectedDossier.getPatientNom(), snapshot);
+
+                    Stage stage = new Stage();
+                    stage.initModality(Modality.APPLICATION_MODAL);
+                    stage.setTitle("Snapshot Médical AI");
+                    stage.setScene(new Scene(root));
+                    stage.show();
+
+                    statusText.setText("Snapshot généré.");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    statusText.setText("Erreur d'ouverture du snapshot.");
+                }
+            });
+        }).start();
+    }
+
+    @FXML
+    private void runDiagnosticAssistant(ActionEvent event) {
+        if (selectedDossier == null) {
+            statusText.setText("Sélectionnez un patient d'abord.");
+            return;
+        }
+        String remarks = remarquesField.getText();
+        if (remarks == null || remarks.isEmpty()) {
+            statusText.setText("Saisissez des remarques pour l'assistant AI.");
+            return;
+        }
+
+        statusText.setText("Analyse AI en cours...");
+        new Thread(() -> {
+            String advice = GeminiService.analyzeText(GeminiService.getDiagnosticAssistantPrompt(), remarks);
+            javafx.application.Platform.runLater(() -> {
+                try {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/ai/AIReportView.fxml"));
+                    Parent root = loader.load();
+                    
+                    AIReportController controller = loader.getController();
+                    controller.setData(selectedDossier.getPatientPrenom() + " " + selectedDossier.getPatientNom(), advice);
+
+                    Stage stage = new Stage();
+                    stage.initModality(Modality.APPLICATION_MODAL);
+                    stage.setTitle("Analyse Co-pilote AI");
+                    stage.setScene(new Scene(root));
+                    stage.show();
+
+                    statusText.setText("Rapport AI prêt.");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    statusText.setText("Erreur lors de l'ouverture du rapport.");
+                }
+            });
+        }).start();
+    }
+
+    private void selectDossier(DossierMedical dm) {
+        this.selectedDossier = dm;
+        if (dm != null) {
+            numDossierField.setText(dm.getNumeroDossier());
+            nomField.setText(dm.getPatientNom());
+            prenomField.setText(dm.getPatientPrenom());
+            emailPatientField.setText(dm.getEmail());
+            telephoneField.setText(dm.getTelephone());
+            adresseField.setText(dm.getAdresse());
+            remarquesField.setText(dm.getRemarques());
+            genreField.setText(dm.getGenre());
         }
     }
 }

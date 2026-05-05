@@ -55,14 +55,19 @@ public class LoginController {
             String dashboardPath;
 
             // Priority 1: Check if Admin
-            if ("ADMIN".equalsIgnoreCase(user.getRole())) {
+            if (user.getRole() != null && user.getRole().contains("ADMIN")) {
                 dashboardPath = "/fxml/admin/admin_dashboard.fxml";
             }
-            // Priority 2: Check if Doctor
-            else if ("doctor".equalsIgnoreCase(user.getDtype())) {
+            // Priority 2: Check if Doctor (both role and dtype must indicate doctor)
+            else if (user.getDtype() != null && user.getDtype().equalsIgnoreCase("doctor")) {
                 dashboardPath = "/fxml/doctor/DoctorDashboard.fxml";
             }
-            // Default: Patient
+            // Priority 3: Check if patient (role contains PATIENT or dtype is patient)
+            else if ((user.getRole() != null && user.getRole().contains("PATIENT")) || 
+                     (user.getDtype() != null && user.getDtype().equalsIgnoreCase("patient"))) {
+                dashboardPath = "/fxml/patient/PatientDashboard.fxml";
+            }
+            // Fallback: Patient dashboard (default)
             else {
                 dashboardPath = "/fxml/patient/PatientDashboard.fxml";
             }
@@ -149,8 +154,14 @@ public class LoginController {
         }
 
     @FXML
-    private void goToForgotPassword(ActionEvent event) throws IOException {
-        switchScene(event, "/fxml/auth/forgot_password.fxml");
+    private void goToForgotPassword(javafx.scene.input.MouseEvent event) throws IOException {
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/auth/forgot_password.fxml"));
+        Parent root = loader.load();
+        Scene scene = new Scene(root);
+        ThemeManager.applyTheme(scene);
+        stage.setScene(scene);
+        stage.show();
     }
 
     protected void switchScene(ActionEvent event, String fxmlPath) throws IOException {

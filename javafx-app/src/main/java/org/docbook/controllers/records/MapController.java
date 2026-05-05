@@ -1,6 +1,10 @@
 package org.docbook.controllers.records;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.scene.web.WebEngine;
@@ -11,6 +15,11 @@ public class MapController {
     @FXML private WebView mapWebView;
     private String selectedAddress = "";
     private java.util.function.Consumer<String> onAddressSelected;
+    private String previousView = "/fxml/doctor/DoctorDashboard.fxml";
+
+    public void setPreviousView(String view) {
+        this.previousView = view;
+    }
 
     public void setOnAddressSelected(java.util.function.Consumer<String> callback) {
         this.onAddressSelected = callback;
@@ -67,11 +76,24 @@ public class MapController {
         if (onAddressSelected != null && !selectedAddress.isEmpty()) {
             onAddressSelected.accept(selectedAddress);
         }
-        close();
+        goBack(null);
     }
 
     @FXML
     private void close() {
-        ((Stage) mapWebView.getScene().getWindow()).close();
+        goBack(null);
+    }
+
+    @FXML
+    private void goBack(ActionEvent event) {
+        try {
+            Parent root = FXMLLoader.load(getClass().getResource(previousView));
+            Stage stage = (Stage) mapWebView.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+            ((Stage) mapWebView.getScene().getWindow()).close();
+        }
     }
 }

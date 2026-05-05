@@ -1,31 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Region?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Text?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="org.docbook.controllers.patient.AdherenceHistoryController"
             stylesheets="/css/style.css"
             prefHeight="800.0" prefWidth="1200.0">
-    <top>
-        <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 16;">
-            <Text text="DocBook" style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
-            <Region HBox.hgrow="ALWAYS"/>
-            <Button text="Retour" onAction="#goBack"/>
-        </HBox>
-    </top>
+
+    <!-- Left Sidebar -->
+    <left>
+        <VBox styleClass="dashboard-sidebar" prefWidth="250" spacing="20">
+            <VBox alignment="CENTER" spacing="10">
+                <Text text="DocBook" style="-fx-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;"/>
+                <Text text="Espace Patient" style="-fx-fill: #94a3b8;"/>
+            </VBox>
+            
+            <Separator style="-fx-opacity: 0.2;"/>
+            
+            <VBox spacing="10">
+                <Button text="🏠 Dashboard" styleClass="nav-link" prefWidth="210" onAction="#goToDashboard"/>
+                <Button text="📄 Documents" styleClass="nav-link" prefWidth="210" onAction="#goToDocuments"/>
+                <Button text="🔍 Médecins" styleClass="nav-link" prefWidth="210" onAction="#goToSearch"/>
+                <Button text="📊 Statistiques" styleClass="nav-link" prefWidth="210" onAction="#goToStats"/>
+                <Button text="🗺️ Carte" styleClass="nav-link" prefWidth="210" onAction="#goToMap"/>
+                <Button text="Mon Profil" styleClass="nav-link" prefWidth="210" onAction="#goToProfile"/>
+            </VBox>
+            
+            <Region VBox.vgrow="ALWAYS" />
+            
+            <Button text="Déconnexion" onAction="#logout" 
+                    style="-fx-background-color: #334155; -fx-text-fill: #fca5a5; -fx-background-radius: 8; -fx-padding: 10; -fx-cursor: hand;"
+                    prefWidth="210"/>
+        </VBox>
+    </left>
+
+    <!-- Main Content -->
     <center>
-        <VBox alignment="CENTER" spacing="12">
-            <padding>
-                <Insets top="20" right="20" bottom="20" left="20"/>
-            </padding>
-            <Text text="Historique d'Adhérence"/>
+        <VBox alignment="CENTER" spacing="12" style="-fx-padding: 30;">
+            <Text text="Historique d'Adhérence" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
             <Text text="Vue en cours de préparation." style="-fx-fill: #64748b;"/>
         </VBox>
     </center>

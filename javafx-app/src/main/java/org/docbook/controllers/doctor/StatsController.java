@@ -138,4 +138,56 @@ public class StatsController {
     @FXML
     private void goBack(ActionEvent event) {
     }
+
+    @FXML
+    private void openDoctorDashboard(ActionEvent event) {
+        loadView(event, "/fxml/doctor/DoctorDashboard.fxml", "Espace Médecin");
+    }
+
+    @FXML
+    private void openDocumentView(ActionEvent event) {
+        loadView(event, "/fxml/records/DocumentView.fxml", "Documents");
+    }
+
+    @FXML
+    private void openMapView(ActionEvent event) {
+        loadView(event, "/fxml/records/MapView.fxml", "Carte");
+    }
+
+    @FXML
+    private void handleProfileNav() {
+        try {
+            Parent root = FXMLLoader.load(getClass().getResource("/fxml/profile.fxml"));
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Mon Profil");
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void logout(ActionEvent event) {
+        org.docbook.util.AppState.setCurrentUser(null);
+        try {
+            Parent root = FXMLLoader.load(getClass().getResource("/fxml/auth/login.fxml"));
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("DocBook - Connexion");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadView(ActionEvent event, String fxmlPath, String title) {
+        try {
+            Parent root = FXMLLoader.load(getClass().getResource(fxmlPath));
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle(title);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

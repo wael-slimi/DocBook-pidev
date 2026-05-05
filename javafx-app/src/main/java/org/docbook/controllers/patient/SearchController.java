@@ -4,20 +4,27 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Stage;
 import org.docbook.entities.users.Doctor;
 import org.docbook.services.users.UserService;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
 public class SearchController implements Initializable {
 
     @FXML private TextField nameSearchField;
-    @FXML private TextField specialtySearchField; // Added for specialty filtering
+    @FXML private TextField specialtySearchField;
     @FXML private TextField priceSearchField;
     @FXML private TableView<Doctor> doctorTable;
 
@@ -84,5 +91,49 @@ public class SearchController implements Initializable {
 
             return matchesName && matchesSpecialty && matchesPrice;
         });
+    }
+
+    @FXML
+    private void goToDashboard(ActionEvent event) throws IOException {
+        switchView(event, "/fxml/patient/PatientDashboard.fxml");
+    }
+
+    @FXML
+    private void goToDocuments(ActionEvent event) throws IOException {
+        switchView(event, "/fxml/records/DocumentView.fxml");
+    }
+
+    @FXML
+    private void goToStats(ActionEvent event) throws IOException {
+        switchView(event, "/fxml/doctor/StatsView.fxml");
+    }
+
+    @FXML
+    private void goToMap(ActionEvent event) throws IOException {
+        switchView(event, "/fxml/records/MapView.fxml");
+    }
+
+    @FXML
+    private void goToProfile(ActionEvent event) throws IOException {
+        switchView(event, "/fxml/patient/PatientProfile.fxml");
+    }
+
+    private void switchView(ActionEvent event, String fxmlPath) throws IOException {
+        Parent root = FXMLLoader.load(getClass().getResource(fxmlPath));
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        stage.setScene(new Scene(root));
+    }
+
+    @FXML
+    private void logout(ActionEvent event) throws IOException {
+        org.docbook.util.AppState.setCurrentUser(null);
+        Parent root = FXMLLoader.load(getClass().getResource("/fxml/auth/login.fxml"));
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        stage.setScene(new Scene(root));
+    }
+
+    @FXML
+    private void showHome(ActionEvent event) throws IOException {
+        switchView(event, "/fxml/patient/PatientDashboard.fxml");
     }
 }
