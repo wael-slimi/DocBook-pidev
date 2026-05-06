@@ -23,6 +23,9 @@ import org.docbook.services.medical.DossierMedicalService;
 import org.docbook.services.users.PatientService;
 import org.docbook.util.AppState;
 import org.docbook.util.ThemeManager;
+import org.docbook.util.WeatherWidget;
+import org.docbook.controllers.patient.ChatWidget;
+import org.docbook.util.WeatherWidget;
 
 import java.io.File;
 import java.io.IOException;
@@ -58,6 +61,10 @@ public class PatientController {
     private Label profileNameText;
 
     @FXML
+    private VBox weatherWidgetContainer;
+
+    @FXML
+    private VBox chatWidgetContainer;
     private ImageView sidebarProfileImage;
 
     @FXML
@@ -78,6 +85,16 @@ public class PatientController {
         loadPatientData();
         if (dossiersContainer != null) {
             loadDossierCards();
+        }
+        
+        if (weatherWidgetContainer != null) {
+            WeatherWidget weatherWidget = new WeatherWidget();
+            weatherWidgetContainer.getChildren().add(weatherWidget);
+        }
+        
+        if (chatWidgetContainer != null) {
+            ChatWidget chatWidget = new ChatWidget();
+            chatWidgetContainer.getChildren().add(chatWidget);
         }
     }
 

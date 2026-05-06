@@ -147,6 +147,11 @@
 
                         <!-- Right: Quick Actions -->
                         <VBox prefWidth="320" spacing="16">
+                            <!-- Weather Widget -->
+                            <VBox fx:id="weatherWidgetContainer" style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0.3, 0, 2); -fx-padding: 10;">
+                                <Text text="Météo - Tunis" style="-fx-font-size: 14px; -fx-font-weight: 600; -fx-fill: #1e293b;"/>
+                            </VBox>
+
                             <!-- Quick Search -->
                             <VBox style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0.3, 0, 2); -fx-padding: 20;">
                                 <Text text="Trouver un Médecin" style="-fx-font-size: 16px; -fx-font-weight: 600; -fx-fill: #1e293b;"/>
@@ -164,6 +169,9 @@
                                     <Text text="Aucun rendez-vous prévu" style="-fx-font-size: 13px; -fx-fill: #94a3b8;"/>
                                 </VBox>
                             </VBox>
+
+                            <!-- Chat Widget -->
+                            <VBox fx:id="chatWidgetContainer" prefHeight="280" style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0.3, 0, 2);"/>
 
                             <!-- Health Info -->
                             <VBox style="-fx-background-color: #0058be; -fx-background-radius: 12; -fx-padding: 20;">

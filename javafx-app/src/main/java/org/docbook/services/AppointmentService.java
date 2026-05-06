@@ -96,7 +96,7 @@ public class AppointmentService {
 
     public List<Appointment> search(String query) throws Exception {
         String sql = "SELECT id, patient_id, doctor_id, scheduled_at, status, reason, department FROM appointment " +
-                "WHERE reason LIKE ? OR department LIKE ? OR status LIKE ? " +
+                "WHERE reason LIKE ? OR department LIKE ? OR status LIKE ? OR doctor LIKE ? " +
                 "ORDER BY scheduled_at DESC";
         List<Appointment> appointments = new ArrayList<>();
 
@@ -107,6 +107,7 @@ public class AppointmentService {
             ps.setString(1, searchPattern);
             ps.setString(2, searchPattern);
             ps.setString(3, searchPattern);
+            ps.setString(4, searchPattern);
 
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {

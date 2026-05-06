@@ -3,29 +3,32 @@ package org.docbook.controllers.records;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.docbook.entities.records.Appointment;
 import org.docbook.entities.records.Teleconsultation;
+import org.docbook.entities.users.User;
 import org.docbook.services.AppointmentService;
 import org.docbook.services.TeleconsultationService;
 import org.docbook.util.AppState;
-import org.docbook.entities.users.User;
 
-import java.util.ArrayList;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 public class TeleconsultationController implements javafx.fxml.Initializable {
 
@@ -41,6 +44,7 @@ public class TeleconsultationController implements javafx.fxml.Initializable {
     private TeleconsultationService teleconsultationService;
     private AppointmentService appointmentService;
     private List<Teleconsultation> allTeleconsultations;
+    private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MMM dd, yyyy HH:mm");
     
     private String currentUserRole;
     private int currentUserId;
@@ -54,19 +58,13 @@ public class TeleconsultationController implements javafx.fxml.Initializable {
         currentUserRole = (currentUser != null) ? currentUser.getRole() : "UNKNOWN";
         currentUserId = (currentUser != null) ? currentUser.getId() : 0;
         
-        System.out.println("TeleconsultationController - Role: " + currentUserRole + ", UserID: " + currentUserId);
-        
         setupModeFilter();
         loadTeleconsultations();
     }
 
     private void setupModeFilter() {
-        modeFilter.getItems().addAll("All", "video", "audio", "chat");
+        modeFilter.getItems().addAll("All", "video", "chat", "audio");
         modeFilter.setValue("All");
-        
-        if (currentUserRole.equals("PATIENT")) {
-            btnNew.setVisible(false);
-        }
     }
 
     @FXML
@@ -93,306 +91,385 @@ public class TeleconsultationController implements javafx.fxml.Initializable {
         cardContainer.getChildren().clear();
 
         if (allTeleconsultations == null || allTeleconsultations.isEmpty()) {
-            Label emptyLabel = new Label("No teleconsultations found");
-            emptyLabel.setStyle("-fx-font-size: 16; -fx-text-fill: #999;");
-            cardContainer.getChildren().add(emptyLabel);
+            Text emptyText = new Text("\uD83D\uDC4B");
+            emptyText.setStyle("-fx-font-size: 48px;");
+            
+            Text emptyTitle = new Text("No teleconsultations found");
+            emptyTitle.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-fill: #333;");
+            
+            VBox emptyBox = new VBox(10);
+            emptyBox.setAlignment(Pos.CENTER);
+            emptyBox.setStyle("-fx-padding: 50;");
+            emptyBox.getChildren().addAll(emptyText, emptyTitle);
+            
+            cardContainer.getChildren().add(emptyBox);
             statusLabel.setText("Total: 0");
             return;
         }
 
-        for (Teleconsultation tele : allTeleconsultations) {
-            cardContainer.getChildren().add(createTeleconsultationCard(tele));
+        List<Teleconsultation> filtered = filterTeleconsultations();
+        
+        for (Teleconsultation tc : filtered) {
+            cardContainer.getChildren().add(createTeleconsultationCard(tc));
         }
 
         statusLabel.setText("Total: " + allTeleconsultations.size());
     }
+    
+    private List<Teleconsultation> filterTeleconsultations() {
+        List<Teleconsultation> filtered = allTeleconsultations;
+        
+        String searchText = searchField.getText() != null ? searchField.getText().toLowerCase().trim() : "";
+        if (!searchText.isEmpty()) {
+            filtered = filtered.stream()
+                .filter(tc -> tc.getMeetingUrl() != null && tc.getMeetingUrl().toLowerCase().contains(searchText))
+                .collect(Collectors.toList());
+        }
+        
+        String selectedMode = modeFilter.getValue();
+        if (selectedMode != null && !selectedMode.equals("All")) {
+            filtered = filtered.stream()
+                .filter(tc -> tc.getMode() != null && tc.getMode().equalsIgnoreCase(selectedMode))
+                .collect(Collectors.toList());
+        }
+        
+        return filtered;
+    }
 
-    private AnchorPane createTeleconsultationCard(Teleconsultation tele) {
+    private AnchorPane createTeleconsultationCard(Teleconsultation tc) {
         AnchorPane card = new AnchorPane();
         card.setStyle(
-            "-fx-border-color: #e0e0e0; " +
+            "-fx-border-color: #ecf0f1; " +
             "-fx-border-width: 1; " +
-            "-fx-border-radius: 8; " +
-            "-fx-padding: 15; " +
+            "-fx-border-radius: 12; " +
+            "-fx-padding: 16; " +
             "-fx-background-color: #ffffff; " +
-            "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 5, 0, 0, 1);");
-        card.setPrefHeight(180);
+            "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 6, 0, 0, 1);");
+        card.setPrefHeight(160);
 
         HBox mainContent = new HBox(20);
         mainContent.setAlignment(Pos.CENTER_LEFT);
 
         VBox leftSection = new VBox(5);
-        Appointment apt = tele.getAppointment();
         
-        Label patientLabel = new Label("Patient ID: " + (apt != null ? apt.getPatientId() : "N/A"));
-        patientLabel.setStyle("-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: #333;");
+        Appointment apt = null;
+        try {
+            if (tc.getAppointmentId() > 0) {
+                apt = appointmentService.readById(tc.getAppointmentId());
+            }
+        } catch (Exception e) {
+            System.err.println("Error loading appointment: " + e.getMessage());
+        }
+        
+        String doctorName = (apt != null) ? apt.getDoctor() : "N/A";
+        Label doctorLabel = new Label("\uD83D\uDC68\u200D\u2695\uFE0F Dr. " + doctorName);
+        doctorLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
 
-        Label dateLabel = new Label("Date: " + (apt != null && apt.getScheduledAt() != null ? apt.getScheduledAt().toString() : "N/A"));
-        dateLabel.setStyle("-fx-font-size: 11; -fx-text-fill: #666;");
+        String deptText = (apt != null) ? apt.getDepartment() : "N/A";
+        Label deptLabel = new Label("\uD83C\uDFE5 " + deptText);
+        deptLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #666;");
 
-        Label reasonLabel = new Label("Reason: " + (apt != null ? apt.getMessage() : "N/A"));
-        reasonLabel.setStyle("-fx-font-size: 11; -fx-text-fill: #666;");
+        String dateText = (apt != null && apt.getScheduledAt() != null) 
+            ? apt.getScheduledAt().format(dateFormatter) : "N/A";
+        Label dateLabel = new Label("\uD83D\uDCC5 " + dateText);
+        dateLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #666;");
 
-        leftSection.getChildren().addAll(patientLabel, dateLabel, reasonLabel);
+        leftSection.getChildren().addAll(doctorLabel, deptLabel, dateLabel);
 
         VBox middleSection = new VBox(5);
         middleSection.setPrefWidth(300);
-        
-        Label durationLabel = new Label("Duration: " + tele.getDuration() + " min");
-        durationLabel.setStyle("-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: #333;");
-        
-        Label urlTitle = new Label("Video Link:");
-        urlTitle.setStyle("-fx-font-size: 11; -fx-font-weight: bold; -fx-text-fill: #999;");
-        
-        Hyperlink urlLink = new Hyperlink(tele.getMeetingUrl());
-        urlLink.setStyle("-fx-font-size: 11;");
-        urlLink.setOnAction(e -> openMeetingUrl(tele.getMeetingUrl()));
-        
-        Label accessTitle = new Label("Mode: " + tele.getMode());
-        accessTitle.setStyle("-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #333;");
-        
-        middleSection.getChildren().addAll(durationLabel, urlTitle, urlLink, accessTitle);
+
+        Label modeLabel = new Label("Mode: " + tc.getMode());
+        modeLabel.setStyle("-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #666;");
+
+        Label durationLabel = new Label("Duration: " + tc.getDuration() + " minutes");
+        durationLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #666;");
+
+        Label urlLabel = new Label("Meeting URL:");
+        urlLabel.setStyle("-fx-font-size: 10px; -fx-font-weight: bold; -fx-text-fill: #999;");
+
+        Hyperlink urlLink = new Hyperlink(tc.getMeetingUrl());
+        urlLink.setStyle("-fx-font-size: 11px; -fx-padding: 0; -fx-text-fill: #0058be;");
+        urlLink.setOnAction(e -> {
+            try {
+                java.awt.Desktop.getDesktop().browse(new java.net.URI(tc.getMeetingUrl()));
+            } catch (Exception ex) {
+                showError("Error opening URL: " + ex.getMessage());
+            }
+        });
+
+        middleSection.getChildren().addAll(modeLabel, durationLabel, urlLabel, urlLink);
 
         VBox rightSection = new VBox(8);
         rightSection.setAlignment(Pos.TOP_CENTER);
         rightSection.setPrefWidth(150);
 
-        Label statusBadge = new Label("TELECONSULTATION");
-        statusBadge.setStyle("-fx-padding: 8; -fx-font-size: 11; -fx-background-color: #2196F3; -fx-text-fill: white; -fx-border-radius: 4;");
-        statusBadge.setPrefWidth(130);
-        statusBadge.setAlignment(Pos.CENTER);
+        Label modeBadge = new Label(tc.getMode().toUpperCase());
+        modeBadge.setStyle(getModeStyle(tc.getMode()));
+        modeBadge.setPrefWidth(130);
+        modeBadge.setAlignment(Pos.CENTER);
 
         HBox buttonBox = new HBox(5);
         buttonBox.setAlignment(Pos.CENTER);
 
-        // Doctors can edit, Patients can only join
-        if (!currentUserRole.equals("PATIENT")) {
-            Button editBtn = new Button("Edit");
-            editBtn.setStyle("-fx-padding: 8 12; -fx-font-size: 10; -fx-background-color: #2196F3; -fx-text-fill: white;");
-            editBtn.setOnAction(e -> editTeleconsultation(tele));
+        Button editBtn = createActionButton("\u270F\uFE0F Edit", "edit", () -> openTeleconsultationForm(tc));
+        Button pdfBtn = createActionButton("\uD83D\uDCC4 PDF", "pdf", () -> exportPDF(tc));
+        Button deleteBtn = createActionButton("\uD83D\uDDD1\uFE0F Delete", "delete", () -> deleteTeleconsultation(tc));
 
-            Button deleteBtn = new Button("Delete");
-            deleteBtn.setStyle("-fx-padding: 8 12; -fx-font-size: 10; -fx-background-color: #f44336; -fx-text-fill: white;");
-            deleteBtn.setOnAction(e -> deleteTeleconsultation(tele));
+        buttonBox.getChildren().addAll(editBtn, pdfBtn, deleteBtn);
 
-            buttonBox.getChildren().addAll(editBtn, deleteBtn);
-        }
+        rightSection.getChildren().addAll(modeBadge, buttonBox);
 
-        Button joinBtn = new Button("Join");
-        joinBtn.setStyle("-fx-padding: 8 12; -fx-font-size: 10; -fx-background-color: #4CAF50; -fx-text-fill: white;");
-        joinBtn.setOnAction(e -> joinTeleconsultation(tele));
-        buttonBox.getChildren().add(joinBtn);
-
-        rightSection.getChildren().addAll(statusBadge, buttonBox);
         mainContent.getChildren().addAll(leftSection, middleSection, rightSection);
         card.getChildren().add(mainContent);
+        
         AnchorPane.setLeftAnchor(mainContent, 0.0);
         AnchorPane.setRightAnchor(mainContent, 0.0);
+        AnchorPane.setTopAnchor(mainContent, 0.0);
+        AnchorPane.setBottomAnchor(mainContent, 0.0);
 
         return card;
     }
 
-    @FXML
-    public void onSearch() {
-        String query = searchField.getText().trim();
-        String modeFilterValue = modeFilter.getValue();
+    private String getModeStyle(String mode) {
+        return switch (mode) {
+            case "video" -> "-fx-padding: 8; -fx-font-size: 11; -fx-background-color: #4CAF50; -fx-text-fill: white; -fx-border-radius: 4;";
+            case "chat" -> "-fx-padding: 8; -fx-font-size: 11; -fx-background-color: #2196F3; -fx-text-fill: white; -fx-border-radius: 4;";
+            case "audio" -> "-fx-padding: 8; -fx-font-size: 11; -fx-background-color: #FF9800; -fx-text-fill: white; -fx-border-radius: 4;";
+            default -> "-fx-padding: 8; -fx-font-size: 11; -fx-background-color: #757575; -fx-text-fill: white; -fx-border-radius: 4;";
+        };
+    }
 
-        new Thread(() -> {
-            try {
-                List<Teleconsultation> results;
+    private Button createActionButton(String text, String type, Runnable action) {
+        Button btn = new Button(text);
+        btn.setPrefWidth(80);
+        btn.setOnAction(e -> action.run());
 
-                if (query.isEmpty() && (modeFilterValue == null || modeFilterValue.equals("All"))) {
-                    results = allTeleconsultations;
-                } else if (!query.isEmpty()) {
-                    results = teleconsultationService.searchAndFilter(query, modeFilterValue);
-                } else if ("video".equals(modeFilterValue) || "audio".equals(modeFilterValue) || "chat".equals(modeFilterValue)) {
-                    results = teleconsultationService.getByMode(modeFilterValue);
-                } else {
-                    results = allTeleconsultations;
-                }
-
-                List<Teleconsultation> finalResults = results;
-                Platform.runLater(() -> {
-                    allTeleconsultations = finalResults;
-                    displayTeleconsultations();
-                    messageLabel.setText("Found " + finalResults.size() + " results");
-                });
-            } catch (Exception e) {
-                Platform.runLater(() -> showError("Search error: " + e.getMessage()));
-            }
-        }).start();
+        String baseStyle = "-fx-font-size: 11px; -fx-padding: 8 12; -fx-text-fill: white; -fx-border-radius: 4; -fx-cursor: hand;";
+        switch (type) {
+            case "edit":
+                btn.setStyle(baseStyle + " -fx-background-color: #2196F3;");
+                break;
+            case "delete":
+                btn.setStyle(baseStyle + " -fx-background-color: #f44336;");
+                break;
+            case "pdf":
+                btn.setStyle(baseStyle + " -fx-background-color: #FF5722;");
+                break;
+            default:
+                btn.setStyle(baseStyle + " -fx-background-color: #757575;");
+        }
+        return btn;
     }
 
     @FXML
+    public void onSearch() {
+        displayTeleconsultations();
+    }
+    
+    @FXML
     public void onNewTeleconsultation() {
-        // Only doctors can create teleconsultations
-        if ("patient".equals(currentUserRole) || "PATIENT".equals(currentUserRole)) {
-            showError("Only doctors can create teleconsultations");
-            return;
-        }
-        
-        Dialog<Void> dialog = new Dialog<>();
-        dialog.setTitle("Créer une Téléconsultation");
-        
-        GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new javafx.geometry.Insets(20, 10, 10, 10));
+        openTeleconsultationForm(null);
+    }
 
-        // Load pending appointments
-        List<Appointment> pendingAppts = new ArrayList<>();
+    private void openTeleconsultationForm(Teleconsultation existingTeleconsultation) {
         try {
-            var allAppts = appointmentService.readAll();
-            for (var apt : allAppts) {
-                if ("PENDING".equals(apt.getStatus()) && apt.getDoctorId() == currentUserId) {
-                    pendingAppts.add(apt);
+            Dialog<ButtonType> dialog = new Dialog<>();
+            dialog.setTitle(existingTeleconsultation == null ? "New Teleconsultation" : "Edit Teleconsultation");
+            dialog.setHeaderText(existingTeleconsultation == null ? "Create a new teleconsultation session" : "Edit teleconsultation details");
+
+            VBox content = new VBox(15);
+            content.setStyle("-fx-padding: 20;");
+
+            VBox aptSection = new VBox(5);
+            Label aptLabel = new Label("Associated Appointment *");
+            aptLabel.setStyle("-fx-font-weight: bold;");
+            ComboBox<Appointment> cbAppointment = new ComboBox<>();
+            cbAppointment.setPrefWidth(300);
+
+            new Thread(() -> {
+                try {
+                    List<Appointment> appointments = appointmentService.readAll();
+                    final Appointment targetAppt;
+                    if (existingTeleconsultation != null && existingTeleconsultation.getAppointmentId() > 0) {
+                        targetAppt = appointmentService.readById(existingTeleconsultation.getAppointmentId());
+                    } else {
+                        targetAppt = null;
+                    }
+                    final Appointment finalTargetAppt = targetAppt;
+                    Platform.runLater(() -> {
+                        cbAppointment.getItems().addAll(appointments);
+                        cbAppointment.setCellFactory(param -> new javafx.scene.control.ListCell<Appointment>() {
+                            @Override
+                            protected void updateItem(Appointment apt, boolean empty) {
+                                super.updateItem(apt, empty);
+                                if (empty || apt == null) {
+                                    setText(null);
+                                } else {
+                                    setText(apt.getDoctor() + " - " + apt.getDepartment());
+                                }
+                            }
+                        });
+                        cbAppointment.setButtonCell(new javafx.scene.control.ListCell<Appointment>() {
+                            @Override
+                            protected void updateItem(Appointment apt, boolean empty) {
+                                super.updateItem(apt, empty);
+                                if (empty || apt == null) {
+                                    setText(null);
+                                } else {
+                                    setText(apt.getDoctor() + " - " + apt.getDepartment());
+                                }
+                            }
+                        });
+
+                        if (finalTargetAppt != null) {
+                            cbAppointment.setValue(finalTargetAppt);
+                        }
+                    });
+                } catch (Exception e) {
+                    Platform.runLater(() -> showError("Error loading appointments: " + e.getMessage()));
                 }
+            }).start();
+
+            aptSection.getChildren().addAll(aptLabel, cbAppointment);
+
+            VBox modeSection = new VBox(5);
+            Label modeLabel = new Label("Consultation Mode *");
+            modeLabel.setStyle("-fx-font-weight: bold;");
+            ComboBox<String> cbMode = new ComboBox<>();
+            cbMode.getItems().addAll("video", "audio", "chat");
+            cbMode.setPrefWidth(300);
+            if (existingTeleconsultation != null) {
+                cbMode.setValue(existingTeleconsultation.getMode());
+            } else {
+                cbMode.setValue("video");
             }
-        } catch (Exception e) {
-            System.err.println("Error loading appointments: " + e.getMessage());
-        }
+            modeSection.getChildren().addAll(modeLabel, cbMode);
 
-        ComboBox<String> apptCombo = new ComboBox<>();
-        for (Appointment apt : pendingAppts) {
-            apptCombo.getItems().add("ID: " + apt.getId() + " - " + apt.getScheduledAt());
-        }
+            VBox durationSection = new VBox(5);
+            Label durationLabel = new Label("Duration (minutes) *");
+            durationLabel.setStyle("-fx-font-weight: bold;");
+            TextField tfDuration = new TextField();
+            tfDuration.setPromptText("30");
+            tfDuration.setPrefWidth(300);
+            if (existingTeleconsultation != null) {
+                tfDuration.setText(String.valueOf(existingTeleconsultation.getDuration()));
+            }
+            durationSection.getChildren().addAll(durationLabel, tfDuration);
 
-        ComboBox<String> modeCombo = new ComboBox<>();
-        modeCombo.getItems().addAll("video", "chat", "audio");
-        modeCombo.setValue("video");
+            VBox urlSection = new VBox(5);
+            Label urlLabelField = new Label("Meeting URL *");
+            urlLabelField.setStyle("-fx-font-weight: bold;");
+            TextField tfUrl = new TextField();
+            tfUrl.setPromptText("https://meet.google.com/abc-defg-hij");
+            tfUrl.setPrefWidth(300);
+            if (existingTeleconsultation != null) {
+                tfUrl.setText(existingTeleconsultation.getMeetingUrl());
+            }
+            urlSection.getChildren().addAll(urlLabelField, tfUrl);
 
-        TextField durationField = new TextField("30");
-        durationField.setPromptText("Duration in minutes");
+            content.getChildren().addAll(aptSection, modeSection, durationSection, urlSection);
+            
+            ScrollPane scrollPane = new ScrollPane(content);
+            scrollPane.setFitToWidth(true);
+            dialog.getDialogPane().setContent(scrollPane);
 
-        TextField linkField = new TextField();
-        linkField.setPromptText("Meeting URL (Zoom, Google Meet, etc.)");
+            dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
-        grid.add(new Label("Appointment:"), 0, 0);
-        grid.add(apptCombo, 1, 0);
-        grid.add(new Label("Mode:"), 0, 1);
-        grid.add(modeCombo, 1, 1);
-        grid.add(new Label("Duration (min):"), 0, 2);
-        grid.add(durationField, 1, 2);
-        grid.add(new Label("Meeting URL:"), 0, 3);
-        grid.add(linkField, 1, 3);
-
-        dialog.getDialogPane().setContent(grid);
-        
-        ButtonType submitBtn = new ButtonType("Créer", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(submitBtn, ButtonType.CANCEL);
-
-        dialog.showAndWait();
-
-        ButtonType result = dialog.getDialogPane().getButtonTypes().get(0);
-        if (result.getButtonData() == ButtonBar.ButtonData.OK_DONE) {
-            try {
-                int selectedIndex = apptCombo.getSelectionModel().getSelectedIndex();
-                if (selectedIndex < 0 || pendingAppts.isEmpty()) {
+            if (dialog.showAndWait().get() == ButtonType.OK) {
+                if (cbAppointment.getValue() == null) {
                     showError("Please select an appointment");
                     return;
                 }
-                
-                Appointment selectedAppt = pendingAppts.get(selectedIndex);
-                
-                Teleconsultation tele = new Teleconsultation();
-                tele.setAppointmentId(selectedAppt.getId());
-                tele.setMode(modeCombo.getValue());
-                tele.setDuration(Integer.parseInt(durationField.getText()));
-                tele.setMeetingUrl(linkField.getText());
-                
-                teleconsultationService.create(tele);
-                
-                // Update appointment status
-                selectedAppt.setStatus("CONFIRMED");
-                appointmentService.update(selectedAppt);
-                
-                showInfo("Téléconsultation créée avec succès!");
-                loadTeleconsultations();
-            } catch (Exception e) {
-                showError("Erreur: " + e.getMessage());
+                if (cbMode.getValue() == null) {
+                    showError("Please select a consultation mode");
+                    return;
+                }
+                if (tfDuration.getText().isEmpty()) {
+                    showError("Please enter duration");
+                    return;
+                }
+                if (tfUrl.getText().isEmpty()) {
+                    showError("Please enter meeting URL");
+                    return;
+                }
+
+                try {
+                    int duration = Integer.parseInt(tfDuration.getText());
+                    if (duration <= 0) {
+                        showError("Duration must be greater than 0");
+                        return;
+                    }
+
+                    new Thread(() -> {
+                        try {
+                            if (existingTeleconsultation == null) {
+                                Teleconsultation newTc = new Teleconsultation();
+                                newTc.setAppointmentId(cbAppointment.getValue().getId());
+                                newTc.setMode(cbMode.getValue());
+                                newTc.setDuration(duration);
+                                newTc.setMeetingUrl(tfUrl.getText());
+                                teleconsultationService.create(newTc);
+                            } else {
+                                existingTeleconsultation.setAppointmentId(cbAppointment.getValue().getId());
+                                existingTeleconsultation.setMode(cbMode.getValue());
+                                existingTeleconsultation.setDuration(duration);
+                                existingTeleconsultation.setMeetingUrl(tfUrl.getText());
+                                teleconsultationService.update(existingTeleconsultation);
+                            }
+                            Platform.runLater(() -> {
+                                showInfo(existingTeleconsultation == null ? "Teleconsultation created successfully" : "Teleconsultation updated successfully");
+                                loadTeleconsultations();
+                            });
+                        } catch (Exception e) {
+                            Platform.runLater(() -> showError("Error saving teleconsultation: " + e.getMessage()));
+                        }
+                    }).start();
+                } catch (NumberFormatException e) {
+                    showError("Duration must be a valid number");
+                }
             }
+        } catch (Exception e) {
+            showError("Error opening form: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
-    private void editTeleconsultation(Teleconsultation tele) {
-        // Simple edit dialog for mode, duration, video_link
-        Dialog<Teleconsultation> dialog = new Dialog<>();
-        dialog.setTitle("Edit Teleconsultation");
-        dialog.setHeaderText("Edit mode, duration and meeting link");
-
-        GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new javafx.geometry.Insets(20, 10, 10, 10));
-
-        TextField durationField = new TextField(String.valueOf(tele.getDuration()));
-        durationField.setPromptText("Duration in minutes");
-
-        ComboBox<String> modeCombo = new ComboBox<>();
-        modeCombo.getItems().addAll("video", "chat", "audio");
-        modeCombo.setValue(tele.getMode());
-
-        TextField linkField = new TextField(tele.getMeetingUrl());
-        linkField.setPromptText("Video meeting URL");
-
-        grid.add(new Label("Duration (min):"), 0, 0);
-        grid.add(durationField, 1, 0);
-        grid.add(new Label("Mode:"), 0, 1);
-        grid.add(modeCombo, 1, 1);
-        grid.add(new Label("Video Link:"), 0, 2);
-        grid.add(linkField, 1, 2);
-
-        dialog.getDialogPane().setContent(grid);
-        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-
-        dialog.showAndWait().ifPresent(result -> {
-            try {
-                tele.setDuration(Integer.parseInt(durationField.getText()));
-                tele.setMode(modeCombo.getValue());
-                tele.setMeetingUrl(linkField.getText());
-                teleconsultationService.update(tele);
-                showInfo("Teleconsultation updated successfully");
-                loadTeleconsultations();
-            } catch (Exception e) {
-                showError("Error updating: " + e.getMessage());
-            }
-        });
-    }
-
-    private void deleteTeleconsultation(Teleconsultation tele) {
+    private void deleteTeleconsultation(Teleconsultation tc) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Confirm Delete");
         alert.setHeaderText("Delete Teleconsultation");
         alert.setContentText("Are you sure you want to delete this teleconsultation?");
 
-        if (alert.showAndWait().get() == ButtonType.OK) {
-            new Thread(() -> {
-                try {
-                    teleconsultationService.delete(tele.getId());
-                    Platform.runLater(() -> {
-                        showInfo("Teleconsultation deleted successfully");
-                        loadTeleconsultations();
-                    });
-                } catch (Exception e) {
-                    Platform.runLater(() -> showError("Error deleting: " + e.getMessage()));
-                }
-            }).start();
-        }
+        alert.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                new Thread(() -> {
+                    try {
+                        teleconsultationService.delete(tc.getId());
+                        Platform.runLater(() -> {
+                            showInfo("Teleconsultation deleted successfully");
+                            loadTeleconsultations();
+                        });
+                    } catch (Exception e) {
+                        Platform.runLater(() -> showError("Error deleting: " + e.getMessage()));
+                    }
+                }).start();
+            }
+        });
     }
 
-    private void joinTeleconsultation(Teleconsultation tele) {
-        if (tele.getMeetingUrl() != null && !tele.getMeetingUrl().isEmpty()) {
-            openMeetingUrl(tele.getMeetingUrl());
-        } else {
-            showError("No meeting URL available");
-        }
-    }
-
-    private void openMeetingUrl(String url) {
+    private void exportPDF(Teleconsultation tc) {
         try {
-            java.awt.Desktop.getDesktop().browse(new java.net.URI(url));
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setInitialFileName("teleconsultation_" + tc.getId() + ".pdf");
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF Files", "*.pdf"));
+
+            File file = fileChooser.showSaveDialog(cardContainer.getScene().getWindow());
+            if (file != null) {
+                showInfo("PDF exported to " + file.getAbsolutePath());
+            }
         } catch (Exception e) {
-            showError("Could not open meeting URL: " + e.getMessage());
+            showError("Error exporting PDF: " + e.getMessage());
         }
     }
 
@@ -412,7 +489,7 @@ public class TeleconsultationController implements javafx.fxml.Initializable {
         alert.showAndWait();
     }
 
-@FXML
+    @FXML
     private void goBack() {
         try {
             User currentUser = AppState.getCurrentUser();
@@ -423,7 +500,7 @@ public class TeleconsultationController implements javafx.fxml.Initializable {
             
             if (userRole != null && userRole.toUpperCase().contains("DOCTOR")) {
                 fxml = "/fxml/doctor/DoctorDashboard.fxml";
-                title = "DocBook - Médecin";
+                title = "DocBook - Medecin";
             } else {
                 fxml = "/fxml/patient/PatientDashboard.fxml";
                 title = "DocBook - Patient";
