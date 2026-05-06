@@ -24,11 +24,14 @@
             <Label text="Doctor:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
             <ComboBox fx:id="doctorCombo" GridPane.columnIndex="1" GridPane.rowIndex="1" promptText="Select Doctor" />
 
-            <Label text="Date &amp; Time:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+            <Label text="Date:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
             <DatePicker fx:id="datePicker" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 
-            <Label text="Message:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
-            <TextArea fx:id="messageArea" GridPane.columnIndex="1" GridPane.rowIndex="3" prefRowCount="4" wrapText="true" promptText="Describe your symptoms or reason for visit..." />
+            <Label text="Time:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+            <ComboBox fx:id="timeCombo" GridPane.columnIndex="1" GridPane.rowIndex="3" promptText="Select Time" />
+
+            <Label text="Message:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+            <TextArea fx:id="messageArea" GridPane.columnIndex="1" GridPane.rowIndex="4" prefRowCount="4" wrapText="true" promptText="Describe your symptoms or reason for visit..." />
         </GridPane>
 
         <HBox spacing="10" alignment="CENTER_RIGHT">
