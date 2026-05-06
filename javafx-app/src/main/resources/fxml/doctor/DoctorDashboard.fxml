@@ -38,6 +38,8 @@
             <VBox styleClass="sidebar-nav" spacing="2" style="-fx-padding: 8 12;">
                 <Button text="🏠  Tableau de bord" styleClass="nav-link-active" prefWidth="220" 
                         style="-fx-alignment: CENTER_LEFT; -fx-padding: 14 16; -fx-font-size: 14px;"/>
+                <Button text="📹  Téléconsultations" onAction="#openTeleconsultationsView" styleClass="nav-link" prefWidth="220" 
+                        style="-fx-alignment: CENTER_LEFT; -fx-padding: 14 16; -fx-font-size: 14px;"/>
                 <Button text="👥  Patients" onAction="#openPatientListView" styleClass="nav-link" prefWidth="220" 
                         style="-fx-alignment: CENTER_LEFT; -fx-padding: 14 16; -fx-font-size: 14px;"/>
                 <Button text="📄  Documents" styleClass="nav-link" prefWidth="220" onAction="#openDocumentView" 
