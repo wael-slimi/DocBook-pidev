@@ -11,7 +11,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.docbook.controllers.ai.AIReportController;
@@ -23,6 +25,7 @@ import org.docbook.util.AppState;
 import org.docbook.util.GeminiService;
 import org.docbook.util.QrCodeService;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
@@ -37,6 +40,7 @@ public class DoctorController {
     private final QrCodeService qrCodeService = new QrCodeService();
     @FXML
     private TableView<DossierMedical> patientTable;
+    @FXML private ListView<String> sidebarPatientList;
     @FXML
     private TableColumn<DossierMedical, String> numCol;
     @FXML
@@ -58,6 +62,7 @@ public class DoctorController {
     @FXML private TextField emailPatientField;
     @FXML private TextField telephoneField;
     @FXML private TextField adresseField;
+    @FXML private TextField searchField;
     @FXML private TextArea remarquesField;
 
     @FXML private javafx.scene.text.Text numDossierError;
@@ -88,21 +93,16 @@ public class DoctorController {
         firstNameCol.setCellValueFactory(new PropertyValueFactory<>("patientPrenom"));
         emailCol.setCellValueFactory(new PropertyValueFactory<>("email"));
 
-        patientTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
+patientTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
             if (newSel != null) {
-                numDossierField.setText(newSel.getNumeroDossier());
-                nomField.setText(newSel.getPatientNom());
-                prenomField.setText(newSel.getPatientPrenom());
-                if (newSel.getDateNaissance() != null) {
-                    dateNaissField.setValue(newSel.getDateNaissance());
-                } else {
-                    dateNaissField.setValue(null);
-                }
-                genreField.setText(newSel.getGenre());
-                emailPatientField.setText(newSel.getEmail());
-                telephoneField.setText(newSel.getTelephone());
-                adresseField.setText(newSel.getAdresse());
-                remarquesField.setText(newSel.getRemarques());
+                if (numDossierField != null) numDossierField.setText(newSel.getNumeroDossier());
+                if (nomField != null) nomField.setText(newSel.getPatientNom());
+                if (prenomField != null) prenomField.setText(newSel.getPatientPrenom());
+                if (genreField != null) genreField.setText(newSel.getGenre());
+                if (emailPatientField != null) emailPatientField.setText(newSel.getEmail());
+                if (telephoneField != null) telephoneField.setText(newSel.getTelephone());
+                if (adresseField != null) adresseField.setText(newSel.getAdresse());
+                if (remarquesField != null) remarquesField.setText(newSel.getRemarques());
             }
         });
 
@@ -131,6 +131,29 @@ public class DoctorController {
         if (activeDossiersLabel != null) {
             activeDossiersLabel.setText(String.valueOf(list.size()));
         }
+        
+        // Populate sidebar patient list
+        if (sidebarPatientList != null) {
+            ObservableList<String> patientNames = FXCollections.observableArrayList();
+            for (DossierMedical p : list) {
+                patientNames.add(p.getPatientPrenom() + " " + p.getPatientNom());
+            }
+            sidebarPatientList.setItems(patientNames);
+            
+            // Add click handler
+            sidebarPatientList.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+                if (newVal != null) {
+                    String selectedName = newVal;
+                    for (DossierMedical p : list) {
+                        String fullName = p.getPatientPrenom() + " " + p.getPatientNom();
+                        if (fullName.equals(selectedName)) {
+                            selectDossier(p);
+                            break;
+                        }
+                    }
+                }
+            });
+        }
     }
 
     /**
@@ -148,52 +171,128 @@ public class DoctorController {
         }
     }
 
-    /**
+/**
      * Verifie les champs du formulaire dossier avant creation ou mise a jour.
      */
     private boolean validateDossierForm() {
         boolean isValid = true;
 
-        if (numDossierField.getText() == null || numDossierField.getText().trim().isEmpty()) { numDossierError.setText("Champ obligatoire."); isValid = false; } else { numDossierError.setText(""); }
+        if (numDossierField == null || numDossierField.getText() == null || numDossierField.getText().trim().isEmpty()) { 
+            if (numDossierError != null) numDossierError.setText("Champ obligatoire."); 
+            isValid = false; 
+        } else { 
+            if (numDossierError != null) numDossierError.setText(""); 
+        }
 
-        if (nomField.getText() == null || !nomField.getText().matches("[a-zA-ZÀ-ÿ\\s]+")) { nomError.setText("Nom invalide."); isValid = false; } else { nomError.setText(""); }
+        if (nomField == null || nomField.getText() == null || !nomField.getText().matches("[a-zA-ZÀ-ÿ\\s]+")) { 
+            if (nomError != null) nomError.setText("Nom invalide."); 
+            isValid = false; 
+        } else { 
+            if (nomError != null) nomError.setText(""); 
+        }
 
-        if (prenomField.getText() == null || !prenomField.getText().matches("[a-zA-ZÀ-ÿ\\s]+")) { prenomError.setText("Prénom invalide."); isValid = false; } else { prenomError.setText(""); }
+        if (prenomField == null || prenomField.getText() == null || !prenomField.getText().matches("[a-zA-ZÀ-ÿ\\s]+")) { 
+            if (prenomError != null) prenomError.setText("Prénom invalide."); 
+            isValid = false; 
+        } else { 
+            if (prenomError != null) prenomError.setText(""); 
+        }
 
-        if (dateNaissField.getValue() == null) { dateNaissanceError.setText("Veuillez choisir une date."); isValid = false; } else { dateNaissanceError.setText(""); }
+        if (dateNaissField == null || dateNaissField.getValue() == null) { 
+            if (dateNaissField != null) dateNaissField.setValue(null);
+            if (dateNaissField != null) dateNaissField.setPromptText("Veuillez choisir une date.");
+            isValid = false; 
+        }
 
-        if (genreField.getText() == null || !genreField.getText().matches("[MFmf]")) { genreError.setText("M ou F uniquement."); isValid = false; } else { genreError.setText(""); }
+        if (genreField == null || genreField.getText() == null || !genreField.getText().matches("[MFmf]")) { 
+            if (genreError != null) genreError.setText("M ou F uniquement."); 
+            isValid = false; 
+        } else { 
+            if (genreError != null) genreError.setText(""); 
+        }
 
-        if (emailPatientField.getText() == null || !emailPatientField.getText().matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) { emailError.setText("Email invalide."); isValid = false; } else { emailError.setText(""); }
+        if (emailPatientField == null || emailPatientField.getText() == null || !emailPatientField.getText().matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) { 
+            if (emailError != null) emailError.setText("Email invalide."); 
+            isValid = false; 
+        } else { 
+            if (emailError != null) emailError.setText(""); 
+        }
 
-        if (telephoneField.getText() == null || !telephoneField.getText().matches("\\d{8,}")) { telephoneError.setText("Numéro invalide (min 8 chiffres)."); isValid = false; } else { telephoneError.setText(""); }
+        if (telephoneField == null || telephoneField.getText() == null || !telephoneField.getText().matches("\\d{8,}")) { 
+            if (telephoneError != null) telephoneError.setText("Numéro invalide (min 8 chiffres)."); 
+            isValid = false; 
+        } else { 
+            if (telephoneError != null) telephoneError.setText(""); 
+        }
 
-        if (adresseField.getText() == null || adresseField.getText().trim().isEmpty()) { adresseError.setText("Adresse obligatoire."); isValid = false; } else { adresseError.setText(""); }
+        if (adresseField == null || adresseField.getText() == null || adresseField.getText().trim().isEmpty()) { 
+            if (adresseError != null) adresseError.setText("Adresse obligatoire."); 
+            isValid = false; 
+        } else { 
+            if (adresseError != null) adresseError.setText(""); 
+        }
 
         return isValid;
     }
 
-    /**
+/**
      * Ajoute un nouveau dossier medical depuis le formulaire.
      */
     @FXML
     private void addDossierPanel(ActionEvent event) {
+        // Debug: check which fields are null
+        StringBuilder missing = new StringBuilder();
+        if (numDossierField == null) missing.append("numDossierField, ");
+        if (nomField == null) missing.append("nomField, ");
+        if (prenomField == null) missing.append("prenomField, ");
+        if (dateNaissField == null) missing.append("dateNaissField, ");
+        if (genreField == null) missing.append("genreField, ");
+        if (emailPatientField == null) missing.append("emailPatientField, ");
+        if (telephoneField == null) missing.append("telephoneField, ");
+        if (adresseField == null) missing.append("adresseField, ");
+        if (remarquesField == null) missing.append("remarquesField, ");
+        
+        if (missing.length() > 0) {
+            System.err.println("Missing fields: " + missing.toString());
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Erreur");
+            alert.setHeaderText("Champs manquants");
+            alert.setContentText("Les champs suivants ne sont pas disponibles: " + missing.toString());
+            alert.showAndWait();
+            return;
+        }
+        
         if (!validateDossierForm()) return;
 
-        DossierMedical dm = new DossierMedical();
-        dm.setNumeroDossier(numDossierField.getText());
-        dm.setPatientNom(nomField.getText());
-        dm.setPatientPrenom(prenomField.getText());
-        dm.setDateNaissance(dateNaissField.getValue() != null ? dateNaissField.getValue() : java.time.LocalDate.now());
-        dm.setGenre(genreField.getText());
-        dm.setEmail(emailPatientField.getText());
-        dm.setTelephone(telephoneField.getText());
-        dm.setAdresse(adresseField.getText());
-        dm.setRemarques(remarquesField.getText());
+        try {
+            DossierMedical dm = new DossierMedical();
+            dm.setNumeroDossier(numDossierField.getText());
+            dm.setPatientNom(nomField.getText());
+            dm.setPatientPrenom(prenomField.getText());
+            dm.setDateNaissance(dateNaissField.getValue() != null ? dateNaissField.getValue() : java.time.LocalDate.now());
+            dm.setGenre(genreField.getText());
+            dm.setEmail(emailPatientField.getText());
+            dm.setTelephone(telephoneField.getText());
+            dm.setAdresse(adresseField.getText());
+            dm.setRemarques(remarquesField != null ? remarquesField.getText() : "");
 
-        dossierService.add(dm);
-        loadPatients();
-        clearDossierPanel(event);
+            dossierService.add(dm);
+            loadPatients();
+            clearDossierPanel(event);
+            
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Succès");
+            alert.setHeaderText(null);
+            alert.setContentText("Patient ajouté avec succès!");
+            alert.showAndWait();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Erreur");
+            alert.setHeaderText(null);
+            alert.setContentText("Erreur lors de l'ajout: " + e.getMessage());
+            alert.showAndWait();
+        }
     }
 
     /**
@@ -230,18 +329,18 @@ public class DoctorController {
      */
     @FXML
     private void clearDossierPanel(ActionEvent event) {
-        numDossierField.clear();
-        nomField.clear();
-        prenomField.clear();
-        dateNaissField.setValue(null);
-        genreField.clear();
-        emailPatientField.clear();
-        telephoneField.clear();
-        adresseField.clear();
-        remarquesField.clear();
-        patientTable.getSelectionModel().clearSelection();
+        if (numDossierField != null) numDossierField.clear();
+        if (nomField != null) nomField.clear();
+        if (prenomField != null) prenomField.clear();
+        if (dateNaissField != null) dateNaissField.setValue(null);
+        if (genreField != null) genreField.clear();
+        if (emailPatientField != null) emailPatientField.clear();
+        if (telephoneField != null) telephoneField.clear();
+        if (adresseField != null) adresseField.clear();
+        if (remarquesField != null) remarquesField.clear();
+        if (patientTable != null) patientTable.getSelectionModel().clearSelection();
 
-        numDossierError.setText("");
+        if (numDossierError != null) numDossierError.setText("");
         nomError.setText("");
         prenomError.setText("");
         dateNaissanceError.setText("");
@@ -274,6 +373,14 @@ public class DoctorController {
     @FXML
     private void openStatsView(ActionEvent event) {
         loadView(event, "/fxml/doctor/StatsView.fxml", "Statistiques");
+    }
+
+    /**
+     * Ouvre la vue de la liste des patients avec outils AI.
+     */
+    @FXML
+    private void openPatientListView(ActionEvent event) {
+        loadView(event, "/fxml/doctor/PatientListView.fxml", "Mes Patients");
     }
 
     /**
@@ -317,6 +424,271 @@ public class DoctorController {
         }
     }
 
+    /**
+     * Exporte la liste des patients en fichier CSV.
+     */
+    @FXML
+    private void exportPatientsCSV(ActionEvent event) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Exporter patients en CSV");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
+        fileChooser.setInitialFileName("patients_" + java.time.LocalDate.now() + ".csv");
+        
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        java.io.File file = fileChooser.showSaveDialog(stage);
+        
+        if (file != null) {
+            try {
+                List<DossierMedical> patients = dossierService.getAll();
+                java.io.FileWriter writer = new java.io.FileWriter(file);
+                writer.write("Numéro Dossier,Nom,Prénom,Date Naissance,Genre,Email,Téléphone,Adresse,Date Création\n");
+                
+                for (DossierMedical p : patients) {
+                    writer.write(String.format("%s,%s,%s,%s,%s,%s,%s,%s,%s\n",
+                        escapeCSV(p.getNumeroDossier()),
+                        escapeCSV(p.getPatientNom()),
+                        escapeCSV(p.getPatientPrenom()),
+                        p.getDateNaissance() != null ? p.getDateNaissance().toString() : "",
+                        escapeCSV(p.getGenre()),
+                        escapeCSV(p.getEmail()),
+                        escapeCSV(p.getTelephone()),
+                        escapeCSV(p.getAdresse()),
+                        p.getDateCreation() != null ? p.getDateCreation().toString() : ""));
+                }
+                writer.close();
+                
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Export réussi");
+                alert.setHeaderText(null);
+                alert.setContentText("Patients exportés avec succès vers: " + file.getName());
+                alert.showAndWait();
+            } catch (Exception e) {
+                e.printStackTrace();
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Erreur d'export");
+                alert.setHeaderText(null);
+                alert.setContentText("Erreur lors de l'export: " + e.getMessage());
+                alert.showAndWait();
+            }
+        }
+    }
+    
+    private String escapeCSV(String value) {
+        if (value == null) return "";
+        if (value.contains(",") || value.contains("\"") || value.contains("\n")) {
+            return "\"" + value.replace("\"", "\"\"") + "\"";
+        }
+        return value;
+    }
+
+    /**
+     * Supprime le patient sélectionné après confirmation.
+     */
+    @FXML
+    private void deleteDossierPanel(ActionEvent event) {
+        DossierMedical selected = patientTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Aucune sélection");
+            alert.setHeaderText(null);
+            alert.setContentText("Veuillez sélectionner un patient à supprimer.");
+            alert.showAndWait();
+            return;
+        }
+        
+        Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmAlert.setTitle("Confirmer la suppression");
+        confirmAlert.setHeaderText(null);
+        confirmAlert.setContentText("Êtes-vous sûr de vouloir supprimer le patient: " + 
+            selected.getPatientPrenom() + " " + selected.getPatientNom() + "?\n\nCette action est irréversible.");
+        
+        confirmAlert.showAndWait().ifPresent(response -> {
+            if (response == javafx.scene.control.ButtonType.OK) {
+                try {
+                    dossierService.delete(selected.getId());
+                    loadPatients();
+                    clearDossierPanel(event);
+                    
+                    Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
+                    successAlert.setTitle("Suppression réussie");
+                    successAlert.setHeaderText(null);
+                    successAlert.setContentText("Patient supprimé avec succès.");
+                    successAlert.showAndWait();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+                    errorAlert.setTitle("Erreur");
+                    errorAlert.setHeaderText(null);
+                    errorAlert.setContentText("Erreur lors de la suppression: " + e.getMessage());
+                    errorAlert.showAndWait();
+                }
+            }
+        });
+    }
+
+    /**
+     * Filtre les patients en fonction de la recherche.
+     */
+    @FXML
+    private void searchPatients(KeyEvent event) {
+        String query = searchField.getText();
+        if (query == null || query.isEmpty()) {
+            loadPatients();
+            return;
+        }
+        
+        final String searchQuery = query.toLowerCase();
+        List<DossierMedical> allPatients = dossierService.getAll();
+        List<DossierMedical> filtered = allPatients.stream()
+            .filter(p -> (p.getPatientNom() != null && p.getPatientNom().toLowerCase().contains(searchQuery)) ||
+                        (p.getPatientPrenom() != null && p.getPatientPrenom().toLowerCase().contains(searchQuery)) ||
+                        (p.getNumeroDossier() != null && p.getNumeroDossier().toLowerCase().contains(searchQuery)) ||
+                        (p.getEmail() != null && p.getEmail().toLowerCase().contains(searchQuery)))
+            .collect(java.util.stream.Collectors.toList());
+        
+        ObservableList<DossierMedical> obsList = FXCollections.observableArrayList(filtered);
+        patientTable.setItems(obsList);
+    }
+
+    /**
+     * Affiche le QR code du patient sélectionné.
+     */
+    @FXML
+    private void showPatientQrPopup(ActionEvent event) {
+        DossierMedical selected = patientTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Aucun patient sélectionné");
+            alert.setHeaderText(null);
+            alert.setContentText("Veuillez sélectionner un patient pour générer son QR code.");
+            alert.showAndWait();
+            return;
+        }
+        
+        try {
+            // Generate QR code using QrCodeService
+            javafx.scene.image.Image qrImage = qrCodeService.generatePatientQrImage(selected, 200);
+            
+            // Get documents for this patient
+            List<org.docbook.entities.records.Document> docs = documentService.getByDossierId(selected.getId());
+            
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/ai/PatientQrView.fxml"));
+            Parent root = loader.load();
+            
+            org.docbook.controllers.ai.PatientQrController controller = loader.getController();
+            controller.setData(selected, docs, qrImage);
+            
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("QR Code Patient");
+            stage.setScene(new Scene(root));
+            stage.showAndWait();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Erreur");
+            alert.setHeaderText(null);
+            alert.setContentText("Erreur lors de la génération du QR code: " + e.getMessage());
+            alert.showAndWait();
+        }
+    }
+
+    /**
+     * Génère une analyse initiale via l'IA lors de la création d'un patient.
+     */
+    @FXML
+    private void generateInitialAnalysis(ActionEvent event) {
+        String remarks = remarquesField.getText();
+        if (remarks == null || remarks.isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Aucune donnée");
+            alert.setHeaderText(null);
+            alert.setContentText("Veuillez d'abord saisir des observations ou symptômes dans le champ 'Remarques'.");
+            alert.showAndWait();
+            return;
+        }
+        
+        Alert loadingAlert = new Alert(Alert.AlertType.INFORMATION);
+        loadingAlert.setTitle("Analyse IA");
+        loadingAlert.setHeaderText(null);
+        loadingAlert.setContentText("Génération de l'analyse en cours...");
+        loadingAlert.show();
+        
+        new Thread(() -> {
+            String analysis = org.docbook.util.GeminiService.analyzeText(
+                "Tu es un assistant médical. Analyse les observations suivantes et génère un résumé médical structuré en français. " +
+                "Format: 1) Antécédents plausibles 2) Observations actuelles 3) Recommandations.",
+                remarks);
+            
+            javafx.application.Platform.runLater(() -> {
+                loadingAlert.close();
+                
+                try {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/ai/SnapshotView.fxml"));
+                    Parent root = loader.load();
+                    
+                    org.docbook.controllers.ai.SnapshotController controller = loader.getController();
+                    controller.setData("Analyse Initiale", analysis);
+                    
+                    Stage stage = new Stage();
+                    stage.initModality(Modality.APPLICATION_MODAL);
+                    stage.setTitle("Analyse IA");
+                    stage.setScene(new Scene(root));
+                    stage.showAndWait();
+                    
+                    // Optionally auto-fill the remarques field with the analysis
+                    // remarquesField.setText(remarks + "\n\n--- Analyse IA ---\n" + analysis);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+                    errorAlert.setTitle("Erreur");
+                    errorAlert.setHeaderText(null);
+                    errorAlert.setContentText("Erreur lors de l'analyse: " + e.getMessage());
+                    errorAlert.showAndWait();
+                }
+            });
+        }).start();
+    }
+
+    /**
+     * Obtient des suggestions IA basées sur les symptômes saisis.
+     */
+    @FXML
+    private void getAISuggestions(ActionEvent event) {
+        String symptoms = remarquesField.getText();
+        if (symptoms == null || symptoms.isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Aucune donnée");
+            alert.setHeaderText(null);
+            alert.setContentText("Veuillez saisir des symptômes ou observations dans le champ 'Remarques' pour obtenir des suggestions.");
+            alert.showAndWait();
+            return;
+        }
+        
+        Alert loadingAlert = new Alert(Alert.AlertType.INFORMATION);
+        loadingAlert.setTitle("Suggestions IA");
+        loadingAlert.setHeaderText(null);
+        loadingAlert.setContentText("Génération des suggestions en cours...");
+        loadingAlert.show();
+        
+        new Thread(() -> {
+            String suggestions = org.docbook.util.GeminiService.analyzeText(
+                "En tant que médecin assistant, suggère 3 questions importantes à poser au patient " +
+                "et 2 examens complémentaires pertinents basés sur ces symptômes. Réponds de manière concise en français.",
+                symptoms);
+            
+            javafx.application.Platform.runLater(() -> {
+                loadingAlert.close();
+                
+                Alert resultAlert = new Alert(Alert.AlertType.INFORMATION);
+                resultAlert.setTitle("Suggestions IA");
+                resultAlert.setHeaderText("Basé sur les symptômes saisis:");
+                resultAlert.setContentText(suggestions);
+                resultAlert.showAndWait();
+            });
+        }).start();
+    }
+
 
 
     /**
@@ -346,7 +718,11 @@ public class DoctorController {
     @FXML
     private void generatePatientSnapshot(ActionEvent event) {
         if (selectedDossier == null) {
-            statusText.setText("Sélectionnez un patient d'abord.");
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Aucun patient sélectionné");
+            alert.setHeaderText(null);
+            alert.setContentText("Veuillez sélectionner un patient dans la liste avant de générer un snapshot AI.");
+            alert.showAndWait();
             return;
         }
         
@@ -380,12 +756,20 @@ public class DoctorController {
     @FXML
     private void runDiagnosticAssistant(ActionEvent event) {
         if (selectedDossier == null) {
-            statusText.setText("Sélectionnez un patient d'abord.");
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Aucun patient sélectionné");
+            alert.setHeaderText(null);
+            alert.setContentText("Veuillez sélectionner un patient dans la liste pour utiliser l'assistant AI.");
+            alert.showAndWait();
             return;
         }
         String remarks = remarquesField.getText();
         if (remarks == null || remarks.isEmpty()) {
-            statusText.setText("Saisissez des remarques pour l'assistant AI.");
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Aucune remarque");
+            alert.setHeaderText(null);
+            alert.setContentText("Veuillez saisir des remarques dans le formulaire pour l'assistant AI.");
+            alert.showAndWait();
             return;
         }
 

@@ -10,14 +10,20 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyEvent;
+import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
+import org.docbook.controllers.ai.SnapshotController;
 import org.docbook.entities.records.Document;
 import org.docbook.entities.records.DossierMedical;
 import org.docbook.services.medical.DocumentService;
 import org.docbook.services.medical.DossierMedicalService;
+import org.docbook.util.GeminiService;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
@@ -35,6 +41,7 @@ public class DocumentController {
 
     @FXML private ComboBox<DossierMedical> dossierIdCombo;
     @FXML private TextField titreField;
+    @FXML private TextField searchField;
     @FXML private ComboBox<String> typeCombo;
     @FXML private DatePicker dateField;
     @FXML private TextArea contenuField;
@@ -202,7 +209,14 @@ public class DocumentController {
      */
     @FXML
     private void addDocument(ActionEvent event) {
-        if (!validateDocumentForm()) return;
+        if (!validateDocumentForm()) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Formulaire incomplet");
+            alert.setHeaderText(null);
+            alert.setContentText("Veuillez remplir tous les champs obligatoires pour ajouter un document.");
+            alert.showAndWait();
+            return;
+        }
 
         try {
             Document doc = new Document();
@@ -214,12 +228,19 @@ public class DocumentController {
             doc.setFichierPath(selectedFilePath);
 
             documentService.add(doc);
-            statusText.setText("Ajouté avec succès !");
-            statusText.setStyle("-fx-fill: #10b981;");
+            Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
+            successAlert.setTitle("Succès");
+            successAlert.setHeaderText(null);
+            successAlert.setContentText("Document ajouté avec succès !");
+            successAlert.showAndWait();
             loadDocuments();
             clearForm();
         } catch (Exception e) {
-            dossierIdError.setText("Dossier invalide !");
+            Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+            errorAlert.setTitle("Erreur");
+            errorAlert.setHeaderText(null);
+            errorAlert.setContentText("Erreur lors de l'ajout du document: " + e.getMessage());
+            errorAlert.showAndWait();
         }
     }
 
@@ -339,8 +360,36 @@ public class DocumentController {
     }
 
     @FXML
+    private void generatePatientSnapshot(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/doctor/DoctorDashboard.fxml"));
+            Parent root = loader.load();
+            Stage stage = (Stage) ((javafx.scene.Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new javafx.scene.Scene(root));
+            stage.setTitle("Espace Médecin");
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void runDiagnosticAssistant(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/doctor/DoctorDashboard.fxml"));
+            Parent root = loader.load();
+            Stage stage = (Stage) ((javafx.scene.Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new javafx.scene.Scene(root));
+            stage.setTitle("Espace Médecin");
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
     private void goToDashboard(ActionEvent event) {
-        loadView(event, "/fxml/patient/PatientDashboard.fxml", "Dashboard Patient");
+        loadView(event, "/fxml/doctor/DoctorDashboard.fxml", "Espace Médecin");
     }
 
     @FXML
@@ -375,6 +424,237 @@ public class DocumentController {
             System.err.println("FXML LOAD ERROR: The file exists, but there is an error INSIDE the FXML or its Controller.");
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Exporte les documents en fichier CSV.
+     */
+    @FXML
+    private void exportDocumentsCSV(ActionEvent event) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Exporter documents en CSV");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
+        fileChooser.setInitialFileName("documents_" + java.time.LocalDate.now() + ".csv");
+        
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        java.io.File file = fileChooser.showSaveDialog(stage);
+        
+        if (file != null) {
+            try {
+                List<Document> docs = documentService.getAll();
+                FileWriter writer = new FileWriter(file);
+                writer.write("ID,Titre,Type,Date,Dossier ID,Fichier,Contenu,Date Création\n");
+                
+                for (Document doc : docs) {
+                    writer.write(String.format("%d,%s,%s,%s,%d,%s,%s,%s\n",
+                        doc.getId(),
+                        escapeCSV(doc.getTitre()),
+                        escapeCSV(doc.getTypeDocument()),
+                        doc.getDateDocument() != null ? doc.getDateDocument().toString() : "",
+                        doc.getDossierMedicalId(),
+                        escapeCSV(doc.getFichierPath()),
+                        escapeCSV(doc.getContenu()),
+                        doc.getDateCreation() != null ? doc.getDateCreation().toString() : ""));
+                }
+                writer.close();
+                
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Export réussi");
+                alert.setHeaderText(null);
+                alert.setContentText("Documents exportés avec succès vers: " + file.getName());
+                alert.showAndWait();
+            } catch (Exception e) {
+                e.printStackTrace();
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Erreur d'export");
+                alert.setHeaderText(null);
+                alert.setContentText("Erreur lors de l'export: " + e.getMessage());
+                alert.showAndWait();
+            }
+        }
+    }
+    
+    private String escapeCSV(String value) {
+        if (value == null) return "";
+        if (value.contains(",") || value.contains("\"") || value.contains("\n")) {
+            return "\"" + value.replace("\"", "\"\"") + "\"";
+        }
+        return value;
+    }
+
+    /**
+     * Filtre les documents en fonction de la recherche.
+     */
+    @FXML
+    private void filterDocuments(KeyEvent event) {
+        String query = searchField.getText();
+        if (query == null || query.isEmpty()) {
+            loadDocuments();
+            return;
+        }
+        
+        final String searchQuery = query.toLowerCase();
+        List<Document> allDocs = documentService.getAll();
+        List<Document> filtered = allDocs.stream()
+            .filter(d -> (d.getTitre() != null && d.getTitre().toLowerCase().contains(searchQuery)) ||
+                        (d.getTypeDocument() != null && d.getTypeDocument().toLowerCase().contains(searchQuery)) ||
+                        (d.getContenu() != null && d.getContenu().toLowerCase().contains(searchQuery)))
+            .collect(java.util.stream.Collectors.toList());
+        
+        ObservableList<Document> obsList = FXCollections.observableArrayList(filtered);
+        documentTable.setItems(obsList);
+    }
+
+    /**
+     * Génère automatiquement un titre pour le document via IA.
+     */
+    @FXML
+    private void runAutoTitleAI(ActionEvent event) {
+        String content = contenuField.getText();
+        if (content == null || content.isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Aucune donnée");
+            alert.setHeaderText(null);
+            alert.setContentText("Veuillez d'abord saisir du contenu dans le champ 'Contenu'.");
+            alert.showAndWait();
+            return;
+        }
+        
+        Alert loadingAlert = new Alert(Alert.AlertType.INFORMATION);
+        loadingAlert.setTitle("Titre Auto IA");
+        loadingAlert.setHeaderText(null);
+        loadingAlert.setContentText("Génération du titre en cours...");
+        loadingAlert.show();
+        
+        new Thread(() -> {
+            String result = GeminiService.analyzeText(GeminiService.getAutoTitlePrompt(), content);
+            
+            javafx.application.Platform.runLater(() -> {
+                loadingAlert.close();
+                
+                // Parse result - expected format: "Titre | Type"
+                String[] parts = result.split("\\|");
+                if (parts.length >= 1) {
+                    titreField.setText(parts[0].trim());
+                }
+                if (parts.length >= 2 && typeCombo.getItems() != null) {
+                    String typeStr = parts[1].trim().toLowerCase();
+                    for (String type : typeCombo.getItems()) {
+                        if (type.toLowerCase().contains(typeStr)) {
+                            typeCombo.setValue(type);
+                            break;
+                        }
+                    }
+                }
+                
+                Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
+                successAlert.setTitle("Titre généré");
+                successAlert.setHeaderText(null);
+                successAlert.setContentText("Titre suggestions: " + result);
+                successAlert.showAndWait();
+            });
+        }).start();
+    }
+
+    /**
+     * Vérifie la sécurité des prescriptions via IA.
+     */
+    @FXML
+    private void runSafetyGuardAI(ActionEvent event) {
+        if (dossierIdCombo.getValue() == null) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Aucun dossier");
+            alert.setHeaderText(null);
+            alert.setContentText("Veuillez sélectionner un patient pour vérifier les interactions médicamenteuses.");
+            alert.showAndWait();
+            return;
+        }
+        
+        String prescription = contenuField.getText();
+        if (prescription == null || prescription.isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Aucune prescription");
+            alert.setHeaderText(null);
+            alert.setContentText("Veuillez saisir une prescription à vérifier.");
+            alert.showAndWait();
+            return;
+        }
+        
+        // Get patient history
+        DossierMedical patient = dossierIdCombo.getValue();
+        String patientHistory = "Patient: " + patient.getPatientNom() + " " + patient.getPatientPrenom() + 
+                               "\nHistorique: " + (patient.getRemarques() != null ? patient.getRemarques() : "Aucun");
+        
+        Alert loadingAlert = new Alert(Alert.AlertType.INFORMATION);
+        loadingAlert.setTitle("Vérification Sécurité");
+        loadingAlert.setHeaderText(null);
+        loadingAlert.setContentText("Analyse des interactions en cours...");
+        loadingAlert.show();
+        
+        new Thread(() -> {
+            String result = GeminiService.analyzeText(GeminiService.getSafetyGuardPrompt(patientHistory), prescription);
+            
+            javafx.application.Platform.runLater(() -> {
+                loadingAlert.close();
+                
+                Alert resultAlert = new Alert(Alert.AlertType.INFORMATION);
+                resultAlert.setTitle("Résultat de la vérification");
+                resultAlert.setHeaderText("Analyse de sécurité:");
+                resultAlert.setContentText(result);
+                resultAlert.showAndWait();
+            });
+        }).start();
+    }
+
+    /**
+     * Génère une version simplifiée pour le patient via IA.
+     */
+    @FXML
+    private void runPatientFriendlyAI(ActionEvent event) {
+        String content = contenuField.getText();
+        if (content == null || content.isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Aucune donnée");
+            alert.setHeaderText(null);
+            alert.setContentText("Veuillez d'abord sélectionner un document ou saisir du contenu.");
+            alert.showAndWait();
+            return;
+        }
+        
+        Alert loadingAlert = new Alert(Alert.AlertType.INFORMATION);
+        loadingAlert.setTitle("Version Patient");
+        loadingAlert.setHeaderText(null);
+        loadingAlert.setContentText("Génération de la version simplifiée...");
+        loadingAlert.show();
+        
+        new Thread(() -> {
+            String result = GeminiService.analyzeText(GeminiService.getPatientFriendlyPrompt(), content);
+            
+            javafx.application.Platform.runLater(() -> {
+                loadingAlert.close();
+                
+                try {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/ai/SnapshotView.fxml"));
+                    Parent root = loader.load();
+                    
+                    SnapshotController controller = loader.getController();
+                    controller.setData("Version Patient", result);
+                    
+                    Stage stage = new Stage();
+                    stage.initModality(Modality.APPLICATION_MODAL);
+                    stage.setTitle("Version Patient");
+                    stage.setScene(new Scene(root));
+                    stage.showAndWait();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+                    errorAlert.setTitle("Erreur");
+                    errorAlert.setHeaderText(null);
+                    errorAlert.setContentText("Erreur: " + e.getMessage());
+                    errorAlert.showAndWait();
+                }
+            });
+        }).start();
     }
 }
 

@@ -34,7 +34,7 @@
             
             <!-- Navigation -->
             <VBox styleClass="sidebar-nav" spacing="2" style="-fx-padding: 8 12;">
-                <Button text="🏠  Dashboard" onAction="#goToDoctorDashboard" styleClass="nav-link" prefWidth="220" 
+                <Button text="🏠  Dashboard" onAction="#openDoctorDashboard" styleClass="nav-link" prefWidth="220" 
                         style="-fx-alignment: CENTER_LEFT; -fx-padding: 14 16; -fx-font-size: 14px;"/>
                 <Button text="📄  Documents" styleClass="nav-link-active" prefWidth="220" 
                         style="-fx-alignment: CENTER_LEFT; -fx-padding: 14 16; -fx-font-size: 14px;"/>
@@ -59,19 +59,18 @@
             </VBox>
         </VBox>
     </left>
-                <Button text="Déconnexion" onAction="#logout"
-                        style="-fx-background-color: #fee2e2; -fx-text-fill: #dc2626; -fx-background-radius: 8; 
-                               -fx-font-size: 12px; -fx-padding: 8 12; -fx-cursor: hand;"
-                        prefWidth="220"/>
-            </VBox>
-        </VBox>
-    </left>
 
     <!-- Main Content -->
     <center>
         <VBox spacing="25" style="-fx-padding: 30;">
             <HBox alignment="CENTER_LEFT" spacing="20">
                 <Text text="Documents et Prescriptions" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <TextField fx:id="searchField" promptText="🔍 Rechercher document..." 
+                           onKeyReleased="#filterDocuments"
+                           style="-fx-background-color: white; -fx-background-radius: 8; 
+                                  -fx-border-color: #e2e8f0; -fx-border-radius: 8; 
+                                  -fx-padding: 8 16; -fx-pref-width: 250;"/>
             </HBox>
             
             <!-- Table and Form Container -->
@@ -110,10 +109,16 @@
                             <HBox spacing="10" style="-fx-padding: 10 0 0 0;">
                                 <Button text="Ajouter" styleClass="patient-btn" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#addDocument"/>
                                 <Button text="Modifier" styleClass="doctor-btn" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#updateDocument"/>
+                                <Button text="📥 CSV" onAction="#exportDocumentsCSV" style="-fx-background-color: #059669; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-weight: bold; -fx-padding: 8 16;" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
                             </HBox>
                             <HBox spacing="10">
                                 <Button text="Supprimer" style="-fx-background-color: #ef4444; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#deleteDocument"/>
                                 <Button text="Vider" style="-fx-background-color: transparent; -fx-text-fill: #94a3b8;" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#clearForm"/>
+                            </HBox>
+                            <HBox spacing="10" style="-fx-padding: 8 0 0 0;">
+                                <Button text="🤖 Titre Auto" onAction="#runAutoTitleAI" style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-background-radius: 6; -fx-font-size: 11px; -fx-padding: 6 10;" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                                <Button text="🛡️ Sécurité" onAction="#runSafetyGuardAI" style="-fx-background-color: #dc2626; -fx-text-fill: white; -fx-background-radius: 6; -fx-font-size: 11px; -fx-padding: 6 10;" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                                <Button text="💬 Patient" onAction="#runPatientFriendlyAI" style="-fx-background-color: #8b5cf6; -fx-text-fill: white; -fx-background-radius: 6; -fx-font-size: 11px; -fx-padding: 6 10;" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
                             </HBox>
                             <Text fx:id="statusText" style="-fx-fill: #10b981; -fx-font-size: 12px;"/>
                         </VBox>

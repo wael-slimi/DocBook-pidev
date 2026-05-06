@@ -155,7 +155,7 @@ public class StatsController {
     }
 
     @FXML
-    private void handleProfileNav() {
+    private void handleProfileNav(ActionEvent event) {
         try {
             Parent root = FXMLLoader.load(getClass().getResource("/fxml/profile.fxml"));
             Stage stage = new Stage();

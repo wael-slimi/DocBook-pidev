@@ -11,7 +11,7 @@ import java.net.http.HttpResponse;
 
 public class GeminiService {
 
-    private static final String API_KEY = "YOUR_GEMINI_API_KEY_HERE";
+    private static final String API_KEY = EnvLoader.get("GEMINI_API_KEY", "YOUR_GEMINI_API_KEY_HERE");
     private static final String API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key="
             + API_KEY;
 
@@ -19,8 +19,8 @@ public class GeminiService {
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     public static String analyzeText(String prompt, String content) {
-        if (API_KEY.equals("YOUR_GEMINI_API_KEY_HERE")) {
-            return "Veuillez configurer votre clé API Gemini dans GeminiService.java pour activer l'IA.";
+        if (API_KEY == null || API_KEY.equals("YOUR_GEMINI_API_KEY_HERE")) {
+            return "Veuillez configurer votre clé API Gemini dans le fichier .env pour activer l'IA.";
         }
 
         int maxRetries = 15;

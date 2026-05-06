@@ -61,6 +61,10 @@
         <VBox spacing="25" style="-fx-padding: 30;">
             <HBox alignment="CENTER_LEFT" spacing="20">
                 <Text text="Mes Documents et Prescriptions" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="💡 Expliquer avec IA" onAction="#explainWithAI" 
+                        style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-background-radius: 8; 
+                               -fx-font-weight: 600; -fx-padding: 10 20;"/>
             </HBox>
             
             <!-- Documents Table - View Only -->

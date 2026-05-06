@@ -38,15 +38,11 @@
             <VBox styleClass="sidebar-nav" spacing="2" style="-fx-padding: 8 12;">
                 <Button text="🏠  Tableau de bord" styleClass="nav-link-active" prefWidth="220" 
                         style="-fx-alignment: CENTER_LEFT; -fx-padding: 14 16; -fx-font-size: 14px;"/>
-                <Button text="👥  Patients" styleClass="nav-link" prefWidth="220" 
+                <Button text="👥  Patients" onAction="#openPatientListView" styleClass="nav-link" prefWidth="220" 
                         style="-fx-alignment: CENTER_LEFT; -fx-padding: 14 16; -fx-font-size: 14px;"/>
                 <Button text="📄  Documents" styleClass="nav-link" prefWidth="220" onAction="#openDocumentView" 
                         style="-fx-alignment: CENTER_LEFT; -fx-padding: 14 16; -fx-font-size: 14px;"/>
                 <Button text="📊  Statistiques" styleClass="nav-link" prefWidth="220" onAction="#openStatsView" 
-                        style="-fx-alignment: CENTER_LEFT; -fx-padding: 14 16; -fx-font-size: 14px;"/>
-                <Button text="🤖  AI Snapshot" styleClass="nav-link" prefWidth="220" onAction="#generatePatientSnapshot" 
-                        style="-fx-alignment: CENTER_LEFT; -fx-padding: 14 16; -fx-font-size: 14px;"/>
-                <Button text="💡  AI Assistant" styleClass="nav-link" prefWidth="220" onAction="#runDiagnosticAssistant" 
                         style="-fx-alignment: CENTER_LEFT; -fx-padding: 14 16; -fx-font-size: 14px;"/>
                 <Button text="👤  Mon Profil" styleClass="nav-link" prefWidth="220" onAction="#handleProfileNav" 
                         style="-fx-alignment: CENTER_LEFT; -fx-padding: 14 16; -fx-font-size: 14px;"/>
@@ -151,6 +147,11 @@
                             <HBox style="-fx-padding: 24 24 16 24;" alignment="CENTER_LEFT" spacing="16">
                                 <Text text="Patients récents" styleClass="h2"/>
                                 <Region HBox.hgrow="ALWAYS"/>
+                                <TextField fx:id="searchField" promptText="🔍 Rechercher..." 
+                                           onKeyReleased="#searchPatients"
+                                           style="-fx-background-color: white; -fx-background-radius: 8; 
+                                                  -fx-border-color: #e2e8f0; -fx-border-radius: 8; 
+                                                  -fx-padding: 8 16; -fx-pref-width: 200;"/>
                                 <Text text="Voir tout" styleClass="label" style="-fx-text-fill: #0058be; -fx-cursor: hand;"/>
                             </HBox>
                             
@@ -266,6 +267,14 @@
                             <VBox GridPane.rowIndex="2" GridPane.columnIndex="2" GridPane.columnSpan="2" spacing="5">
                                 <Label text="Remarques" styleClass="label"/>
                                 <TextArea fx:id="remarquesField" styleClass="form-input" prefHeight="60"/>
+                                <HBox spacing="8">
+                                    <Button text="🤖 Analyser" onAction="#generateInitialAnalysis" 
+                                            style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-background-radius: 6; 
+                                                   -fx-font-size: 11px; -fx-padding: 6 12;"/>
+                                    <Button text="💡 Suggestions" onAction="#getAISuggestions" 
+                                            style="-fx-background-color: #8b5cf6; -fx-text-fill: white; -fx-background-radius: 6; 
+                                                   -fx-font-size: 11px; -fx-padding: 6 12;"/>
+                                </HBox>
                             </VBox>
                         </GridPane>
 
@@ -275,6 +284,15 @@
                             <Button text="Modifier" onAction="#updateDossierPanel" 
                                     style="-fx-background-color: #6b38d4; -fx-text-fill: white; -fx-background-radius: 8; 
                                            -fx-font-weight: 600; -fx-padding: 12 32;"/>
+                            <Button text="🗑️ Supprimer" onAction="#deleteDossierPanel" 
+                                    style="-fx-background-color: #dc2626; -fx-text-fill: white; -fx-background-radius: 8; 
+                                           -fx-font-weight: 600; -fx-padding: 12 32;"/>
+                            <Button text="📥 Exporter CSV" onAction="#exportPatientsCSV" 
+                                    style="-fx-background-color: #059669; -fx-text-fill: white; -fx-background-radius: 8; 
+                                           -fx-font-weight: 600; -fx-padding: 12 24;"/>
+                            <Button text="QR Code" onAction="#showPatientQrPopup" 
+                                    style="-fx-background-color: #0891b2; -fx-text-fill: white; -fx-background-radius: 8; 
+                                           -fx-font-weight: 600; -fx-padding: 12 24;"/>
                             <Button text="Réinitialiser" onAction="#clearDossierPanel" 
                                     style="-fx-background-color: transparent; -fx-text-fill: #64748b; -fx-cursor: hand; 
                                            -fx-font-weight: 600; -fx-padding: 12 32;"/>
