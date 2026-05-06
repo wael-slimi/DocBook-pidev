@@ -42,23 +42,23 @@ public class WeatherWidget extends VBox {
         locationLabel = new Label("Tunis, Tunisia");
         locationLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: white;");
 
-        temperatureLabel = new Label("24\u00B0C");
+        temperatureLabel = new Label("--\u00B0C");
         temperatureLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;");
 
-        conditionLabel = new Label("Sunny");
+        conditionLabel = new Label("Loading...");
         conditionLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #ecf0f1;");
 
-        windLabel = new Label("\uD83D\uDCA8 12 km/h");
+        windLabel = new Label("Wind: --");
         windLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #bdc3c7;");
 
         getChildren().addAll(iconLabel, locationLabel, temperatureLabel, conditionLabel, windLabel);
     }
 
     public void loadWeather() {
-        System.out.println("Loading weather...");
+        System.out.println("Loading weather for Tunis...");
         WeatherApiClient.fetchWeatherAsync(
                 weather -> {
-                    System.out.println("Weather received: " + weather);
+                    System.out.println("Got weather: " + weather);
                     Platform.runLater(() -> updateUI(weather));
                 },
                 error -> {
@@ -68,16 +68,17 @@ public class WeatherWidget extends VBox {
     }
 
     private void updateUI(WeatherApiClient.WeatherData weather) {
-        iconLabel.setText(weather.icon);
-        temperatureLabel.setText(String.format("%.0f\u00B0C", weather.temperature));
-        conditionLabel.setText(weather.condition);
-        windLabel.setText(String.format("\uD83D\uDCA8 Wind: %.1f km/h", weather.windSpeed));
+        if (weather != null) {
+            iconLabel.setText(weather.icon);
+            temperatureLabel.setText(String.format("%.0f\u00B0C", weather.temperature));
+            conditionLabel.setText(weather.condition);
+            windLabel.setText(String.format("\uD83D\uDCA8 %.0f km/h", weather.windSpeed));
+        }
     }
 
     private void showError() {
         temperatureLabel.setText("--\u00B0C");
-        conditionLabel.setText("Unable to load");
-        windLabel.setText("Check connection");
+        conditionLabel.setText("API Error");
     }
 
     public void refresh() {

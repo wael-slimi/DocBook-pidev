@@ -35,7 +35,7 @@ public class WeatherApiClient {
 
         @Override
         public String toString() {
-            return String.format("%.0f\u00B0C \u2022 %s \u2022 Wind: %.1f km/h", temperature, condition, windSpeed);
+            return String.format("%.0f\u00B0C %s Wind: %.1f km/h", temperature, condition, windSpeed);
         }
     }
 
@@ -43,9 +43,10 @@ public class WeatherApiClient {
         new Thread(() -> {
             try {
                 WeatherData weather = fetchWeather();
+                System.out.println("WeatherAPI: Fetched " + weather);
                 callback.onSuccess(weather);
             } catch (Exception e) {
-                System.err.println("Error fetching weather: " + e.getMessage());
+                System.err.println("WeatherAPI Error: " + e.getMessage());
                 errorCallback.onError(e);
             }
         }).start();
@@ -66,10 +67,11 @@ public class WeatherApiClient {
         }
 
         String json = response.toString();
+        System.out.println("WeatherAPI raw: " + json);
         
-        double temperature = extractValue(json, "temperature_2m");
-        int weatherCode = (int) extractValue(json, "weather_code");
-        double windSpeed = extractValue(json, "wind_speed_10m");
+        double temperature = extractValue(json, "\"temperature_2m\":", "current");
+        int weatherCode = (int) extractValue(json, "\"weather_code\":", "current");
+        double windSpeed = extractValue(json, "\"wind_speed_10m\":", "current");
 
         String condition = getWeatherCondition(weatherCode);
         String icon = getWeatherIcon(weatherCode);
@@ -77,51 +79,46 @@ public class WeatherApiClient {
         return new WeatherData(temperature, condition, icon, windSpeed);
     }
 
-    private static double extractValue(String json, String key) {
+    private static double extractValue(String json, String key, String section) {
         try {
-            String searchKey = "\"" + key + "\":";
-            int index = json.indexOf(searchKey);
-            if (index == -1) {
-                System.err.println("Key not found: " + key);
-                return 0;
+            int sectionStart = json.indexOf("\"" + section + "\"");
+            if (sectionStart == -1) {
+                sectionStart = 0;
             }
             
-            int start = index + searchKey.length();
-            int end = json.indexOf(",", start);
-            if (end == -1) end = json.indexOf("}", start);
-            if (end == -1) end = json.length();
+            int index = json.indexOf(key, sectionStart);
+            if (index == -1) {
+                System.err.println("Key not found: " + key);
+                return 20; // fallback
+            }
+            
+            int start = index + key.length();
+            int end = Math.min(json.indexOf(",", start), json.indexOf("}", start));
+            if (end == -1) end = start + 10;
             
             String value = json.substring(start, end).trim();
-            return Double.parseDouble(value);
+            double result = Double.parseDouble(value);
+            System.out.println("Extracted " + key + " = " + result);
+            return result;
         } catch (Exception e) {
-            System.err.println("Error extracting " + key + ": " + e.getMessage());
-            return 0;
+            System.err.println("Extract error for " + key + ": " + e.getMessage());
+            return 20;
         }
     }
 
     private static String getWeatherCondition(int code) {
-        if (contains(SUNNY_CODES, code)) {
-            return "Sunny";
-        } else if (contains(CLOUDY_CODES, code)) {
-            return "Cloudy";
-        } else if (contains(RAINY_CODES, code)) {
-            return "Rainy";
-        } else if (contains(STORMY_CODES, code)) {
-            return "Stormy";
-        }
+        if (contains(SUNNY_CODES, code)) return "Sunny";
+        if (contains(CLOUDY_CODES, code)) return "Cloudy";
+        if (contains(RAINY_CODES, code)) return "Rainy";
+        if (contains(STORMY_CODES, code)) return "Stormy";
         return "Clear";
     }
 
     private static String getWeatherIcon(int code) {
-        if (contains(SUNNY_CODES, code)) {
-            return "\u2600\uFE0F";
-        } else if (contains(CLOUDY_CODES, code)) {
-            return "\u2601\uFE0F";
-        } else if (contains(RAINY_CODES, code)) {
-            return "\uD83C\uDF27\uFE0F";
-        } else if (contains(STORMY_CODES, code)) {
-            return "\u26C8\uFE0F";
-        }
+        if (contains(SUNNY_CODES, code)) return "\u2600\uFE0F";
+        if (contains(CLOUDY_CODES, code)) return "\u2601\uFE0F";
+        if (contains(RAINY_CODES, code)) return "\uD83C\uDF27\uFE0F";
+        if (contains(STORMY_CODES, code)) return "\u26C8\uFE0F";
         return "\uD83C\uDF24\uFE0F";
     }
 
