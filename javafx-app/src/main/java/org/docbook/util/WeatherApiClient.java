@@ -78,16 +78,25 @@ public class WeatherApiClient {
     }
 
     private static double extractValue(String json, String key) {
-        String searchKey = "\"" + key + "\":";
-        int index = json.indexOf(searchKey);
-        if (index == -1) return 0;
-        
-        int start = index + searchKey.length();
-        int end = json.indexOf(",", start);
-        if (end == -1) end = json.indexOf("}", start);
-        
-        String value = json.substring(start, end).trim();
-        return Double.parseDouble(value);
+        try {
+            String searchKey = "\"" + key + "\":";
+            int index = json.indexOf(searchKey);
+            if (index == -1) {
+                System.err.println("Key not found: " + key);
+                return 0;
+            }
+            
+            int start = index + searchKey.length();
+            int end = json.indexOf(",", start);
+            if (end == -1) end = json.indexOf("}", start);
+            if (end == -1) end = json.length();
+            
+            String value = json.substring(start, end).trim();
+            return Double.parseDouble(value);
+        } catch (Exception e) {
+            System.err.println("Error extracting " + key + ": " + e.getMessage());
+            return 0;
+        }
     }
 
     private static String getWeatherCondition(int code) {

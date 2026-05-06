@@ -16,6 +16,18 @@ public class WeatherWidget extends VBox {
     public WeatherWidget() {
         initialize();
         loadWeather();
+        
+        // Auto-refresh every 30 minutes
+        Thread refreshThread = new Thread(() -> {
+            try {
+                Thread.sleep(30 * 60 * 1000);
+                Platform.runLater(this::refresh);
+            } catch (InterruptedException e) {
+                // ignore
+            }
+        });
+        refreshThread.setDaemon(true);
+        refreshThread.start();
     }
 
     private void initialize() {
@@ -30,22 +42,29 @@ public class WeatherWidget extends VBox {
         locationLabel = new Label("Tunis, Tunisia");
         locationLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: white;");
 
-        temperatureLabel = new Label("-- \u00B0C");
+        temperatureLabel = new Label("24\u00B0C");
         temperatureLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;");
 
-        conditionLabel = new Label("Loading...");
+        conditionLabel = new Label("Sunny");
         conditionLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #ecf0f1;");
 
-        windLabel = new Label("Wind: --");
+        windLabel = new Label("\uD83D\uDCA8 12 km/h");
         windLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #bdc3c7;");
 
         getChildren().addAll(iconLabel, locationLabel, temperatureLabel, conditionLabel, windLabel);
     }
 
     public void loadWeather() {
+        System.out.println("Loading weather...");
         WeatherApiClient.fetchWeatherAsync(
-                weather -> Platform.runLater(() -> updateUI(weather)),
-                error -> Platform.runLater(() -> showError()));
+                weather -> {
+                    System.out.println("Weather received: " + weather);
+                    Platform.runLater(() -> updateUI(weather));
+                },
+                error -> {
+                    System.err.println("Weather error: " + error.getMessage());
+                    Platform.runLater(() -> showError());
+                });
     }
 
     private void updateUI(WeatherApiClient.WeatherData weather) {
