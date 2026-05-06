@@ -391,6 +391,16 @@ patientTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel
         loadView(event, "/fxml/records/MapView.fxml", "Carte");
     }
 
+    @FXML
+    private void openAppointmentsView(ActionEvent event) {
+        loadView(event, "/fxml/records/AppointmentView.fxml", "Rendez-vous");
+    }
+
+    @FXML
+    private void openTeleconsultationsView(ActionEvent event) {
+        loadView(event, "/fxml/records/TeleconsultationView.fxml", "Téléconsultations");
+    }
+
     /**
      * Deconnecte l'utilisateur et retourne a la page d'accueil.
      */

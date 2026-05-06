@@ -254,6 +254,11 @@ public class PatientController {
     }
 
     @FXML
+    private void openAppointments(ActionEvent event) {
+        loadView(event, "/fxml/records/AppointmentView.fxml", "Mes Rendez-vous");
+    }
+
+    @FXML
     private void openMap(ActionEvent event) {
         loadView(event, "/fxml/records/MapView.fxml", "Carte");
     }

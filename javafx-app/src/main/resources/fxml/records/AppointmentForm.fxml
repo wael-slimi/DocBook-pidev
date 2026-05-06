@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.docbook.controllers.records.AppointmentFormController"
+            prefWidth="500" prefHeight="600">
+
+    <VBox spacing="15" style="-fx-padding: 20;" AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
+        
+        <Label text="New Appointment" style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #333;" />
+
+        <GridPane hgap="10" vgap="10">
+            <columnConstraints>
+                <ColumnConstraints minWidth="120" />
+                <ColumnConstraints prefWidth="300" />
+            </columnConstraints>
+
+            <Label text="Department:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+            <ComboBox fx:id="departmentCombo" GridPane.columnIndex="1" GridPane.rowIndex="0" promptText="Select Department" />
+
+            <Label text="Doctor:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+            <ComboBox fx:id="doctorCombo" GridPane.columnIndex="1" GridPane.rowIndex="1" promptText="Select Doctor" />
+
+            <Label text="Date &amp; Time:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+            <DatePicker fx:id="datePicker" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+            <Label text="Message:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+            <TextArea fx:id="messageArea" GridPane.columnIndex="1" GridPane.rowIndex="3" prefRowCount="4" wrapText="true" promptText="Describe your symptoms or reason for visit..." />
+        </GridPane>
+
+        <HBox spacing="10" alignment="CENTER_RIGHT">
+            <Button text="Cancel" style="-fx-padding: 10 20; -fx-background-color: #9E9E9E; -fx-text-fill: white;" onAction="#onCancel" />
+            <Button text="Submit" style="-fx-padding: 10 20; -fx-background-color: #4CAF50; -fx-text-fill: white;" onAction="#onSubmit" />
+        </HBox>
+    </VBox>
+</AnchorPane>
