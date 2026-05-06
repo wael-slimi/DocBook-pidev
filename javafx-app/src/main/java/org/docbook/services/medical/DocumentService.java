@@ -11,6 +11,26 @@ import java.util.List;
 
 public class DocumentService implements IService<Document> {
 
+    @Override
+    public void create(Document doc) throws Exception {
+        add(doc);
+    }
+
+    @Override
+    public Document readById(Integer id) throws Exception {
+        return getById(id);
+    }
+
+    @Override
+    public List<Document> readAll() throws Exception {
+        return getAll();
+    }
+
+    @Override
+    public void delete(Integer id) throws Exception {
+        delete(id);
+    }
+
     private Connection connection;
     public DocumentService() {
         try {

@@ -11,6 +11,26 @@ import java.util.List;
 
 public class DossierMedicalService implements IService<DossierMedical> {
 
+    @Override
+    public void create(DossierMedical dossier) throws Exception {
+        add(dossier);
+    }
+
+    @Override
+    public DossierMedical readById(Integer id) throws Exception {
+        return getById(id);
+    }
+
+    @Override
+    public List<DossierMedical> readAll() throws Exception {
+        return getAll();
+    }
+
+    @Override
+    public void delete(Integer id) throws Exception {
+        delete(id);
+    }
+
     private Connection connection;
     public DossierMedicalService(){
         try {

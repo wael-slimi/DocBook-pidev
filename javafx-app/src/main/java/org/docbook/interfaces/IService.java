@@ -3,30 +3,21 @@ package org.docbook.interfaces;
 import java.util.List;
 
 public interface IService<T> {
-    /**
-     * Ajoute une entite.
-     */
-    void add(T t);
+    void create(T t) throws Exception;
+    
+    void add(T t) throws Exception;
 
-    /**
-     * Met a jour une entite existante.
-     */
-    void update(T t);
+    T readById(Integer id) throws Exception;
 
-    /**
-     * Supprime une entite par identifiant.
-     */
-    void delete(int id);
+    List<T> readAll() throws Exception;
 
-    /**
-     * Retourne toutes les entites.
-     */
-    List<T> getAll();
+    List<T> getAll() throws Exception;
 
-    /**
-     * Retourne une entite par identifiant.
-     */
-    T getById(int id);
+    T getById(int id) throws Exception;
+
+    void update(T t) throws Exception;
+
+    void delete(Integer id) throws Exception;
+
+    void delete(int id) throws Exception;
 }
-
-
