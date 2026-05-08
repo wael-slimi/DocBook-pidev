@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
+import java.util.Locale;
 
 public class AppointmentController implements javafx.fxml.Initializable {
 
@@ -65,7 +66,7 @@ public class AppointmentController implements javafx.fxml.Initializable {
 
     private void setupStatusFilter() {
         statusFilter.getItems().addAll(
-            "All", "PENDING", "CONFIRMED", "COMPLETED", "CANCELLED");
+            "All", "Pending", "Confirmed", "Completed", "Cancelled");
         statusFilter.setValue("All");
         
         if (currentUserRole != null && currentUserRole.toUpperCase().contains("PATIENT")) {
@@ -132,7 +133,7 @@ public class AppointmentController implements javafx.fxml.Initializable {
         String selectedStatus = statusFilter.getValue();
         if (selectedStatus != null && !selectedStatus.equals("All")) {
             filtered = filtered.stream()
-                .filter(a -> a.getStatus().equals(selectedStatus))
+                .filter(a -> a.getStatus() != null && a.getStatus().toLowerCase(Locale.ROOT).equals(selectedStatus.toLowerCase(Locale.ROOT)))
                 .collect(Collectors.toList());
         }
         
@@ -167,8 +168,8 @@ public class AppointmentController implements javafx.fxml.Initializable {
         }
         
         long total = appointments.size();
-        long pending = appointments.stream().filter(a -> "PENDING".equals(a.getStatus())).count();
-        long confirmed = appointments.stream().filter(a -> "CONFIRMED".equals(a.getStatus())).count();
+        long pending = appointments.stream().filter(a -> a.getStatus() != null && a.getStatus().toLowerCase(Locale.ROOT).equals("pending")).count();
+        long confirmed = appointments.stream().filter(a -> a.getStatus() != null && a.getStatus().toLowerCase(Locale.ROOT).equals("confirmed")).count();
         
         lblTotalCount.setText("Total: " + total);
         lblPendingCount.setText("Pending: " + pending);
@@ -226,7 +227,7 @@ public class AppointmentController implements javafx.fxml.Initializable {
         ratingBox.setAlignment(Pos.CENTER_LEFT);
         ratingBox.setStyle("-fx-padding: 8 0 0 0;");
         
-        if (isPatient && "CONFIRMED".equals(apt.getStatus())) {
+        if (isPatient && "confirmed".equals(apt.getStatus() != null ? apt.getStatus().toLowerCase(Locale.ROOT) : "")) {
             Label ratingLabel = new Label("Rate: ");
             ratingLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #7f8c8d;");
             ratingBox.getChildren().add(ratingLabel);
@@ -336,11 +337,13 @@ public class AppointmentController implements javafx.fxml.Initializable {
     }
 
     private String getStatusStyle(String status) {
-        return switch (status) {
-            case "PENDING" -> "-fx-padding: 8; -fx-font-size: 11; -fx-background-color: #FFC107; -fx-text-fill: white; -fx-border-radius: 4;";
-            case "CONFIRMED" -> "-fx-padding: 8; -fx-font-size: 11; -fx-background-color: #4CAF50; -fx-text-fill: white; -fx-border-radius: 4;";
-            case "COMPLETED" -> "-fx-padding: 8; -fx-font-size: 11; -fx-background-color: #8BC34A; -fx-text-fill: white; -fx-border-radius: 4;";
-            case "CANCELLED" -> "-fx-padding: 8; -fx-font-size: 11; -fx-background-color: #f44336; -fx-text-fill: white; -fx-border-radius: 4;";
+        if (status == null) return "-fx-padding: 8; -fx-font-size: 11; -fx-background-color: #757575; -fx-text-fill: white; -fx-border-radius: 4;";
+        String s = status.toLowerCase(Locale.ROOT);
+        return switch (s) {
+            case "pending" -> "-fx-padding: 8; -fx-font-size: 11; -fx-background-color: #FFC107; -fx-text-fill: white; -fx-border-radius: 4;";
+            case "confirmed" -> "-fx-padding: 8; -fx-font-size: 11; -fx-background-color: #4CAF50; -fx-text-fill: white; -fx-border-radius: 4;";
+            case "completed" -> "-fx-padding: 8; -fx-font-size: 11; -fx-background-color: #8BC34A; -fx-text-fill: white; -fx-border-radius: 4;";
+            case "cancelled" -> "-fx-padding: 8; -fx-font-size: 11; -fx-background-color: #f44336; -fx-text-fill: white; -fx-border-radius: 4;";
             default -> "-fx-padding: 8; -fx-font-size: 11; -fx-background-color: #757575; -fx-text-fill: white; -fx-border-radius: 4;";
         };
     }

@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
+import java.util.Locale;
 
 public class TeleconsultationController implements javafx.fxml.Initializable {
 
@@ -289,7 +290,18 @@ public class TeleconsultationController implements javafx.fxml.Initializable {
 
             new Thread(() -> {
                 try {
-                    List<Appointment> appointments = appointmentService.readAll();
+                    // Get appointments for this doctor only (filter by doctor_id)
+                    List<Appointment> allAppointments;
+                    if (currentUserRole != null && currentUserRole.toUpperCase().contains("DOCTOR")) {
+                        allAppointments = appointmentService.getByDoctorId(currentUserId).stream()
+                            .filter(a -> a.getStatus() != null && a.getStatus().toLowerCase(Locale.ROOT).equals(Appointment.STATUS_PENDING.toLowerCase(Locale.ROOT)))
+                            .collect(Collectors.toList());
+                    } else {
+                        allAppointments = appointmentService.readAll().stream()
+                            .filter(a -> a.getStatus() != null && a.getStatus().toLowerCase(Locale.ROOT).equals(Appointment.STATUS_PENDING.toLowerCase(Locale.ROOT)))
+                            .collect(Collectors.toList());
+                    }
+                    
                     final Appointment targetAppt;
                     if (existingTeleconsultation != null && existingTeleconsultation.getAppointmentId() > 0) {
                         targetAppt = appointmentService.readById(existingTeleconsultation.getAppointmentId());
@@ -298,7 +310,12 @@ public class TeleconsultationController implements javafx.fxml.Initializable {
                     }
                     final Appointment finalTargetAppt = targetAppt;
                     Platform.runLater(() -> {
-                        cbAppointment.getItems().addAll(appointments);
+                        cbAppointment.getItems().addAll(allAppointments);
+                        
+                        // Show patient name + date for doctors
+                        String displayRole = currentUserRole != null ? currentUserRole.toUpperCase() : "";
+                        final boolean isDoctor = displayRole.contains("DOCTOR");
+                        
                         cbAppointment.setCellFactory(param -> new javafx.scene.control.ListCell<Appointment>() {
                             @Override
                             protected void updateItem(Appointment apt, boolean empty) {
@@ -306,7 +323,14 @@ public class TeleconsultationController implements javafx.fxml.Initializable {
                                 if (empty || apt == null) {
                                     setText(null);
                                 } else {
-                                    setText(apt.getDoctor() + " - " + apt.getDepartment());
+                                    // For doctors: show patient ID + date
+                                    // For patients: show doctor name
+                                    if (isDoctor) {
+                                        setText("Patient #" + apt.getPatientId() + " - " + 
+                                            (apt.getScheduledAt() != null ? apt.getScheduledAt().toLocalDate().toString() : "N/A"));
+                                    } else {
+                                        setText(apt.getDoctor() + " - " + apt.getDepartment());
+                                    }
                                 }
                             }
                         });
@@ -317,7 +341,12 @@ public class TeleconsultationController implements javafx.fxml.Initializable {
                                 if (empty || apt == null) {
                                     setText(null);
                                 } else {
-                                    setText(apt.getDoctor() + " - " + apt.getDepartment());
+                                    if (isDoctor) {
+                                        setText("Patient #" + apt.getPatientId() + " - " + 
+                                            (apt.getScheduledAt() != null ? apt.getScheduledAt().toLocalDate().toString() : "N/A"));
+                                    } else {
+                                        setText(apt.getDoctor() + " - " + apt.getDepartment());
+                                    }
                                 }
                             }
                         });
