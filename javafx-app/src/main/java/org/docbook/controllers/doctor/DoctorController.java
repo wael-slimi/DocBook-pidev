@@ -18,8 +18,11 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.docbook.controllers.ai.AIReportController;
 import org.docbook.controllers.ai.SnapshotController;
+import org.docbook.entities.records.Appointment;
 import org.docbook.entities.records.DossierMedical;
 import org.docbook.entities.users.Doctor;
+import org.docbook.entities.users.User;
+import org.docbook.services.AppointmentService;
 import org.docbook.services.medical.DossierMedicalService;
 import org.docbook.util.AppState;
 import org.docbook.util.GeminiService;
@@ -27,7 +30,9 @@ import org.docbook.util.QrCodeService;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class DoctorController {
 
@@ -78,6 +83,7 @@ public class DoctorController {
     private javafx.scene.text.Text statusText;
 
     private final DossierMedicalService dossierService = new DossierMedicalService();
+    private final AppointmentService appointmentService = new AppointmentService();
     private final org.docbook.services.medical.DocumentService documentService = new org.docbook.services.medical.DocumentService();
 
     /**
@@ -119,17 +125,42 @@ patientTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel
      * Charge la liste des dossiers medicaux dans le tableau principal.
      */
     private void loadPatients() {
+        User currentUser = AppState.getCurrentUser();
+        int doctorId = (currentUser != null) ? currentUser.getId() : 0;
+        
         List<DossierMedical> list = dossierService.getAll();
+        
+        // Get real stats from database
+        int totalPatients = list.size();
+        
+        // Today's consultations
+        LocalDate today = LocalDate.now();
+        int todayConsultations = 0;
+        try {
+            List<Appointment> appointments = appointmentService.getByDoctorId(doctorId);
+            todayConsultations = (int) appointments.stream()
+                .filter(a -> a.getScheduledAt() != null && 
+                            a.getScheduledAt().toLocalDate().equals(today))
+                .count();
+        } catch (Exception e) {
+            System.err.println("Error loading today's appointments: " + e.getMessage());
+        }
+        
+        // Active dossiers (with medical file number)
+        long activeDossiers = list.stream()
+            .filter(d -> d.getNumeroDossier() != null && !d.getNumeroDossier().isEmpty())
+            .count();
+        
         ObservableList<DossierMedical> obsList = FXCollections.observableArrayList(list);
         patientTable.setItems(obsList);
-        totalPatientsLabel.setText(String.valueOf(list.size()));
         
-        // Update stats
+        // Update stats labels with real data
+        totalPatientsLabel.setText(String.valueOf(totalPatients));
         if (todayConsultationsLabel != null) {
-            todayConsultationsLabel.setText(String.valueOf(list.size()));
+            todayConsultationsLabel.setText(String.valueOf(todayConsultations));
         }
         if (activeDossiersLabel != null) {
-            activeDossiersLabel.setText(String.valueOf(list.size()));
+            activeDossiersLabel.setText(String.valueOf(activeDossiers));
         }
         
         // Populate sidebar patient list
@@ -341,8 +372,8 @@ patientTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel
         if (patientTable != null) patientTable.getSelectionModel().clearSelection();
 
         if (numDossierError != null) numDossierError.setText("");
-        nomError.setText("");
-        prenomError.setText("");
+        if (nomError != null) nomError.setText("");
+        if (prenomError != null) prenomError.setText("");
         dateNaissanceError.setText("");
         genreError.setText("");
         emailError.setText("");

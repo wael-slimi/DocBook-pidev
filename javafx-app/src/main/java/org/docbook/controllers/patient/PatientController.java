@@ -15,9 +15,11 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import org.docbook.entities.records.Appointment;
 import org.docbook.entities.records.DossierMedical;
 import org.docbook.entities.users.Patient;
 import org.docbook.entities.users.User;
+import org.docbook.services.AppointmentService;
 import org.docbook.services.medical.DocumentService;
 import org.docbook.services.medical.DossierMedicalService;
 import org.docbook.services.users.PatientService;
@@ -25,11 +27,12 @@ import org.docbook.util.AppState;
 import org.docbook.util.ThemeManager;
 import org.docbook.util.WeatherWidget;
 import org.docbook.controllers.patient.ChatWidget;
-import org.docbook.util.WeatherWidget;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class PatientController {
 
@@ -76,6 +79,7 @@ public class PatientController {
     private final DossierMedicalService dossierService = new DossierMedicalService();
     private final DocumentService documentService = new DocumentService();
     private final PatientService patientService = new PatientService();
+    private final AppointmentService appointmentService = new AppointmentService();
 
     /**
      * Initialise le tableau de bord patient.
@@ -111,23 +115,37 @@ public class PatientController {
 
         loadSidebarProfile(currentUser);
 
-        if (dossiersCountLabel != null) {
+        // Get real data from database
+        if (dossiersCountLabel != null || prescriptionsCountLabel != null) {
             List<DossierMedical> dossiers = dossierService.getByPatientId(currentUser.getId());
-            dossiersCountLabel.setText(String.valueOf(dossiers.size()));
-        }
-
-        if (prescriptionsCountLabel != null) {
-            int count = 0;
-            List<DossierMedical> dossiers = dossierService.getByPatientId(currentUser.getId());
-            for (DossierMedical d : dossiers) {
-                count += documentService.getByDossierId(d.getId()).size();
+            if (dossiersCountLabel != null) {
+                dossiersCountLabel.setText(String.valueOf(dossiers.size()));
             }
-            prescriptionsCountLabel.setText(String.valueOf(count));
+            if (prescriptionsCountLabel != null) {
+                int count = 0;
+                for (DossierMedical d : dossiers) {
+                    count += documentService.getByDossierId(d.getId()).size();
+                }
+                prescriptionsCountLabel.setText(String.valueOf(count));
+            }
         }
 
+        // Get upcoming appointments
         if (appointmentsCountLabel != null) {
-            appointmentsCountLabel.setText("0");
+            try {
+                List<Appointment> appointments = appointmentService.getByPatientId(currentUser.getId());
+                long upcoming = appointments.stream()
+                    .filter(a -> a.getScheduledAt() != null && 
+                                a.getScheduledAt().isAfter(LocalDateTime.now()))
+                    .count();
+                appointmentsCountLabel.setText(String.valueOf(upcoming));
+            } catch (Exception e) {
+                appointmentsCountLabel.setText("0");
+            }
         }
+        
+        // Populate upcoming appointments list
+        loadUpcomingAppointments();
 
         if (bloodTypeLabel != null) {
             bloodTypeLabel.setText("-");
@@ -296,5 +314,59 @@ public class PatientController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+    
+    private void loadUpcomingAppointments() {
+        User currentUser = AppState.getCurrentUser();
+        if (currentUser == null || appointmentsContainer == null) return;
+        
+        appointmentsContainer.getChildren().clear();
+        
+        try {
+            List<Appointment> appointments = appointmentService.getByPatientId(currentUser.getId());
+            List<Appointment> upcoming = appointments.stream()
+                .filter(a -> a.getScheduledAt() != null && 
+                           a.getScheduledAt().isAfter(LocalDateTime.now()))
+                .sorted((a1, a2) -> a1.getScheduledAt().compareTo(a2.getScheduledAt()))
+                .limit(5)
+                .collect(Collectors.toList());
+            
+            if (upcoming.isEmpty()) {
+                javafx.scene.text.Text emptyText = new javafx.scene.text.Text("Aucun rendez-vous prévu");
+                emptyText.setStyle("-fx-font-size: 13px; -fx-fill: #94a3b8;");
+                appointmentsContainer.getChildren().add(emptyText);
+            } else {
+                for (Appointment apt : upcoming) {
+                    VBox aptBox = createAppointmentCard(apt);
+                    appointmentsContainer.getChildren().add(aptBox);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error loading appointments: " + e.getMessage());
+        }
+    }
+    
+    private VBox createAppointmentCard(Appointment apt) {
+        VBox box = new VBox(4);
+        box.setStyle("-fx-padding: 10; -fx-background-color: #f8fafc; -fx-background-radius: 8;");
+        
+        javafx.scene.text.Text doctorText = new javafx.scene.text.Text("Dr. " + apt.getDoctor());
+        doctorText.setStyle("-fx-font-size: 13px; -fx-font-weight: bold; -fx-fill: #1e293b;");
+        
+        String dateStr = apt.getScheduledAt() != null ? 
+            apt.getScheduledAt().format(java.time.format.DateTimeFormatter.ofPattern("dd MMM yyyy HH:mm")) : "N/A";
+        javafx.scene.text.Text dateText = new javafx.scene.text.Text(dateStr);
+        dateText.setStyle("-fx-font-size: 12px; -fx-fill: #64748b;");
+        
+        String status = apt.getStatus() != null ? apt.getStatus() : "";
+        Label statusBadge = new Label(apt.getStatus());
+        String statusStyle = "-fx-font-size: 10px; -fx-padding: 4 8; " +
+            ("CONFIRMED".equalsIgnoreCase(status) ? "-fx-background-color: #22c55e; -fx-text-fill: white;" :
+             "PENDING".equalsIgnoreCase(status) ? "-fx-background-color: #f59e0b; -fx-text-fill: white;" :
+             "-fx-background-color: #94a3b8; -fx-text-fill: white;");
+        statusBadge.setStyle(statusStyle);
+        
+        box.getChildren().addAll(doctorText, dateText, statusBadge);
+        return box;
     }
 }
