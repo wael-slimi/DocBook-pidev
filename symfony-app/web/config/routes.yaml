@@ -47,6 +47,120 @@ app_doctor_settings:
     controller: App\Controller\DoctorController::settings
     methods: [GET, POST]
 
+app_patient_dashboard:
+    path: /patient
+    controller: App\Controller\PatientController::dashboard
+    methods: [GET]
+
 app_doctor_dashboard:
     path: /doctor/dashboard
-    controller: App\Controller\DoctorController::index 
+    controller: App\Controller\DoctorController::index
+
+# Medical Records - Dossier routes
+app_medecin_dossier_index:
+    path: /doctor/medical-records
+    controller: App\Controller\Medecin\DossierMedicalController::index
+    methods: [GET]
+
+app_medecin_dossier_new:
+    path: /doctor/medical-records/nouveau
+    controller: App\Controller\Medecin\DossierMedicalController::new
+    methods: [GET, POST]
+
+app_medecin_dossier_show:
+    path: /doctor/medical-records/{id}
+    controller: App\Controller\Medecin\DossierMedicalController::show
+    methods: [GET]
+
+app_medecin_dossier_edit:
+    path: /doctor/medical-records/{id}/modifier
+    controller: App\Controller\Medecin\DossierMedicalController::edit
+    methods: [GET, POST]
+
+app_medecin_dossier_delete:
+    path: /doctor/medical-records/{id}
+    controller: App\Controller\Medecin\DossierMedicalController::delete
+    methods: [POST]
+
+# Medical Records - Document routes
+app_medecin_document_index:
+    path: /doctor/medical-records/{dossierId}/documents
+    controller: App\Controller\Medecin\DocumentController::index
+    methods: [GET]
+
+app_medecin_document_new:
+    path: /doctor/medical-records/{dossierId}/documents/nouveau
+    controller: App\Controller\Medecin\DocumentController::new
+    methods: [GET, POST]
+
+app_medecin_document_show:
+    path: /doctor/medical-records/{dossierId}/documents/{id}
+    controller: App\Controller\Medecin\DocumentController::show
+    methods: [GET]
+
+app_medecin_document_edit:
+    path: /doctor/medical-records/{dossierId}/documents/{id}/modifier
+    controller: App\Controller\Medecin\DocumentController::edit
+    methods: [GET, POST]
+
+app_medecin_document_delete:
+    path: /doctor/medical-records/{dossierId}/documents/{id}
+    controller: App\Controller\Medecin\DocumentController::delete
+    methods: [POST]
+
+# Patient Medical Records routes
+app_patient_dossier_index:
+    path: /patient/medical-records
+    controller: App\Controller\Patient\DossierMedicalController::index
+    methods: [GET]
+
+app_patient_dossier_new:
+    path: /patient/medical-records/nouveau
+    controller: App\Controller\Patient\DossierMedicalController::new
+    methods: [GET, POST]
+
+app_patient_dossier_show:
+    path: /patient/medical-records/{id}
+    controller: App\Controller\Patient\DossierMedicalController::show
+    methods: [GET]
+
+app_patient_dossier_edit:
+    path: /patient/medical-records/{id}/modifier
+    controller: App\Controller\Patient\DossierMedicalController::edit
+    methods: [GET, POST]
+
+app_patient_dossier_delete:
+    path: /patient/medical-records/{id}
+    controller: App\Controller\Patient\DossierMedicalController::delete
+    methods: [POST]
+
+app_patient_document_index:
+    path: /patient/medical-records/{dossierId}/documents
+    controller: App\Controller\Patient\DocumentController::index
+    methods: [GET]
+
+app_patient_document_new:
+    path: /patient/medical-records/{dossierId}/documents/nouveau
+    controller: App\Controller\Patient\DocumentController::new
+    methods: [GET, POST]
+
+app_patient_document_show:
+    path: /patient/medical-records/{dossierId}/documents/{id}
+    controller: App\Controller\Patient\DocumentController::show
+    methods: [GET]
+
+app_patient_document_edit:
+    path: /patient/medical-records/{dossierId}/documents/{id}/modifier
+    controller: App\Controller\Patient\DocumentController::edit
+    methods: [GET, POST]
+
+app_patient_document_delete:
+    path: /patient/medical-records/{dossierId}/documents/{id}
+    controller: App\Controller\Patient\DocumentController::delete
+    methods: [POST]
+
+# Appointment Rating route
+app_appointment_rate:
+    path: /appointment/{id}/rate
+    controller: App\Controller\AppointmentRatingController::rate
+    methods: [GET, POST] 

@@ -1,0 +1,47 @@
+{% extends 'dashboard_base.html.twig' %}
+
+{% block title %}Voir document - DOCBOOK{% endblock %}
+
+{% block body %}
+<div class="max-w-2xl mx-auto space-y-8">
+    <div class="flex flex-col gap-1">
+        <h1 class="text-4xl font-black text-slate-900 dark:text-white">{{ document.titre }}</h1>
+        <p class="text-slate-500">
+            <span class="material-symbols-outlined mr-1">description</span>
+            {{ document.typeDocument|capitalize }} • {{ document.dateDocument|date('d/m/Y') }}
+        </p>
+    </div>
+
+    <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+        <div class="p-6 border-b border-slate-100 dark:border-slate-800">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-slate-500">Dossier</p>
+                    <p class="font-medium text-slate-900 dark:text-white">
+                        #{{ document.dossierMedical.numeroDossier }} - {{ document.dossierMedical.patientNom }} {{ document.dossierMedical.patientPrenom }}
+                    </p>
+                </div>
+                <a href="{{ path('app_patient_document_index', {dossierId: document.dossierMedical.id}) }}" class="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-4 py-2 rounded-lg font-semibold hover:bg-slate-200 dark:hover:bg-slate-700">
+                    Retour
+                </a>
+            </div>
+        </div>
+
+        <div class="p-6 space-y-4">
+            <div>
+                <h3 class="text-sm font-medium text-slate-500 mb-1">Contenu</h3>
+                <div class="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-4">
+                    <p class="whitespace-pre-wrap text-slate-900 dark:text-white">{{ document.contenu ?? 'Aucun contenu' }}</p>
+                </div>
+            </div>
+
+            {% if document.fichierPath %}
+            <div>
+                <h3 class="text-sm font-medium text-slate-500 mb-1">Fichier</h3>
+                <p class="text-slate-900 dark:text-white">{{ document.fichierPath }}</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends 'dashboard_base.html.twig' %}
+
+{% block title %}Mes documents - Dossier #{{ dossier.numeroDossier }} - DOCBOOK{% endblock %}
+
+{% block body %}
+<div class="max-w-6xl mx-auto space-y-8">
+    <div class="flex flex-col gap-1">
+        <h1 class="text-4xl font-black text-slate-900 dark:text-white">Mes documents</h1>
+        <p class="text-slate-500">Dossier #{{ dossier.numeroDossier }} - {{ dossier.patientNom }} {{ dossier.patientPrenom }}</p>
+    </div>
+
+    <div class="flex flex-wrap gap-4">
+        <a href="{{ path('app_patient_document_new', {dossierId: dossier.id}) }}" class="bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20">
+            <span class="material-symbols-outlined mr-2">add</span> Nouveau document
+        </a>
+        <a href="{{ path('app_patient_dossier_index') }}" class="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-6 py-3 rounded-lg font-semibold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+            <span class="material-symbols-outlined mr-2">arrow_back</span> Retour aux dossiers
+        </a>
+    </div>
+
+    <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+        <div class="p-6 border-b border-slate-100 dark:border-slate-800">
+            <h3 class="text-xl font-black text-slate-900 dark:text-white">Documents</h3>
+        </div>
+
+        <div class="p-6">
+            {% if documents is defined and documents is not empty %}
+                <div class="space-y-4">
+                    {% for document in documents %}
+                        <div class="flex items-center justify-between p-6 bg-slate-50 dark:bg-slate-800/50 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                            <div class="flex items-center gap-4">
+                                <div class="size-12 bg-blue-50 dark:bg-blue-900/20 text-blue-600 rounded-2xl flex items-center justify-center">
+                                    <span class="material-symbols-outlined">description</span>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-slate-900 dark:text-white">{{ document.titre }}</p>
+                                    <p class="text-sm text-slate-500">
+                                        {{ document.typeDocument|capitalize }} • {{ document.dateDocument|date('d/m/Y') }}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <a href="{{ path('app_patient_document_show', {dossierId: dossier.id, id: document.id}) }}" class="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-4 py-2 rounded-lg font-semibold hover:bg-slate-200 dark:hover:bg-slate-700">
+                                    Voir
+                                </a>
+                                <a href="{{ path('app_patient_document_edit', {dossierId: dossier.id, id: document.id}) }}" class="bg-primary text-white px-4 py-2 rounded-lg font-semibold hover:bg-primary/90 transition-colors">
+                                    Modifier
+                                </a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-12">
+                    <div class="size-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="material-symbols-outlined text-3xl text-slate-400">description</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Aucun document</h3>
+                    <p class="text-slate-500 mb-6">Ajoutez votre premier document.</p>
+                    <a href="{{ path('app_patient_document_new', {dossierId: dossier.id}) }}" class="bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors inline-flex items-center gap-2">
+                        <span class="material-symbols-outlined">add</span> Nouveau document
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

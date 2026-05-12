@@ -17,10 +17,16 @@ use App\Form\DoctorSettingsType;
 #[IsGranted('ROLE_DOCTOR')] 
 class DoctorController extends AbstractController
 {
-    #[Route('/doctor/dashboard', name: 'app_doctor_dashboard')]
+    #[Route('/dashboard', name: 'app_doctor_dashboard')]
     public function index(): Response
     {
         return $this->render('doctor/dashboard.html.twig');
+    }
+    
+    #[Route('/medical-records', name: 'app_medecin_dossier_index')]
+    public function listRecords(): Response
+    {
+        return $this->render('doctor/records/index.html.twig');
     }
     
     #[Route('/complete-profile', name: 'app_doctor_complete_profile')]
@@ -67,7 +73,7 @@ class DoctorController extends AbstractController
         ]);
     }
 
-    #[Route('/doctor/settings', name: 'app_doctor_settings')]
+    #[Route('/settings', name: 'app_doctor_settings')]
     public function settings(Request $request, EntityManagerInterface $em): Response
     {
         /** @var User $doctor */

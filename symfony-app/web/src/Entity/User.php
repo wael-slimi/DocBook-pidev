@@ -63,10 +63,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'boolean')]
     private bool $is2faEnabled = false;
 
-    #[ORM\Column(length: 6, nullable: true)]
-    private ?string $tempVerificationCode = null;
+#[ORM\Column(length: 6, nullable: true)]
+     private ?string $tempVerificationCode = null;
 
-    // --- AUTH METHODS ---
+     // --- FIELDS TO MATCH JAVAFX DATABASE ---
+
+     #[ORM\Column(length: 20, options: ['default' => 'pending'])]
+     private ?string $status = 'pending';
+
+     #[ORM\Column(length: 255, nullable: true)]
+     private ?string $resetToken = null;
+
+     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+     private ?\DateTimeInterface $resetTokenExpiry = null;
+
+     #[ORM\Column(length: 10, nullable: true)]
+     private ?string $verificationCode = null;
+
+     #[ORM\Column(length: 500, nullable: true)]
+     private ?string $avatarUrl = null;
+
+     #[ORM\Column(length: 20, options: ['default' => 'light'])]
+     private ?string $themePreference = 'light';
+
+     // --- AUTH METHODS ---
 
     public function getUserIdentifier(): string
     {
@@ -164,6 +184,50 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getRole(): ?UserRole
+    {
+        return $this->role;
+    }
+
+    public function setRole(?UserRole $role): static
+    {
+        $this->role = $role;
+        return $this;
+    }
+
+    public function isActive(): ?bool
+    {
+        return $this->isActive;
+    }
+
+    public function setIsActive(bool $isActive): static
+    {
+        $this->isActive = $isActive;
+        return $this;
+    }
+
+    public function getDateOfBirth(): ?\DateTimeInterface
+    {
+        return $this->dateOfBirth;
+    }
+
+    public function setDateOfBirth(?\DateTimeInterface $dateOfBirth): static
+    {
+        $this->dateOfBirth = $dateOfBirth;
+        return $this;
+    }
+
+    public function getCreationDate(): ?\DateTimeImmutable
+    {
+        return $this->creationDate;
+    }
+
+    public function setCreationDate(?\DateTimeImmutable $creationDate): static
+    {
+        $this->creationDate = $creationDate;
+        return $this;
+    }
+
     public function getProfilePicture(): ?string
     {
         return $this->profilePicture;
@@ -180,10 +244,78 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->tempVerificationCode;
     }
 
-    public function setTempVerificationCode(?string $tempVerificationCode): static
-    {
-        $this->tempVerificationCode = $tempVerificationCode;
+public function setTempVerificationCode(?string $tempVerificationCode): static
+     {
+         $this->tempVerificationCode = $tempVerificationCode;
 
-        return $this;
-    }
-}
+         return $this;
+     }
+
+     // --- GETTERS & SETTERS FOR JAVAFX FIELDS ---
+
+     public function getStatus(): ?string
+     {
+         return $this->status;
+     }
+
+     public function setStatus(string $status): static
+     {
+         $this->status = $status;
+         return $this;
+     }
+
+     public function getResetToken(): ?string
+     {
+         return $this->resetToken;
+     }
+
+     public function setResetToken(?string $resetToken): static
+     {
+         $this->resetToken = $resetToken;
+         return $this;
+     }
+
+     public function getResetTokenExpiry(): ?\DateTimeInterface
+     {
+         return $this->resetTokenExpiry;
+     }
+
+     public function setResetTokenExpiry(?\DateTimeInterface $resetTokenExpiry): static
+     {
+         $this->resetTokenExpiry = $resetTokenExpiry;
+         return $this;
+     }
+
+     public function getVerificationCode(): ?string
+     {
+         return $this->verificationCode;
+     }
+
+     public function setVerificationCode(?string $verificationCode): static
+     {
+         $this->verificationCode = $verificationCode;
+         return $this;
+     }
+
+     public function getAvatarUrl(): ?string
+     {
+         return $this->avatarUrl;
+     }
+
+     public function setAvatarUrl(?string $avatarUrl): static
+     {
+         $this->avatarUrl = $avatarUrl;
+         return $this;
+     }
+
+     public function getThemePreference(): ?string
+     {
+         return $this->themePreference;
+     }
+
+     public function setThemePreference(string $themePreference): static
+     {
+         $this->themePreference = $themePreference;
+         return $this;
+     }
+ }

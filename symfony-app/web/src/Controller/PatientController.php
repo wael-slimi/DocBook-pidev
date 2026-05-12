@@ -17,7 +17,7 @@ USE App\Enum\Specialty;
 #[IsGranted('IS_AUTHENTICATED_FULLY')]
 class PatientController extends AbstractController
 {
-    #[Route('/', name: 'patient_dashboard')]
+    #[Route('/', name: 'app_patient_dashboard')]
     public function dashboard(): Response
     {
         return $this->render('patient/dashboard.html.twig');

@@ -7,4 +7,5 @@ enum Specialty: string
     case DENTISTRY = 'dentistry';
     case GENERAL = 'general';
     case PSYCHIATRY = 'psychiatry';
+    case SURGERY = 'surgery';
 }
