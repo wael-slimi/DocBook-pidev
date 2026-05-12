@@ -1,0 +1,87 @@
+{% extends 'dashboard_base.html.twig' %}
+
+{% block title %}Schedule Teleconsultation - DOCBOOK{% endblock %}
+
+{% block body %}
+<div class="max-w-2xl mx-auto space-y-8">
+    <div class="flex flex-col gap-1">
+        <h1 class="text-4xl font-black text-slate-900 dark:text-white">Schedule Teleconsultation</h1>
+        <p class="text-slate-500">Create a video meeting session linked to an appointment.</p>
+    </div>
+
+    <-v /client/input:/workspace/input
+-v Action Buttons -->
+    <div class="flex flex-wrap gap-4">
+        <a href="{{ path('app_teleconsultation_index') }}" class="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-6 py-3 rounded-lg font-semibold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+            <span class="material-symbols-outlined mr-2">arrow_back</span> Back to Sessions
+        </a>
+        <a href="{{ path('app_appointment_index') }}" class="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-6 py-3 rounded-lg font-semibold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+            <span class="material-symbols-outlined mr-2">calendar_month</span> View Appointments
+        </a>
+    </div>
+
+    <-v /client/input:/workspace/input
+-v Teleconsultation Form -->
+    <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden p-8">
+        {{ form_start(form, {'attr': {'class': 'space-y-6', 'novalidate': 'novalidate'}}) }}
+
+            <-v /client/input:/workspace/input
+-v Appointment Selection Field -->
+            <div>
+                {{ form_label(form.appointment, 'Select Appointment', {'label_attr': {'class': 'block text-sm font-bold text-slate-900 dark:text-white mb-2'}}) }}
+                <div class="relative">
+                    {{ form_widget(form.appointment, {'attr': {'class': 'w-full rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800 px-4 py-2 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary'}}) }}
+                </div>
+                <p class="text-xs text-slate-400 mt-2">Choose the appointment to link with this teleconsultation session.</p>
+                {% if form_errors(form.appointment) %}
+                    <div class="mt-2 text-sm text-red-600 dark:text-red-400">
+                        {{ form_errors(form.appointment) }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <-v /client/input:/workspace/input
+-v Video Link Field -->
+            <div>
+                {{ form_label(form.videoLink, 'Video Meeting Link', {'label_attr': {'class': 'block text-sm font-bold text-slate-900 dark:text-white mb-2'}}) }}
+                <div class="relative">
+                    {{ form_widget(form.videoLink, {'attr': {'class': 'w-full rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800 px-4 py-2 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary', 'placeholder': 'https://meet.example.com/...'}}) }}
+                </div>
+                <p class="text-xs text-slate-400 mt-2">Enter the URL to the video meeting room (Zoom, Google Meet, etc.)</p>
+                {% if form_errors(form.videoLink) %}
+                    <div class="mt-2 text-sm text-red-600 dark:text-red-400">
+                        {{ form_errors(form.videoLink) }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <-v /client/input:/workspace/input
+-v Access Code Field -->
+            <div>
+                {{ form_label(form.accessCode, 'Access Code', {'label_attr': {'class': 'block text-sm font-bold text-slate-900 dark:text-white mb-2'}}) }}
+                <div class="relative">
+                    {{ form_widget(form.accessCode, {'attr': {'class': 'w-full rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800 px-4 py-2 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary', 'placeholder': 'e.g., ABC123'}}) }}
+                </div>
+                <p class="text-xs text-slate-400 mt-2">Optional password or access code for the meeting (if required).</p>
+                {% if form_errors(form.accessCode) %}
+                    <div class="mt-2 text-sm text-red-600 dark:text-red-400">
+                        {{ form_errors(form.accessCode) }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <-v /client/input:/workspace/input
+-v Submit Buttons -->
+            <div class="flex gap-4 pt-4">
+                <button type="submit" class="flex-1 bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20">
+                    <span class="material-symbols-outlined mr-2">videocam</span> Create Session
+                </button>
+                <a href="{{ path('app_teleconsultation_index') }}" class="flex-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-6 py-3 rounded-lg font-semibold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-center">
+                    <span class="material-symbols-outlined mr-2">close</span> Cancel
+                </a>
+            </div>
+
+        {{ form_end(form) }}
+    </div>
+</div>
+{% endblock %}
