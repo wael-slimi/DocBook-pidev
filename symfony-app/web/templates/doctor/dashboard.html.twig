@@ -23,10 +23,10 @@
             </div>
         {% endif %}
     {% endif %}
-        <div class="flex min-w-72 flex-col gap-1">
-            <p class="text-slate-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">Clinical Overview</p>
-            <p class="text-slate-500 dark:text-slate-400 text-base font-normal leading-normal">Welcome back, Dr. {{app.user.name}}. You have 12 appointments today.</p>
-        </div>
+<div class="flex min-w-72 flex-col gap-1">
+             <p class="text-slate-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">Clinical Overview</p>
+             <p class="text-slate-500 dark:text-slate-400 text-base font-normal leading-normal">Welcome back, Dr. {{app.user.name}}. You have {{ todayAppointments|length }} appointment{{ todayAppointments|length != 1 ? 's' }} today.</p>
+         </div>
         <div class="flex gap-3">
             <button class="flex h-10 items-center justify-center rounded-lg px-4 bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-white font-medium text-sm gap-2">
                 <span class="material-symbols-outlined text-lg">history</span> Patient History
@@ -37,29 +37,29 @@
         </div>
     </div>
 
-    <div class="flex flex-wrap gap-4 pb-8">
-        <div class="flex min-w-[200px] flex-1 flex-col gap-2 rounded-xl p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
-            <div class="flex items-center justify-between">
-                <p class="text-slate-500 text-sm font-bold uppercase tracking-wider">Patients Today</p>
-                <span class="material-symbols-outlined text-primary">groups</span>
-            </div>
-            <p class="text-slate-900 dark:text-white text-3xl font-black">12</p>
-        </div>
-        <div class="flex min-w-[200px] flex-1 flex-col gap-2 rounded-xl p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
-            <div class="flex items-center justify-between">
-                <p class="text-slate-500 text-sm font-bold uppercase tracking-wider">Pending Reports</p>
-                <span class="material-symbols-outlined text-amber-500">description</span>
-            </div>
-            <p class="text-amber-600 text-3xl font-black">5</p>
-        </div>
-        <div class="flex min-w-[200px] flex-1 flex-col gap-2 rounded-xl p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
-            <div class="flex items-center justify-between">
-                <p class="text-slate-500 text-sm font-bold uppercase tracking-wider">Avg. Wait Time</p>
-                <span class="material-symbols-outlined text-emerald-500">schedule</span>
-            </div>
-            <p class="text-emerald-600 text-3xl font-black">14 <span class="text-sm">min</span></p>
-        </div>
-    </div>
+<div class="flex flex-wrap gap-4 pb-8">
+         <div class="flex min-w-[200px] flex-1 flex-col gap-2 rounded-xl p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+             <div class="flex items-center justify-between">
+                 <p class="text-slate-500 text-sm font-bold uppercase tracking-wider">Patients Today</p>
+                 <span class="material-symbols-outlined text-primary">groups</span>
+             </div>
+             <p class="text-slate-900 dark:text-white text-3xl font-black">{{ todayAppointments|length }}</p>
+         </div>
+         <div class="flex min-w-[200px] flex-1 flex-col gap-2 rounded-xl p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+             <div class="flex items-center justify-between">
+                 <p class="text-slate-500 text-sm font-bold uppercase tracking-wider">Pending Reports</p>
+                 <span class="material-symbols-outlined text-amber-500">description</span>
+             </div>
+             <p class="text-amber-600 text-3xl font-black">{{ todayAppointments|filter(a => a.status == 'PENDING')|length }}</p>
+         </div>
+         <div class="flex min-w-[200px] flex-1 flex-col gap-2 rounded-xl p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+             <div class="flex items-center justify-between">
+                 <p class="text-slate-500 text-sm font-bold uppercase tracking-wider">Avg. Wait Time</p>
+                 <span class="material-symbols-outlined text-emerald-500">schedule</span>
+             </div>
+             <p class="text-emerald-600 text-3xl font-black">— <span class="text-sm">min</span></p>
+         </div>
+     </div>
 
     <div class="grid grid-cols-12 gap-6">
         <div class="col-span-12 lg:col-span-8">
@@ -81,68 +81,71 @@
                                 <th class="px-6 py-4 text-right">Action</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
-                            <tr>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <div class="size-10 rounded-full bg-slate-200" style="background-image: url('https://i.pravatar.cc/150?u=1'); background-size: cover;"></div>
-                                        <div>
-                                            <p class="text-slate-900 dark:text-white font-bold">John Doe</p>
-                                            <p class="text-slate-400 text-xs">Annual Checkup</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 text-slate-500 text-sm">02:00 PM</td>
-                                <td class="px-6 py-4">
-                                    <span class="px-3 py-1 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700">IN WAITING ROOM</span>
-                                </td>
-                                <td class="px-6 py-4 text-right">
-                                    <button class="bg-primary text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-primary/90">START</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <div class="size-10 rounded-full bg-slate-200" style="background-image: url('https://i.pravatar.cc/150?u=2'); background-size: cover;"></div>
-                                        <div>
-                                            <p class="text-slate-900 dark:text-white font-bold">Sarah Wilson</p>
-                                            <p class="text-slate-400 text-xs">Video Call - Results</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 text-slate-500 text-sm">02:30 PM</td>
-                                <td class="px-6 py-4">
-                                    <span class="px-3 py-1 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500">SCHEDULED</span>
-                                </td>
-                                <td class="px-6 py-4 text-right">
-                                    <button class="text-primary font-bold text-sm hover:underline">View File</button>
-                                </td>
-                            </tr>
-                        </tbody>
+<tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                         {% for appointment in todayAppointments %}
+                         <tr>
+                             <td class="px-6 py-4">
+                                 <div class="flex items-center gap-3">
+                                     <div class="size-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 font-bold text-sm">
+                                         {{ appointment.patient.name|default('?')|upper|slice(0, 1) }}
+                                     </div>
+                                     <div>
+                                         <p class="text-slate-900 dark:text-white font-bold">{{ appointment.patient.name ?? 'Unknown' }}</p>
+                                         <p class="text-slate-400 text-xs">{{ appointment.department|default('General') }}</p>
+                                     </div>
+                                 </div>
+                             </td>
+                             <td class="px-6 py-4 text-slate-500 text-sm">{{ appointment.scheduledAt|date('h:i A') }}</td>
+                             <td class="px-6 py-4">
+                                 {% if appointment.status == 'CONFIRMED' %}
+                                     <span class="px-3 py-1 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700">{{ appointment.status }}</span>
+                                 {% elseif appointment.status == 'PENDING' %}
+                                     <span class="px-3 py-1 rounded-full text-[10px] font-bold bg-yellow-100 text-yellow-700">{{ appointment.status }}</span>
+                                 {% else %}
+                                     <span class="px-3 py-1 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500">{{ appointment.status }}</span>
+                                 {% endif %}
+                             </td>
+                             <td class="px-6 py-4 text-right">
+                                 <a href="{{ path('app_appointment_show', { id: appointment.id }) }}" class="text-primary font-bold text-sm hover:underline">View Details</a>
+                             </td>
+                         </tr>
+                         {% else %}
+                         <tr>
+                             <td class="px-6 py-4 text-center text-slate-400" colspan="4">No appointments today</td>
+                         </tr>
+                         {% endfor %}
+                     </tbody>
                     </table>
                 </div>
             </div>
         </div>
 
         <div class="col-span-12 lg:col-span-4 flex flex-col gap-6">
-            <div class="rounded-xl bg-slate-900 text-white p-6 shadow-lg">
-                <p class="text-xs font-bold uppercase text-slate-400 mb-1">Today's Performance</p>
-                <p class="text-2xl font-black">$1,450.00</p>
-                <div class="w-full bg-slate-800 h-1.5 rounded-full mt-4">
-                    <div class="bg-primary h-full w-[75%]" style="width: 75%"></div>
-                </div>
-                <p class="text-[10px] text-slate-500 mt-2 font-bold">75% OF DAILY REVENUE TARGET</p>
-            </div>
+<div class="rounded-xl bg-slate-900 text-white p-6 shadow-lg">
+                 <p class="text-xs font-bold uppercase text-slate-400 mb-1">Today's Performance</p>
+                 <p class="text-2xl font-black">{{ '$' ~ todayRevenue|number_format(2) }}</p>
+                 <div class="w-full bg-slate-800 h-1.5 rounded-full mt-4">
+                     <div class="bg-primary h-full w-[75%]" style="width: 75%"></div>
+                 </div>
+                 <p class="text-[10px] text-slate-500 mt-2 font-bold">TODAY'S REVENUE ESTIMATE</p>
+             </div>
 
-            <div class="rounded-xl bg-white dark:bg-slate-900 p-6 border border-slate-200 dark:border-slate-800">
-                <h3 class="text-slate-900 dark:text-white text-lg font-bold mb-4">Urgent Notifications</h3>
-                <div class="flex flex-col gap-4">
-                    <div class="p-3 bg-red-50 dark:bg-red-900/10 rounded-lg border-l-4 border-red-500">
-                        <p class="text-xs font-bold text-red-700 dark:text-red-400">CRITICAL LAB RESULT</p>
-                        <p class="text-slate-900 dark:text-white text-sm font-medium mt-1">Robert Brown: Blood Sugar High</p>
-                    </div>
-                </div>
-            </div>
+             <div class="rounded-xl bg-white dark:bg-slate-900 p-6 border border-slate-200 dark:border-slate-800">
+                 <h3 class="text-slate-900 dark:text-white text-lg font-bold mb-4">Today's Notifications</h3>
+                 <div class="flex flex-col gap-4">
+                     {% if todayAppointments|length == 0 %}
+                     <div class="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                         <p class="text-xs text-slate-500 dark:text-slate-400">No appointments today.</p>
+                     </div>
+                     {% endif %}
+                     {% for appointment in todayAppointments %}
+                     <div class="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                         <p class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ appointment.scheduledAt|date('h:i A') }} — {{ appointment.patient.name ?? 'Unknown Patient' }}</p>
+                         <p class="text-slate-500 dark:text-slate-400 text-xs mt-1">{{ appointment.department|default('General') }}{% if appointment.status == 'PENDING' %} · Pending{% endif %}</p>
+                     </div>
+                     {% endfor %}
+                 </div>
+             </div>
         </div>
     </div>
 </div>

@@ -88,11 +88,12 @@
                             </p>
 
                             <div class="mt-6 flex items-center justify-between">
-                                <div class="flex items-center gap-2">
-                                    <div class="flex text-yellow-400">
-                                        <span class="material-symbols-outlined text-sm">star</span>
-                                    </div>
-                                    <span class="text-xs font-bold text-slate-600 dark:text-slate-300">4.9 ({{ random(10, 50) }} reviews)</span>
+<div class="flex items-center gap-2">
+                                     <div class="flex text-yellow-400">
+                                         <span class="material-symbols-outlined text-sm fill-1">star</span>
+                                     </div>
+                                     <span class="text-xs font-bold text-slate-600 dark:text-slate-300">{{ doctor.averageRating|default('0.00') }} ({{ doctor.totalReviews|default(0) }} reviews)</span>
+                                 </div>
                                 </div>
                                 <a href="{{ path('app_appointment_new', { doctor: doctor.id }) }}" class="bg-primary text-white px-6 py-2 rounded-lg text-sm font-bold hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20">
                                     Book Appointment

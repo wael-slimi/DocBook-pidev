@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Entity\User; // Ensure this matches your User entity
+use App\Entity\User;
 use App\Form\DoctorCompleteProfileType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -12,21 +12,50 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Form\DoctorSettingsType;
+use App\Repository\AppointmentRepository;
 
 #[Route('/doctor')]
-#[IsGranted('ROLE_DOCTOR')] 
+#[IsGranted('ROLE_DOCTOR')]
 class DoctorController extends AbstractController
 {
     #[Route('/dashboard', name: 'app_doctor_dashboard')]
-    public function index(): Response
+    public function index(AppointmentRepository $appointmentRepository): Response
     {
-        return $this->render('doctor/dashboard.html.twig');
+        /** @var User $doctor */
+        $doctor = $this->getUser();
+        $today = new \DateTimeImmutable('today');
+        $tomorrow = (new \DateTimeImmutable('today'))->modify('+1 day');
+
+        $todayAppointments = $appointmentRepository->createQueryBuilder('a')
+            ->where('a.doctor = :doctor')
+            ->andWhere('a.scheduledAt BETWEEN :today AND :tomorrow')
+            ->setParameter('doctor', $doctor)
+            ->setParameter('today', $today)
+            ->setParameter('tomorrow', $tomorrow)
+            ->orderBy('a.scheduledAt', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+        $pendingCount = count(array_filter($todayAppointments, fn($a) => $a->getStatus() === 'PENDING'));
+        $todayRevenue = count($todayAppointments) * (float) ($doctor->getConsultationFee() ?? 0);
+
+        return $this->render('doctor/dashboard.html.twig', [
+            'todayAppointments' => $todayAppointments,
+            'pendingCount' => $pendingCount,
+            'todayRevenue' => $todayRevenue,
+        ]);
     }
     
     #[Route('/medical-records', name: 'app_medecin_dossier_index')]
-    public function listRecords(): Response
+    public function listRecords(DossierMedicalRepository $dossierRepository): Response
     {
-        return $this->render('doctor/records/index.html.twig');
+        /** @var User $doctor */
+        $doctor = $this->getUser();
+        $dossiers = $dossierRepository->findByDoctor($doctor);
+
+        return $this->render('doctor/records/index.html.twig', [
+            'dossiers' => $dossiers,
+        ]);
     }
     
     #[Route('/complete-profile', name: 'app_doctor_complete_profile')]

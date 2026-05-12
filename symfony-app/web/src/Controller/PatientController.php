@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Repository\AppointmentRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -11,16 +12,31 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\User;
 use App\Form\PatientSettingsType;
 use App\Repository\UserRepository;
-USE App\Enum\Specialty;
+use App\Enum\Specialty;
 
 #[Route('/patient')]
 #[IsGranted('IS_AUTHENTICATED_FULLY')]
 class PatientController extends AbstractController
 {
     #[Route('/', name: 'app_patient_dashboard')]
-    public function dashboard(): Response
+    public function dashboard(AppointmentRepository $appointmentRepository): Response
     {
-        return $this->render('patient/dashboard.html.twig');
+        /** @var User $patient */
+        $patient = $this->getUser();
+
+        $upcomingAppointments = $appointmentRepository->createQueryBuilder('a')
+            ->where('a.patient = :patient')
+            ->andWhere('a.scheduledAt >= :now')
+            ->setParameter('patient', $patient)
+            ->setParameter('now', new \DateTimeImmutable())
+            ->orderBy('a.scheduledAt', 'ASC')
+            ->setMaxResults(5)
+            ->getQuery()
+            ->getResult();
+
+        return $this->render('patient/dashboard.html.twig', [
+            'upcomingAppointments' => $upcomingAppointments,
+        ]);
     }
     
     #[Route('/records', name: 'patient_records')]

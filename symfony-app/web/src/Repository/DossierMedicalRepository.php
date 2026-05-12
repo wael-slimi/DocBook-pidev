@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\DossierMedical;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -150,5 +151,20 @@ class DossierMedicalRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    /**
+     * @return DossierMedical[]
+     */
+    public function findByDoctor(User $doctor): array
+    {
+        // Find dossiers where the patientNom + patientPrenom match the doctor's name
+        // This links dossiers assigned to this doctor's patients
+        return $this->createQueryBuilder('d')
+            ->andWhere('d.patientNom = :name OR d.patientPrenom = :name')
+            ->setParameter('name', $doctor->getName())
+            ->orderBy('d.dateCreation', 'DESC')
+            ->getQuery()
+            ->getResult();
     }
 }

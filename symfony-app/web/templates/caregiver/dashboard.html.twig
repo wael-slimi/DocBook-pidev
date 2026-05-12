@@ -38,26 +38,23 @@
                     <th class="px-6 py-4 text-xs font-bold uppercase text-right">Action</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-slate-100">
-                <tr>
-                    <td class="px-6 py-4 font-bold text-slate-900 dark:text-white">John Doe</td>
-                    <td class="px-6 py-4">
-                        <span class="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">Stable</span>
-                    </td>
-                    <td class="px-6 py-4 text-right">
-                        <button class="text-primary font-bold text-sm">Manage</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="px-6 py-4 font-bold text-slate-900 dark:text-white">Robert Brown</td>
-                    <td class="px-6 py-4">
-                        <span class="px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700">Critical</span>
-                    </td>
-                    <td class="px-6 py-4 text-right">
-                        <button class="text-primary font-bold text-sm">ATTEND NOW</button>
-                    </td>
-                </tr>
-            </tbody>
+<tbody class="divide-y divide-slate-100">
+                 {% for patient in managedPatients %}
+                 <tr>
+                     <td class="px-6 py-4 font-bold text-slate-900 dark:text-white">{{ patient.name }}</td>
+                     <td class="px-6 py-4">
+                         <span class="px-3 py-1 rounded-full text-xs font-bold {% if patient.status == 'Critical' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">{{ patient.status|default('Stable') }}</span>
+                     </td>
+                     <td class="px-6 py-4 text-right">
+                         <button class="text-primary font-bold text-sm">Manage</button>
+                     </td>
+                 </tr>
+                 {% else %}
+                 <tr>
+                     <td class="px-6 py-4 text-center text-slate-400" colspan="3">No managed patients</td>
+                 </tr>
+                 {% endfor %}
+             </tbody>
         </table>
     </div>
 
