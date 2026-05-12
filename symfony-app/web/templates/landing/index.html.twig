@@ -139,7 +139,7 @@
                     </div>
                 </div>
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                     {% for doctor in doctors[:4] %}
+                     {% for doctor in doctors[:4] if doctor is not null %}
                      <div class="bg-white dark:bg-slate-900 rounded-xl overflow-hidden shadow-sm border border-slate-100 dark:border-slate-800">
                          <div class="h-48 bg-slate-200 bg-cover bg-center" style="background-image: url('{{ doctor.profileImage ? asset('uploads/profiles/' ~ doctor.profileImage) : 'https://ui-avatars.com/api/?name=' ~ doctor.name|url_encode ~ '&size=300' }}');"></div>
                          <div class="p-5">

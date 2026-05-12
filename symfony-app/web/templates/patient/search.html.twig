@@ -58,7 +58,7 @@
         </aside>
 
         <div class="col-span-12 lg:col-span-9 space-y-4">
-            {% for doctor in doctors %}
+            {% for doctor in doctors if doctor is not null %}
                 <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 hover:border-primary/30 transition-all shadow-sm">
                     <div class="flex flex-col md:flex-row gap-6">
                         <div class="size-32 rounded-2xl bg-cover bg-center flex-shrink-0 shadow-inner border border-slate-100 dark:border-slate-800"
@@ -87,18 +87,17 @@
                                 {{ doctor.bio ?: 'Experienced healthcare professional dedicated to providing high-quality patient care.' }}
                             </p>
 
-                            <div class="mt-6 flex items-center justify-between">
-<div class="flex items-center gap-2">
+<div class="mt-6 flex items-center justify-between">
+                                 <div class="flex items-center gap-2">
                                      <div class="flex text-yellow-400">
                                          <span class="material-symbols-outlined text-sm fill-1">star</span>
                                      </div>
                                      <span class="text-xs font-bold text-slate-600 dark:text-slate-300">{{ doctor.averageRating|default('0.00') }} ({{ doctor.totalReviews|default(0) }} reviews)</span>
                                  </div>
-                                </div>
-                                <a href="{{ path('app_appointment_new', { doctor: doctor.id }) }}" class="bg-primary text-white px-6 py-2 rounded-lg text-sm font-bold hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20">
-                                    Book Appointment
-                                </a>
-                            </div>
+                                 <a href="{{ path('app_appointment_new', { doctor: doctor.id }) }}" class="bg-primary text-white px-6 py-2 rounded-lg text-sm font-bold hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20">
+                                     Book Appointment
+                                 </a>
+                             </div>
                         </div>
                     </div>
                 </div>
