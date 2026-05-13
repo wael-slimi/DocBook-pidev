@@ -15,50 +15,50 @@
         </button>
     </div>
 
-<div class="flex flex-wrap gap-4 pb-8">
-         <div class="flex min-w-[200px] flex-1 flex-col gap-2 rounded-xl p-6 bg-white dark:bg-slate-900 border border-slate-200 shadow-sm">
-             <p class="text-slate-500 text-sm font-bold uppercase">Total Patients</p>
-             <p class="text-slate-900 dark:text-white text-3xl font-black">{{ managedPatients|length }}</p>
-         </div>
-         <div class="flex min-w-[200px] flex-1 flex-col gap-2 rounded-xl p-6 bg-white dark:bg-slate-900 border border-slate-200 shadow-sm">
-             <p class="text-slate-500 text-sm font-bold uppercase">Critical Alerts</p>
-             <p class="text-red-600 text-3xl font-black">{{ managedPatients|filter(p => p.caregiver is not empty)|length }}</p>
-         </div>
-     </div>
+    <div class="flex flex-wrap gap-4 pb-8">
+        <div class="flex min-w-[200px] flex-1 flex-col gap-2 rounded-xl p-6 bg-white dark:bg-slate-900 border border-slate-200 shadow-sm">
+            <p class="text-slate-500 text-sm font-bold uppercase">Total Patients</p>
+            <p class="text-slate-900 dark:text-white text-3xl font-black">{{ managedPatients|length }}</p>
+        </div>
+        <div class="flex min-w-[200px] flex-1 flex-col gap-2 rounded-xl p-6 bg-white dark:bg-slate-900 border border-slate-200 shadow-sm">
+            <p class="text-slate-500 text-sm font-bold uppercase">Assigned Patients</p>
+            <p class="text-red-600 text-3xl font-black">{{ managedPatients|filter(p => p.caregiver is not empty)|length }}</p>
+        </div>
+    </div>
 
-     <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 overflow-hidden shadow-sm mb-8">
-         <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center">
-             <h3 class="text-slate-900 dark:text-white text-xl font-bold">Managed Patients</h3>
-         </div>
-         <table class="w-full text-left">
-             <thead class="bg-slate-50 dark:bg-slate-800/50">
-                 <tr>
-                     <th class="px-6 py-4 text-xs font-bold uppercase">Patient Name</th>
-                     <th class="px-6 py-4 text-xs font-bold uppercase">Status</th>
-                     <th class="px-6 py-4 text-xs font-bold uppercase text-right">Action</th>
-                 </tr>
-             </thead>
-             <tbody class="divide-y divide-slate-100">
-                 {% for patient in managedPatients %}
-                 <tr>
-                     <td class="px-6 py-4 font-bold text-slate-900 dark:text-white">{{ patient.name }}</td>
-                     <td class="px-6 py-4">
-                         <span class="px-3 py-1 rounded-full text-xs font-bold {% if patient.caregiver %}bg-green-100 text-green-700{% else %}bg-yellow-100 text-yellow-700{% endif %}">
-                             {{ patient.caregiver ? 'Assigned' : 'Pending' }}
-                         </span>
-                     </td>
-                     <td class="px-6 py-4 text-right">
-                         <button class="text-primary font-bold text-sm">Manage</button>
-                     </td>
-                 </tr>
-                 {% else %}
-                 <tr>
-                     <td class="px-6 py-4 text-center text-slate-400" colspan="3">No managed patients</td>
-                 </tr>
-                 {% endfor %}
-</tbody>
-         </table>
-     </div>
+    <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 overflow-hidden shadow-sm mb-8">
+        <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center">
+            <h3 class="text-slate-900 dark:text-white text-xl font-bold">Managed Patients</h3>
+        </div>
+        <table class="w-full text-left">
+            <thead class="bg-slate-50 dark:bg-slate-800/50">
+                <tr>
+                    <th class="px-6 py-4 text-xs font-bold uppercase">Patient Name</th>
+                    <th class="px-6 py-4 text-xs font-bold uppercase">Status</th>
+                    <th class="px-6 py-4 text-xs font-bold uppercase text-right">Action</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+                {% for patient in managedPatients %}
+                <tr>
+                    <td class="px-6 py-4 font-bold text-slate-900 dark:text-white">{{ patient.name }}</td>
+                    <td class="px-6 py-4">
+                        <span class="px-3 py-1 rounded-full text-xs font-bold {% if patient.caregiver %}bg-green-100 text-green-700{% else %}bg-yellow-100 text-yellow-700{% endif %}">
+                            {{ patient.caregiver ? 'Assigned' : 'Pending' }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                        <button class="text-primary font-bold text-sm">Manage</button>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td class="px-6 py-4 text-center text-slate-400" colspan="3">No managed patients</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
     <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 p-8 shadow-sm">
         <h3 class="text-slate-900 dark:text-white text-2xl font-black mb-6">Daily Metrics Entry</h3>
