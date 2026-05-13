@@ -65,12 +65,28 @@ class AppointmentController extends AbstractController
     public function edit(Request $request, Appointment $appointment, EntityManagerInterface $em): Response
     {
         $form = $this->createForm(AppointmentType::class, $appointment);
+
+        // Only doctors can change the appointment status
+        if ($this->isGranted('ROLE_DOCTOR')) {
+            $form->add('status', ChoiceType::class, [
+                'label' => 'Status',
+                'choices' => [
+                    'Pending' => Appointment::STATUS_PENDING,
+                    'Confirmed' => Appointment::STATUS_CONFIRMED,
+                    'Cancelled' => Appointment::STATUS_CANCELLED,
+                    'Completed' => Appointment::STATUS_COMPLETED,
+                    'Expired' => Appointment::STATUS_EXPIRED,
+                ],
+                'attr' => ['class' => 'form-control'],
+            ]);
+        }
+
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $em->flush();
             $this->addFlash('success', 'Appointment updated successfully!');
-            
+
             return $this->redirectToRoute('app_appointment_show', ['id' => $appointment->getId()]);
         }
 

@@ -33,41 +33,55 @@
                 {% endif %}
             </div>
 
-            <div>
-                {{ form_label(form.doctor, 'Select Doctor', {'label_attr': {'class': 'block text-sm font-bold text-slate-900 dark:text-white mb-2'}}) }}
-                <div class="relative">
-                    {{ form_widget(form.doctor, {'attr': {'class': 'w-full rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800 px-4 py-2 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary'}}) }}
-                </div>
-                {% if form_errors(form.doctor) %}
-                    <div class="mt-2 text-sm text-red-600 dark:text-red-400">
-                        {{ form_errors(form.doctor) }}
-                    </div>
-                {% endif %}
-            </div>
+<div>
+                 {{ form_label(form.doctor, 'Select Doctor', {'label_attr': {'class': 'block text-sm font-bold text-slate-900 dark:text-white mb-2'}}) }}
+                 <div class="relative">
+                     {{ form_widget(form.doctor, {'attr': {'class': 'w-full rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800 px-4 py-2 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary'}}) }}
+                 </div>
+                 {% if form_errors(form.doctor) %}
+                     <div class="mt-2 text-sm text-red-600 dark:text-red-400">
+                         {{ form_errors(form.doctor) }}
+                     </div>
+                 {% endif %}
+             </div>
 
-            <div>
-                {{ form_label(form.reason, 'Message / Reason for Visit', {'label_attr': {'class': 'block text-sm font-bold text-slate-900 dark:text-white mb-2'}}) }}
-                <div class="relative">
-                    {{ form_widget(form.reason, {'attr': {'class': 'w-full rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800 px-4 py-2 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary', 'rows': '4', 'placeholder': 'Describe your reason for the appointment...'}}) }}
-                </div>
-                {% if form_errors(form.reason) %}
-                    <div class="mt-2 text-sm text-red-600 dark:text-red-400">
-                        {{ form_errors(form.reason) }}
-                    </div>
-                {% endif %}
-            </div>
+             <div>
+                 {{ form_label(form.department, 'Department', {'label_attr': {'class': 'block text-sm font-bold text-slate-900 dark:text-white mb-2'}}) }}
+                 <div class="relative">
+                     {{ form_widget(form.department, {'attr': {'class': 'w-full rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800 px-4 py-2 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary', 'placeholder': 'e.g., Cardiology'}}) }}
+                 </div>
+                 {% if form_errors(form.department) %}
+                     <div class="mt-2 text-sm text-red-600 dark:text-red-400">
+                         {{ form_errors(form.department) }}
+                     </div>
+                 {% endif %}
+             </div>
 
-            <div>
-                {{ form_label(form.status, 'Status', {'label_attr': {'class': 'block text-sm font-bold text-slate-900 dark:text-white mb-2'}}) }}
-                <div class="relative">
-                    {{ form_widget(form.status, {'attr': {'class': 'w-full rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800 px-4 py-2 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary'}}) }}
-                </div>
-                {% if form_errors(form.status) %}
-                    <div class="mt-2 text-sm text-red-600 dark:text-red-400">
-                        {{ form_errors(form.status) }}
-                    </div>
-                {% endif %}
-            </div>
+             <div>
+                 {{ form_label(form.reason, 'Message / Reason for Visit', {'label_attr': {'class': 'block text-sm font-bold text-slate-900 dark:text-white mb-2'}}) }}
+                 <div class="relative">
+                     {{ form_widget(form.reason, {'attr': {'class': 'w-full rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800 px-4 py-2 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary', 'rows': '4', 'placeholder': 'Describe your reason for the appointment...'}}) }}
+                 </div>
+                 {% if form_errors(form.reason) %}
+                     <div class="mt-2 text-sm text-red-600 dark:text-red-400">
+                         {{ form_errors(form.reason) }}
+                     </div>
+                 {% endif %}
+             </div>
+
+             {% if form.status is defined %}
+             <div>
+                 {{ form_label(form.status, 'Status', {'label_attr': {'class': 'block text-sm font-bold text-slate-900 dark:text-white mb-2'}}) }}
+                 <div class="relative">
+                     {{ form_widget(form.status, {'attr': {'class': 'w-full rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800 px-4 py-2 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary'}}) }}
+                 </div>
+                 {% if form_errors(form.status) %}
+                     <div class="mt-2 text-sm text-red-600 dark:text-red-400">
+                         {{ form_errors(form.status) }}
+                     </div>
+                 {% endif %}
+             </div>
+             {% endif %}
 
             <div class="flex gap-4 pt-4">
                 <button type="submit" class="flex-1 bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20">

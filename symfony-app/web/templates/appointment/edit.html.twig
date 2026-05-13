@@ -28,17 +28,19 @@
                     {{ form_errors(form.doctor) }}
                 </div>
 
-                <div class="form-group mb-3">
-                    {{ form_label(form.message, 'Message / Notes') }}
-                    {{ form_widget(form.message, {'attr': {'class': 'form-control', 'rows': '4', 'placeholder': 'Any additional notes...'}}) }}
-                    {{ form_errors(form.message) }}
-                </div>
+<div class="form-group mb-3">
+                     {{ form_label(form.reason, 'Message / Notes') }}
+                     {{ form_widget(form.reason, {'attr': {'class': 'form-control', 'rows': '4', 'placeholder': 'Any additional notes...'}}) }}
+                     {{ form_errors(form.reason) }}
+                 </div>
 
-                <div class="form-group mb-3">
-                    {{ form_label(form.status, 'Status') }}
-                    {{ form_widget(form.status, {'attr': {'class': 'form-control'}}) }}
-                    {{ form_errors(form.status) }}
-                </div>
+                 {% if form.status is defined %}
+                 <div class="form-group mb-3">
+                     {{ form_label(form.status, 'Status') }}
+                     {{ form_widget(form.status, {'attr': {'class': 'form-control'}}) }}
+                     {{ form_errors(form.status) }}
+                 </div>
+                 {% endif %}
 
                 <div class="d-flex justify-content-between">
                     <button class="btn btn-primary" type="submit">Update Appointment</button>

@@ -9,6 +9,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -35,21 +36,15 @@ class AppointmentType extends AbstractType
                 },
                 'attr' => ['class' => 'form-control'],
             ])
+            ->add('department', TextType::class, [
+                'label' => 'Department',
+                'required' => false,
+                'attr' => ['class' => 'form-control', 'placeholder' => 'e.g., Cardiology'],
+            ])
             ->add('reason', TextareaType::class, [
                 'label' => 'Message (optional)',
                 'required' => false,
                 'attr' => ['class' => 'form-control', 'rows' => 5, 'placeholder' => 'Your message'],
-            ])
-            ->add('status', ChoiceType::class, [
-                'label' => 'Status',
-                'choices' => [
-                    'Pending' => Appointment::STATUS_PENDING,
-                    'Confirmed' => Appointment::STATUS_CONFIRMED,
-                    'Cancelled' => Appointment::STATUS_CANCELLED,
-                    'Completed' => Appointment::STATUS_COMPLETED,
-                    'Expired' => Appointment::STATUS_EXPIRED,
-                ],
-                'attr' => ['class' => 'form-control'],
             ])
         ;
     }
