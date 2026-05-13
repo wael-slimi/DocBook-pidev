@@ -19,11 +19,12 @@ class AppointmentType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('scheduledAt', DateTimeType::class, [
-                'widget' => 'single_text',
-                'label' => 'Date & Time',
-                'attr' => ['class' => 'form-control'],
-            ])
+->add('scheduledAt', DateTimeType::class, [
+                 'widget' => 'single_text',
+                 'label' => 'Date & Time',
+                 'required' => true,
+                 'attr' => ['class' => 'form-control'],
+             ])
             ->add('doctor', EntityType::class, [
                 'class' => User::class,
                 'choice_label' => 'name',

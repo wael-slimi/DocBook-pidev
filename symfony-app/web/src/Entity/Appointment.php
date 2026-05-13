@@ -57,7 +57,7 @@ class Appointment
     public function getId(): ?int { return $this->id; }
 
     public function getScheduledAt(): ?\DateTimeInterface { return $this->scheduledAt; }
-    public function setScheduledAt(\DateTimeInterface $scheduledAt): static { $this->scheduledAt = $scheduledAt; return $this; }
+    public function setScheduledAt(?\DateTimeInterface $scheduledAt): static { $this->scheduledAt = $scheduledAt; return $this; }
 
     public function getStatus(): ?string { return $this->status; }
     public function setStatus(string $status): static { $this->status = $status; return $this; }
