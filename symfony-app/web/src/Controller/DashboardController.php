@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Repository\AppointmentRepository;
 use App\Repository\PatientCaregiverRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,7 +14,7 @@ class DashboardController extends AbstractController
 
     #[Route('/dashboard', name: 'app_dashboard')]
     #[IsGranted('IS_AUTHENTICATED_FULLY')] // Ensures user is logged in
-    public function index(): Response
+    public function index(AppointmentRepository $appointmentRepository): Response
     {
         $user = $this->getUser();
 
@@ -34,7 +35,20 @@ class DashboardController extends AbstractController
         }
 
         // 3. Default to Patient Dashboard
-        return $this->render('patient/dashboard.html.twig');
+        /** @var \App\Entity\User $user */
+        $upcomingAppointments = $appointmentRepository->createQueryBuilder('a')
+            ->where('a.patient = :patient')
+            ->andWhere('a.scheduledAt >= :now')
+            ->setParameter('patient', $user)
+            ->setParameter('now', new \DateTimeImmutable())
+            ->orderBy('a.scheduledAt', 'ASC')
+            ->setMaxResults(5)
+            ->getQuery()
+            ->getResult();
+
+        return $this->render('patient/dashboard.html.twig', [
+            'upcomingAppointments' => $upcomingAppointments,
+        ]);
     }
 
     #[Route('/test/doctor', name: 'test_doctor')]
