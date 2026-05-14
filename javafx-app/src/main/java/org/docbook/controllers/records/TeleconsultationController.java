@@ -180,7 +180,7 @@ public class TeleconsultationController implements javafx.fxml.Initializable {
         VBox middleSection = new VBox(5);
         middleSection.setPrefWidth(300);
 
-        Label modeLabel = new Label("Mode: " + tc.getMode());
+        Label modeLabel = new Label("Mode: " + (tc.getMode() != null ? tc.getMode() : "N/A"));
         modeLabel.setStyle("-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #666;");
 
         Label durationLabel = new Label("Duration: " + tc.getDuration() + " minutes");
@@ -189,15 +189,18 @@ public class TeleconsultationController implements javafx.fxml.Initializable {
         Label urlLabel = new Label("Meeting URL:");
         urlLabel.setStyle("-fx-font-size: 10px; -fx-font-weight: bold; -fx-text-fill: #999;");
 
-        Hyperlink urlLink = new Hyperlink(tc.getMeetingUrl());
+        String url = tc.getMeetingUrl();
+        Hyperlink urlLink = new Hyperlink(url != null ? url : "N/A");
         urlLink.setStyle("-fx-font-size: 11px; -fx-padding: 0; -fx-text-fill: #0058be;");
-        urlLink.setOnAction(e -> {
-            try {
-                java.awt.Desktop.getDesktop().browse(new java.net.URI(tc.getMeetingUrl()));
-            } catch (Exception ex) {
-                showError("Error opening URL: " + ex.getMessage());
-            }
-        });
+        if (url != null) {
+            urlLink.setOnAction(e -> {
+                try {
+                    java.awt.Desktop.getDesktop().browse(new java.net.URI(url));
+                } catch (Exception ex) {
+                    showError("Error opening URL: " + ex.getMessage());
+                }
+            });
+        }
 
         middleSection.getChildren().addAll(modeLabel, durationLabel, urlLabel, urlLink);
 
@@ -205,8 +208,9 @@ public class TeleconsultationController implements javafx.fxml.Initializable {
         rightSection.setAlignment(Pos.TOP_CENTER);
         rightSection.setPrefWidth(150);
 
-        Label modeBadge = new Label(tc.getMode().toUpperCase());
-        modeBadge.setStyle(getModeStyle(tc.getMode()));
+        String mode = tc.getMode() != null ? tc.getMode() : "unknown";
+        Label modeBadge = new Label(mode.toUpperCase());
+        modeBadge.setStyle(getModeStyle(mode));
         modeBadge.setPrefWidth(130);
         modeBadge.setAlignment(Pos.CENTER);
 

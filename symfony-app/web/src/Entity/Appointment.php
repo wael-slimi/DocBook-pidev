@@ -11,12 +11,12 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: AppointmentRepository::class)]
 class Appointment
 {
-    public const STATUS_PENDING = 'PENDING';
-    public const STATUS_CONFIRMED = 'CONFIRMED';
-    public const STATUS_CANCELLED = 'CANCELLED';
-    public const STATUS_COMPLETED = 'COMPLETED';
+    public const STATUS_PENDING = 'Pending';
+    public const STATUS_CONFIRMED = 'Confirmed';
+    public const STATUS_CANCELLED = 'Cancelled';
+    public const STATUS_COMPLETED = 'Completed';
     public const STATUS_URGENT = 'URGENT';
-    public const STATUS_EXPIRED = 'EXPIRED';
+    public const STATUS_EXPIRED = 'Expired';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -27,7 +27,7 @@ class Appointment
     private ?\DateTimeInterface $scheduledAt = null;
 
     #[ORM\Column(length: 50)]
-    private ?string $status = 'PENDING';
+    private ?string $status = self::STATUS_PENDING;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $reason = null;

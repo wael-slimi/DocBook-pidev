@@ -40,7 +40,10 @@ security:
         - { path: ^/forgot-password, roles: PUBLIC_ACCESS }
         - { path: ^/dashboard, roles: ROLE_USER }
         - { path: ^/doctor, roles: ROLE_DOCTOR }
+        - { path: ^/medecin, roles: ROLE_DOCTOR }
         - { path: ^/patient, roles: ROLE_PATIENT }
         - { path: ^/caregiver, roles: ROLE_CAREGIVER }
+        - { path: ^/appointment, roles: ROLE_USER }
+        - { path: ^/teleconsultation, roles: ROLE_USER }
         - { path: ^/2fa, roles: IS_AUTHENTICATED_2FA_IN_PROGRESS }
         - { path: ^/login/2fa-verify, roles: PUBLIC_ACCESS }

@@ -9,9 +9,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Form\DoctorSettingsType;
+use App\Entity\Appointment;
 use App\Repository\AppointmentRepository;
 
 #[Route('/doctor')]
@@ -36,25 +37,13 @@ class DoctorController extends AbstractController
             ->getQuery()
             ->getResult();
 
-        $pendingCount = count(array_filter($todayAppointments, fn($a) => $a->getStatus() === 'PENDING'));
+        $pendingCount = count(array_filter($todayAppointments, fn($a) => $a->getStatus() === Appointment::STATUS_PENDING));
         $todayRevenue = count($todayAppointments) * (float) ($doctor->getConsultationFee() ?? 0);
 
         return $this->render('doctor/dashboard.html.twig', [
             'todayAppointments' => $todayAppointments,
             'pendingCount' => $pendingCount,
             'todayRevenue' => $todayRevenue,
-        ]);
-    }
-    
-    #[Route('/medical-records', name: 'app_medecin_dossier_index')]
-    public function listRecords(DossierMedicalRepository $dossierRepository): Response
-    {
-        /** @var User $doctor */
-        $doctor = $this->getUser();
-        $dossiers = $dossierRepository->findByDoctor($doctor);
-
-        return $this->render('doctor/records/index.html.twig', [
-            'dossiers' => $dossiers,
         ]);
     }
     

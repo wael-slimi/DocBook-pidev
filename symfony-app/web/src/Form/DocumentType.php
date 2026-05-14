@@ -26,7 +26,7 @@ class DocumentType extends AbstractType
             ->add('typeDocument', ChoiceType::class, [
                 'label' => 'Type de document',
                 'choices' => array_combine(
-                    ['Ordonnance', 'Rapport', 'Examen', 'Compte rendu', 'Autre'],
+                    ['Consultation', 'Ordonnance', 'Certificat', 'Imagerie', 'Autre'],
                     Document::TYPES
                 ),
             ])

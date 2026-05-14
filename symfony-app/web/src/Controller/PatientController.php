@@ -5,7 +5,7 @@ namespace App\Controller;
 use App\Repository\AppointmentRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
@@ -39,12 +39,6 @@ class PatientController extends AbstractController
         ]);
     }
     
-    #[Route('/records', name: 'patient_records')]
-    public function records(): Response
-    {
-        return $this->render('patient/records.html.twig');
-    }
-
     #[Route('/settings', name: 'app_patient_settings')] 
     public function settings(Request $request, EntityManagerInterface $entityManager): Response
     {

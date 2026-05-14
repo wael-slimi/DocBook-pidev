@@ -1,55 +1,78 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
-use App\Repository\DossierMedicalRepository;
+use App\Entity\User;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity(repositoryClass: DossierMedicalRepository::class)]
+#[ORM\Entity(repositoryClass: \App\Repository\DossierMedicalRepository::class)]
+#[ORM\Table(name: 'dossier_medical')]
+#[ORM\HasLifecycleCallbacks]
 class DossierMedical
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column(type: Types::INTEGER)]
     private ?int $id = null;
 
-    #[ORM\Column(length: 50, unique: true)]
+    #[ORM\Column(type: Types::STRING, length: 50, unique: true)]
+    #[Assert\NotBlank(message: 'Le numéro de dossier est obligatoire.')]
+    #[Assert\Length(min: 2, max: 50, minMessage: 'Le numéro doit contenir au moins {{ limit }} caractères.', maxMessage: 'Le numéro ne peut pas dépasser {{ limit }} caractères.')]
     private ?string $numeroDossier = null;
 
-    #[ORM\Column(length: 120)]
+    #[ORM\Column(type: Types::STRING, length: 120)]
+    #[Assert\NotBlank(message: 'Le nom du patient est obligatoire.')]
+    #[Assert\Length(min: 3, max: 120, minMessage: 'Le nom doit contenir au moins {{ limit }} caractères.', maxMessage: 'Le nom ne peut pas dépasser {{ limit }} caractères.')]
     private ?string $patientNom = null;
 
-    #[ORM\Column(length: 120)]
+    #[ORM\Column(type: Types::STRING, length: 120)]
+    #[Assert\NotBlank(message: 'Le prénom du patient est obligatoire.')]
+    #[Assert\Length(min: 3, max: 120, minMessage: 'Le prénom doit contenir au moins {{ limit }} caractères.', maxMessage: 'Le prénom ne peut pas dépasser {{ limit }} caractères.')]
     private ?string $patientPrenom = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    #[Assert\NotNull(message: 'La date de naissance est obligatoire.')]
+    #[Assert\LessThan('today', message: 'La date de naissance doit être dans le passé.')]
     private ?\DateTimeInterface $dateNaissance = null;
 
-    #[ORM\Column(length: 20, nullable: true)]
+    #[ORM\Column(type: Types::STRING, length: 20, nullable: true)]
+    #[Assert\Choice(choices: ['M', 'F', 'Autre'], message: 'Le genre doit être M, F ou Autre.')]
     private ?string $genre = null;
 
-    #[ORM\Column(length: 180, nullable: true)]
+    #[ORM\Column(type: Types::STRING, length: 180, nullable: true)]
+    #[Assert\Email(message: 'L\'adresse email "{{ value }}" n\'est pas valide.')]
+    #[Assert\Length(max: 180)]
     private ?string $email = null;
 
-    #[ORM\Column(length: 30, nullable: true)]
+    #[ORM\Column(type: Types::STRING, length: 30, nullable: true)]
+    #[Assert\Regex(pattern: '/^[\d\s\+\-\(\)]{8,30}$/', message: 'Le numéro de téléphone n\'est pas valide (chiffres, espaces, +, -, parenthèses, 8 à 30 caractères).')]
     private ?string $telephone = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Assert\Length(max: 2000, maxMessage: 'L\'adresse ne peut pas dépasser {{ limit }} caractères.')]
     private ?string $adresse = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Assert\Length(max: 5000, maxMessage: 'Les remarques ne peuvent pas dépasser {{ limit }} caractères.')]
     private ?string $remarques = null;
 
-    #[ORM\Column]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private ?\DateTimeImmutable $dateCreation = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $dateModification = null;
 
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?User $patient = null;
+
+    /** @var Collection<int, Document> */
     #[ORM\OneToMany(targetEntity: Document::class, mappedBy: 'dossierMedical', cascade: ['persist', 'remove'], orphanRemoval: true)]
     #[ORM\OrderBy(['dateDocument' => 'DESC', 'dateCreation' => 'DESC'])]
     private Collection $documents;
@@ -62,7 +85,9 @@ class DossierMedical
     #[ORM\PrePersist]
     public function setDateCreationValue(): void
     {
-        $this->dateCreation = new \DateTimeImmutable();
+        if ($this->dateCreation === null) {
+            $this->dateCreation = new \DateTimeImmutable();
+        }
     }
 
     #[ORM\PreUpdate]
@@ -183,6 +208,17 @@ class DossierMedical
     public function getDateModification(): ?\DateTimeInterface
     {
         return $this->dateModification;
+    }
+
+    public function getPatient(): ?User
+    {
+        return $this->patient;
+    }
+
+    public function setPatient(?User $patient): static
+    {
+        $this->patient = $patient;
+        return $this;
     }
 
     /**

@@ -58,7 +58,7 @@
         </aside>
 
         <div class="col-span-12 lg:col-span-9 space-y-4">
-            {% for doctor in doctors if doctor is not null %}
+            {% for doctor in doctors|filter(d => d is not null) %}
                 <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 hover:border-primary/30 transition-all shadow-sm">
                     <div class="flex flex-col md:flex-row gap-6">
                         <div class="size-32 rounded-2xl bg-cover bg-center flex-shrink-0 shadow-inner border border-slate-100 dark:border-slate-800"

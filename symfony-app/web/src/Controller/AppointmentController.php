@@ -8,11 +8,14 @@ use App\Form\AppointmentType;
 use App\Repository\AppointmentRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/appointment')]
+#[IsGranted('ROLE_USER')]
 class AppointmentController extends AbstractController
 {
     #[Route('/', name: 'app_appointment_index', methods: ['GET'])]
@@ -56,6 +59,10 @@ class AppointmentController extends AbstractController
     #[Route('/{id}', name: 'app_appointment_show', methods: ['GET'])]
     public function show(Appointment $appointment): Response
     {
+        $user = $this->getUser();
+        if ($appointment->getPatient() !== $user && $appointment->getDoctor() !== $user) {
+            throw $this->createAccessDeniedException('You can only view your own appointments.');
+        }
         return $this->render('appointment/show.html.twig', [
             'appointment' => $appointment,
         ]);
@@ -94,5 +101,24 @@ class AppointmentController extends AbstractController
             'appointment' => $appointment,
             'form' => $form->createView(),
         ]);
+    }
+
+    #[Route('/{id}/delete', name: 'app_appointment_delete', methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
+    public function delete(Request $request, Appointment $appointment, EntityManagerInterface $em): Response
+    {
+        $user = $this->getUser();
+
+        if ($appointment->getPatient() !== $user && !$this->isGranted('ROLE_DOCTOR')) {
+            throw $this->createAccessDeniedException('You can only delete your own appointments.');
+        }
+
+        if ($this->isCsrfTokenValid('delete'.$appointment->getId(), $request->request->get('_token'))) {
+            $em->remove($appointment);
+            $em->flush();
+            $this->addFlash('success', 'Appointment cancelled successfully.');
+        }
+
+        return $this->redirectToRoute('app_appointment_index');
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\Medecin;
 
 use App\Entity\Document;
@@ -7,19 +9,19 @@ use App\Entity\DossierMedical;
 use App\Form\DocumentType;
 use App\Repository\DocumentRepository;
 use App\Repository\DossierMedicalRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/medecin/dossiers/{dossierId}/documents', requirements: ['dossierId' => '\d+'])]
+#[IsGranted('ROLE_DOCTOR')]
 class DocumentController extends AbstractController
 {
     public function __construct(
         private readonly DocumentRepository $documentRepository,
-        private readonly DossierMedicalRepository $dossierRepository,
-        private readonly EntityManagerInterface $em,
+        private readonly DossierMedicalRepository $dossierRepository
     ) {
     }
 
@@ -40,22 +42,33 @@ class DocumentController extends AbstractController
         $tri = $request->query->get('tri', 'dateDocument');
         $ordre = $request->query->get('ordre', 'DESC');
         $type = $request->query->get('type');
+        $dateDebut = $request->query->get('date_debut') ? \DateTime::createFromFormat('Y-m-d', $request->query->get('date_debut')) : null;
+        $dateFin = $request->query->get('date_fin') ? \DateTime::createFromFormat('Y-m-d', $request->query->get('date_fin')) : null;
 
-        $documents = $this->documentRepository->searchAndFilterByDossier(
-            $dossier, $search, $tri, $ordre, $type
-        );
-        $total = $this->documentRepository->countSearchAndFilterByDossier(
-            $dossier, $search, $type
-        );
+        $items = $this->documentRepository->searchAndFilterByDossier($dossier, $search, $tri, $ordre, $type, $dateDebut, $dateFin);
+        $total = $this->documentRepository->countSearchAndFilterByDossier($dossier, $search, $type, $dateDebut, $dateFin);
+
+        if ($request->isXmlHttpRequest() || $request->query->get('ajax')) {
+            $response = $this->render('medecin/document/_list_rows.html.twig', [
+                'documents' => $items,
+                'dossier' => $dossier,
+                'prefix' => '/medecin',
+            ]);
+            $response->headers->set('X-Total-Count', (string) $total);
+            return $response;
+        }
 
         return $this->render('medecin/document/index.html.twig', [
-            'documents' => $documents,
+            'documents' => $items,
             'dossier' => $dossier,
             'total' => $total,
             'q' => $search,
             'tri' => $tri,
             'ordre' => $ordre,
             'type' => $type,
+            'date_debut' => $request->query->get('date_debut'),
+            'date_fin' => $request->query->get('date_fin'),
+            'prefix' => '/medecin',
         ]);
     }
 
@@ -65,20 +78,18 @@ class DocumentController extends AbstractController
         $dossier = $this->getDossier($dossierId);
         $document = new Document();
         $document->setDossierMedical($dossier);
-
         $form = $this->createForm(DocumentType::class, $document, ['with_dossier' => false]);
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
             $this->documentRepository->save($document, true);
             $this->addFlash('success', 'Document créé.');
             return $this->redirectToRoute('app_medecin_document_index', ['dossierId' => $dossierId]);
         }
-
         return $this->render('medecin/document/form.html.twig', [
             'document' => $document,
             'dossier' => $dossier,
-            'form' => $form->createView(),
+            'form' => $form,
+            'prefix' => '/medecin',
         ]);
     }
 
@@ -92,6 +103,7 @@ class DocumentController extends AbstractController
         return $this->render('medecin/document/show.html.twig', [
             'document' => $document,
             'dossier' => $dossier,
+            'prefix' => '/medecin',
         ]);
     }
 
@@ -102,20 +114,18 @@ class DocumentController extends AbstractController
         if ($document->getDossierMedical() !== $dossier) {
             throw $this->createNotFoundException();
         }
-
         $form = $this->createForm(DocumentType::class, $document, ['with_dossier' => false]);
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
             $this->documentRepository->save($document, true);
             $this->addFlash('success', 'Document mis à jour.');
             return $this->redirectToRoute('app_medecin_document_index', ['dossierId' => $dossierId]);
         }
-
         return $this->render('medecin/document/form.html.twig', [
             'document' => $document,
             'dossier' => $dossier,
-            'form' => $form->createView(),
+            'form' => $form,
+            'prefix' => '/medecin',
         ]);
     }
 
@@ -126,12 +136,8 @@ class DocumentController extends AbstractController
         if ($document->getDossierMedical() !== $dossier) {
             throw $this->createNotFoundException();
         }
-
-        if ($this->isCsrfTokenValid('delete' . $document->getId(), $request->get('_token'))) {
-            $this->documentRepository->remove($document, true);
-            $this->addFlash('success', 'Document supprimé.');
-        }
-
+        $this->documentRepository->remove($document, true);
+        $this->addFlash('success', 'Document supprimé.');
         return $this->redirectToRoute('app_medecin_document_index', ['dossierId' => $dossierId]);
     }
 }

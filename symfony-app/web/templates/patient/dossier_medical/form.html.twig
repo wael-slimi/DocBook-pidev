@@ -1,0 +1,87 @@
+{% extends 'dashboard_base.html.twig' %}
+
+{% block title %}Nouveau dossier médical - DOCBOOK{% endblock %}
+
+{% block body %}
+<div class="max-w-2xl mx-auto space-y-8">
+    <div class="flex flex-col gap-1">
+        <h1 class="text-4xl font-black text-slate-900 dark:text-white">
+            {% if dossier and dossier.id %}Modifier le dossier{% else %}Nouveau dossier médical{% endif %}
+        </h1>
+        <p class="text-slate-500">Informations du dossier médical</p>
+    </div>
+
+    <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm p-6">
+        {{ form_start(form) }}
+
+        <div class="grid grid-cols-2 gap-6">
+            <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Numéro de dossier</label>
+                {{ form_widget(form.numeroDossier, { 'attr': { 'class': 'w-full' } }) }}
+                {{ form_errors(form.numeroDossier) }}
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Date de naissance</label>
+                {{ form_widget(form.dateNaissance, { 'attr': { 'class': 'w-full' } }) }}
+                {{ form_errors(form.dateNaissance) }}
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-6 mt-4">
+            <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Nom</label>
+                {{ form_widget(form.patientNom, { 'attr': { 'class': 'w-full' } }) }}
+                {{ form_errors(form.patientNom) }}
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Prénom</label>
+                {{ form_widget(form.patientPrenom, { 'attr': { 'class': 'w-full' } }) }}
+                {{ form_errors(form.patientPrenom) }}
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-6 mt-4">
+            <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Genre</label>
+                {{ form_widget(form.genre, { 'attr': { 'class': 'w-full' } }) }}
+                {{ form_errors(form.genre) }}
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Email</label>
+                {{ form_widget(form.email, { 'attr': { 'class': 'w-full' } }) }}
+                {{ form_errors(form.email) }}
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-6 mt-4">
+            <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Téléphone</label>
+                {{ form_widget(form.telephone, { 'attr': { 'class': 'w-full' } }) }}
+                {{ form_errors(form.telephone) }}
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Adresse</label>
+                {{ form_widget(form.adresse, { 'attr': { 'class': 'w-full' } }) }}
+                {{ form_errors(form.adresse) }}
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Remarques</label>
+            {{ form_widget(form.remarques, { 'attr': { 'class': 'w-full', 'rows': 4 } }) }}
+            {{ form_errors(form.remarques) }}
+        </div>
+
+        <div class="flex justify-end gap-4 mt-8">
+            <a href="{{ path('app_patient_dossier_index') }}" class="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-6 py-3 rounded-lg font-semibold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+                Annuler
+            </a>
+            <button type="submit" class="bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20">
+                {% if dossier and dossier.id %}Enregistrer{% else %}Créer{% endif %}
+            </button>
+        </div>
+
+        {{ form_end(form) }}
+    </div>
+</div>
+{% endblock %}

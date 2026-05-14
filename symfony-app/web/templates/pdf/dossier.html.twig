@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: 'DejaVu Sans', sans-serif; font-size: 11pt; color: #1e293b; margin: 2cm; }
+        h1 { font-size: 16pt; color: #0066cc; margin-bottom: 4pt; }
+        h2 { font-size: 13pt; color: #334155; border-bottom: 1px solid #e2e8f0; padding-bottom: 4pt; margin-top: 20pt; }
+        .header { text-align: center; margin-bottom: 24pt; padding-bottom: 12pt; border-bottom: 2px solid #0066cc; }
+        .header h1 { font-size: 18pt; margin: 0; }
+        .header p { font-size: 9pt; color: #64748b; margin: 4pt 0 0; }
+        table { width: 100%; border-collapse: collapse; margin: 12pt 0; }
+        td { padding: 6pt 8pt; vertical-align: top; }
+        td:first-child { width: 30%; font-weight: bold; color: #475569; }
+        td:last-child { width: 70%; }
+        tr:nth-child(even) td { background: #f8fafc; }
+        .footer { text-align: center; margin-top: 36pt; padding-top: 8pt; border-top: 1px solid #e2e8f0; font-size: 8pt; color: #94a3b8; }
+        .qr { float: right; margin-left: 12pt; }
+    </style>
+</head>
+<body>
+    <div class="qr">{{ qr_content|raw }}</div>
+    <div class="header">
+        <h1>Dossier Médical</h1>
+        <p>DOCBOOK Health Systems • Document généré le {{ generated_at }}</p>
+    </div>
+
+    <h2>Identité du patient</h2>
+    <table>
+        <tr><td>N° dossier</td><td>{{ numero_dossier }}</td></tr>
+        <tr><td>Nom</td><td>{{ patient_nom }}</td></tr>
+        <tr><td>Prénom</td><td>{{ patient_prenom }}</td></tr>
+        <tr><td>Date de naissance</td><td>{{ date_naissance }}</td></tr>
+        <tr><td>Genre</td><td>{{ genre }}</td></tr>
+    </table>
+
+    <h2>Coordonnées</h2>
+    <table>
+        <tr><td>Email</td><td>{{ email }}</td></tr>
+        <tr><td>Téléphone</td><td>{{ telephone }}</td></tr>
+        <tr><td>Adresse</td><td>{{ adresse }}</td></tr>
+    </table>
+
+    <h2>Informations complémentaires</h2>
+    <table>
+        <tr><td>Date de création</td><td>{{ date_creation }}</td></tr>
+        {% if remarques != '—' %}
+        <tr><td>Remarques</td><td>{{ remarques }}</td></tr>
+        {% endif %}
+    </table>
+
+    <div class="footer">
+        <p>DOCBOOK Health Systems • {{ generated_at }} • QR: {{ qr_data }}</p>
+    </div>
+</body>
+</html>

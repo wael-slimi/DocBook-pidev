@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\DossierMedical;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -28,9 +29,14 @@ class DossierMedicalRepository extends ServiceEntityRepository
         ?\DateTimeInterface $dateFin = null,
         ?string $genre = null,
         ?int $limit = 100,
-        ?int $offset = 0
+        ?int $offset = 0,
+        ?User $patient = null
     ): array {
         $qb = $this->createQueryBuilder('d');
+
+        if ($patient !== null) {
+            $qb->andWhere('d.patient = :patient')->setParameter('patient', $patient);
+        }
 
         if ($search !== null && $search !== '') {
             $qb->andWhere(
@@ -69,9 +75,14 @@ class DossierMedicalRepository extends ServiceEntityRepository
         ?string $search = null,
         ?\DateTimeInterface $dateDebut = null,
         ?\DateTimeInterface $dateFin = null,
-        ?string $genre = null
+        ?string $genre = null,
+        ?User $patient = null
     ): int {
         $qb = $this->createQueryBuilder('d')->select('COUNT(d.id)');
+
+        if ($patient !== null) {
+            $qb->andWhere('d.patient = :patient')->setParameter('patient', $patient);
+        }
 
         if ($search !== null && $search !== '') {
             $qb->andWhere(
@@ -105,9 +116,14 @@ class DossierMedicalRepository extends ServiceEntityRepository
         ?string $ordre = 'DESC',
         ?\DateTimeInterface $dateDebut = null,
         ?\DateTimeInterface $dateFin = null,
-        ?string $genre = null
-    ): \Doctrine\ORM\QueryBuilder {
+        ?string $genre = null,
+        ?User $patient = null
+    ): QueryBuilder {
         $qb = $this->createQueryBuilder('d');
+
+        if ($patient !== null) {
+            $qb->andWhere('d.patient = :patient')->setParameter('patient', $patient);
+        }
 
         if ($search !== null && $search !== '') {
             $qb->andWhere(

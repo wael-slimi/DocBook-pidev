@@ -2,41 +2,62 @@
 
 namespace App\Tests\Controller;
 
+use App\Entity\User;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class AppointmentControllerTest extends WebTestCase
 {
-public function testAppointmentNewPageLoadsSuccessfully(): void
-     {
-         $client = static::createClient();
-         $crawler = $client->request('GET', '/appointment/new');
+    private function createAuthenticatedClient(): \Symfony\Bundle\FrameworkBundle\KernelBrowser
+    {
+        $client = static::createClient();
+        $container = static::getContainer();
+        $em = $container->get(EntityManagerInterface::class);
 
-         $this->assertResponseIsSuccessful();
+        $user = $em->getRepository(User::class)->findOneBy([]);
+        if (!$user) {
+            $user = new User();
+            $user->setEmail('test@example.com');
+            $user->setPassword('$2y$13$dummy');
+            $user->setName('Test User');
+            $user->setRole(\App\Enum\UserRole::PATIENT);
+            $user->setIsVerified(true);
+            $user->setCreationDate(new \DateTimeImmutable());
+            $em->persist($user);
+            $em->flush();
+        }
 
-         // Verify the page heading in the main content area
-         $mainHeading = $crawler->filter('.max-w-2xl > .flex-col > h1');
-         $this->assertCount(1, $mainHeading, 'Main content h1 should exist');
-         $this->assertStringContainsString('Schedule New Appointment', $mainHeading->text());
+        $client->loginUser($user);
+        return $client;
+    }
 
-         // Verify doctor dropdown is populated (no "surgery" enum error)
-         $doctorSelect = $crawler->filter('#appointment_doctor');
-         $this->assertCount(1, $doctorSelect, 'Doctor dropdown should exist');
+    public function testAppointmentNewPageLoadsSuccessfully(): void
+    {
+        $client = $this->createAuthenticatedClient();
+        $crawler = $client->request('GET', '/appointment/new');
 
-         // Verify doctor dropdown exists and has at least the placeholder option
-         $options = $crawler->filter('#appointment_doctor option');
-         $this->assertGreaterThanOrEqual(1, $options->count(), 'Doctor dropdown should have at least the placeholder option');
-     }
+        $this->assertResponseIsSuccessful();
 
-public function testAppointmentIndexPageLoadsSuccessfully(): void
-     {
-         $client = static::createClient();
-         $crawler = $client->request('GET', '/appointment/');
+        $mainHeading = $crawler->filter('.max-w-2xl > .flex-col > h1');
+        $this->assertCount(1, $mainHeading, 'Main content h1 should exist');
+        $this->assertStringContainsString('Schedule New Appointment', $mainHeading->text());
 
-         $this->assertResponseIsSuccessful();
+        $doctorSelect = $crawler->filter('#appointment_doctor');
+        $this->assertCount(1, $doctorSelect, 'Doctor dropdown should exist');
 
-         // Verify the page heading in the main content area
-         $mainHeading = $crawler->filter('.max-w-6xl > .flex-col > h1');
-         $this->assertCount(1, $mainHeading, 'Main content h1 should exist');
-         $this->assertStringContainsString('My Appointments', $mainHeading->text());
-     }
+        $options = $crawler->filter('#appointment_doctor option');
+        $this->assertGreaterThanOrEqual(1, $options->count(), 'Doctor dropdown should have at least the placeholder option');
+    }
+
+    public function testAppointmentIndexPageLoadsSuccessfully(): void
+    {
+        $client = $this->createAuthenticatedClient();
+        $crawler = $client->request('GET', '/appointment/');
+
+        $this->assertResponseIsSuccessful();
+
+        $mainHeading = $crawler->filter('.max-w-6xl > .flex-col > h1');
+        $this->assertCount(1, $mainHeading, 'Main content h1 should exist');
+        $this->assertStringContainsString('My Appointments', $mainHeading->text());
+    }
 }

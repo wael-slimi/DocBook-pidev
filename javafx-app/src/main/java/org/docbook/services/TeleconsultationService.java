@@ -76,7 +76,7 @@ public class TeleconsultationService {
             ps.setInt(1, teleconsultation.getAppointmentId());
             ps.setString(2, teleconsultation.getMeetingUrl());
             ps.setString(3, teleconsultation.getMode());
-            ps.setInt(4, teleconsultation.getId());
+            ps.setObject(4, teleconsultation.getId());
 
             ps.executeUpdate();
         }

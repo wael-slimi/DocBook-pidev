@@ -64,7 +64,7 @@
                              <p class="text-sm text-slate-500">{{ appointment.department|default('General') }} · {{ appointment.scheduledAt|date('M j, Y · g:i A') }}</p>
                          </div>
                      </div>
-                     <span class="px-3 py-1 rounded-full text-[10px] font-bold {% if appointment.status == 'CONFIRMED' %}bg-blue-100 text-blue-700{% elseif appointment.status == 'PENDING' %}bg-yellow-100 text-yellow-700{% else %}bg-slate-100 text-slate-500{% endif %}">
+                     <span class="px-3 py-1 rounded-full text-[10px] font-bold {% if appointment.status == 'Confirmed' %}bg-blue-100 text-blue-700{% elseif appointment.status == 'Pending' %}bg-yellow-100 text-yellow-700{% else %}bg-slate-100 text-slate-500{% endif %}">
                          {{ appointment.status }}
                      </span>
                  </div>

@@ -7,6 +7,7 @@
     <h1 class="text-slate-900 dark:text-white text-3xl font-black mb-6">Appointment #{{ appointment.id }}</h1>
     <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-3 text-sm">
         <p><span class="font-bold text-slate-500">Patient:</span> {{ appointment.patient.name ?? '—' }}</p>
+        <p><span class="font-bold text-slate-500">Doctor:</span> {{ appointment.doctor.name ?? '—' }}</p>
         <p><span class="font-bold text-slate-500">Scheduled:</span> {{ appointment.scheduledAt ? appointment.scheduledAt|date('M j, Y g:i A') : '—' }}</p>
         <p><span class="font-bold text-slate-500">Status:</span> {{ appointment.status|default('—') }}</p>
         <p><span class="font-bold text-slate-500">Reason:</span> {{ appointment.reason ?? '—' }}</p>
@@ -14,6 +15,22 @@
             <p><a href="{{ path('app_teleconsultation_room', { id: appointment.teleconsultation.id }) }}" class="text-primary font-bold hover:underline">Start Teleconsultation</a></p>
         {% endif %}
     </div>
-    <p class="mt-4"><a href="{{ path('app_dashboard') }}" class="text-primary font-bold hover:underline">← Back to Dashboard</a></p>
+    <div class="flex flex-wrap gap-3 mt-4">
+        <a href="{{ path('app_appointment_edit', { id: appointment.id }) }}" class="bg-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20">
+            <span class="material-symbols-outlined mr-1">edit</span> Edit
+        </a>
+        {% if is_granted('ROLE_PATIENT') and appointment.scheduledAt < date() %}
+            <a href="{{ path('app_appointment_rate', { id: appointment.id }) }}" class="bg-amber-500 text-white px-6 py-2 rounded-lg font-semibold hover:bg-amber-600 transition-colors shadow-lg shadow-amber-200">
+                <span class="material-symbols-outlined mr-1">star</span> Rate
+            </a>
+        {% endif %}
+        <form action="{{ path('app_appointment_delete', { id: appointment.id }) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to cancel this appointment?');">
+            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ appointment.id) }}">
+            <button type="submit" class="bg-red-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-red-700 transition-colors shadow-lg shadow-red-200">
+                <span class="material-symbols-outlined mr-1">delete</span> Cancel Appointment
+            </button>
+        </form>
+    </div>
+    <p class="mt-6"><a href="{{ path('app_dashboard') }}" class="text-primary font-bold hover:underline">← Back to Dashboard</a></p>
 </div>
 {% endblock %}

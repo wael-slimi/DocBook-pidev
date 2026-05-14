@@ -1,46 +1,47 @@
 {% extends "dashboard_base.html.twig" %}
 
-{% block title %}Edit Teleconsultation{% endblock %}
+{% block title %}Edit Teleconsultation - DOCBOOK{% endblock %}
 
-{% block content %}
-<div class="container mt-5">
-    <div class="row">
-        <div class="col-md-8 offset-md-2">
-            <h1>Edit Teleconsultation #{{ teleconsultation.id }}</h1>
-            <hr />
+{% block body %}
+<div class="max-w-2xl mx-auto space-y-8">
+    <div class="flex flex-col gap-1">
+        <h1 class="text-4xl font-black text-slate-900 dark:text-white">Modifier la téléconsultation</h1>
+        <p class="text-slate-500">Téléconsultation #{{ teleconsultation.id }}</p>
+    </div>
 
-            {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
-                <div class="form-group mb-3">
-                    {{ form_label(form.appointment, 'Select Appointment') }}
-                    {{ form_widget(form.appointment, {'attr': {'class': 'form-control'}}) }}
-                    {{ form_errors(form.appointment) }}
-                    <small class="form-text text-muted">Choose the appointment to link with this teleconsultation.</small>
-                </div>
+    <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm p-6">
+        {{ form_start(form) }}
 
-                <div class="form-group mb-3">
-                    {{ form_label(form.duration, 'Duration (minutes)') }}
-                    {{ form_widget(form.duration, {'attr': {'class': 'form-control', 'type': 'number', 'min': '1', 'placeholder': 'e.g., 30'}}) }}
-                    {{ form_errors(form.duration) }}
-                </div>
+        <div class="space-y-6">
+            <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Rendez-vous associé</label>
+                {{ form_widget(form.appointment, { 'attr': { 'class': 'w-full' } }) }}
+                {{ form_errors(form.appointment) }}
+            </div>
 
-                <div class="form-group mb-3">
-                    {{ form_label(form.meetingUrl, 'Meeting URL') }}
-                    {{ form_widget(form.meetingUrl, {'attr': {'class': 'form-control', 'type': 'url', 'placeholder': 'https://example.com/meeting'}}) }}
-                    {{ form_errors(form.meetingUrl) }}
-                </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Lien vidéo</label>
+                {{ form_widget(form.videoLink, { 'attr': { 'class': 'w-full', 'placeholder': 'https://meet.example.com/...' } }) }}
+                {{ form_errors(form.videoLink) }}
+            </div>
 
-                <div class="form-group mb-3">
-                    {{ form_label(form.mode, 'Consultation Mode') }}
-                    {{ form_widget(form.mode, {'attr': {'class': 'form-control'}}) }}
-                    {{ form_errors(form.mode) }}
-                </div>
-
-                <div class="d-flex justify-content-between">
-                    <button class="btn btn-primary" type="submit">Update Teleconsultation</button>
-                    <a href="{{ path('app_teleconsultation_show', {'id': teleconsultation.id}) }}" class="btn btn-secondary">Cancel</a>
-                </div>
-            {{ form_end(form) }}
+            <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Code d'accès (optionnel)</label>
+                {{ form_widget(form.accessCode, { 'attr': { 'class': 'w-full', 'placeholder': 'e.g., ABC123' } }) }}
+                {{ form_errors(form.accessCode) }}
+            </div>
         </div>
+
+        <div class="flex justify-end gap-4 mt-8">
+            <a href="{{ path('app_teleconsultation_index') }}" class="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-6 py-3 rounded-lg font-semibold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+                Annuler
+            </a>
+            <button type="submit" class="bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20">
+                Enregistrer
+            </button>
+        </div>
+
+        {{ form_end(form) }}
     </div>
 </div>
 {% endblock %}

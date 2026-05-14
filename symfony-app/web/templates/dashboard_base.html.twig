@@ -40,11 +40,15 @@
     {% block stylesheets %}{% endblock %}
 </head>
 
-<body class="bg-background-light dark:bg-background-dark font-display min-h-screen overflow-x-hidden">
+<body x-data="{ sidebarOpen: false }" @keydown.escape.window="sidebarOpen = false" class="bg-background-light dark:bg-background-dark font-display min-h-screen overflow-x-hidden">
     
     <div class="flex min-h-screen">
         
-        <aside class="w-72 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col h-screen sticky top-0 z-50 hidden lg:flex">
+        <template x-teleport="body">
+            <div x-show="sidebarOpen" class="fixed inset-0 bg-black/50 z-40 lg:hidden" @click="sidebarOpen = false"></div>
+        </template>
+
+        <aside :class="sidebarOpen ? 'flex' : 'hidden'" class="w-72 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex-col h-screen sticky top-0 z-50 lg:flex">
             
             <div class="p-8 flex items-center gap-3">
                 <div class="size-9 bg-primary rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary/30">
@@ -62,16 +66,21 @@
                 </a>
 
                 {% if is_granted('ROLE_DOCTOR') %}
-                    <a href="#" class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-2xl font-bold transition-all group">
-                        <span class="material-symbols-outlined text-slate-400 group-hover:text-primary">groups</span>
-                        Patients
-                    </a>
-
                     <a href="{{ path('app_medecin_dossier_index') }}" class="flex items-center gap-3 px-4 py-3 {{ app.request.attributes.get('_route') starts with 'app_medecin_dossier' ? 'bg-primary/5 text-primary' : 'text-slate-600 dark:text-slate-400' }} hover:bg-slate-50 dark:hover:bg-slate-800 rounded-2xl font-bold transition-all group">
                         <span class="material-symbols-outlined text-slate-400 group-hover:text-primary">folder_shared</span>
                         Medical Records
                     </a>
+                {% elseif is_granted('ROLE_PATIENT') %}
+                    <a href="{{ path('app_patient_dossier_index') }}" class="flex items-center gap-3 px-4 py-3 {{ app.request.attributes.get('_route') starts with 'app_patient_dossier' ? 'bg-primary/5 text-primary' : 'text-slate-600 dark:text-slate-400' }} hover:bg-slate-50 dark:hover:bg-slate-800 rounded-2xl font-bold transition-all group">
+                        <span class="material-symbols-outlined text-slate-400 group-hover:text-primary">folder_shared</span>
+                        Medical Records
+                    </a>
                 {% endif %}
+
+                <a href="{{ path('app_teleconsultation_index') }}" class="flex items-center gap-3 px-4 py-3 {{ app.request.attributes.get('_route') starts with 'app_teleconsultation' ? 'bg-primary/5 text-primary' : 'text-slate-600 dark:text-slate-400' }} hover:bg-slate-50 dark:hover:bg-slate-800 rounded-2xl font-bold transition-all group">
+                    <span class="material-symbols-outlined text-slate-400 group-hover:text-primary">videocam</span>
+                    Teleconsultations
+                </a>
 
                 <a href="{{ path('app_appointment_index') }}" class="flex items-center gap-3 px-4 py-3 {{ app.request.attributes.get('_route') starts with 'app_appointment' ? 'bg-primary/5 text-primary' : 'text-slate-600 dark:text-slate-400' }} hover:bg-slate-50 dark:hover:bg-slate-800 rounded-2xl font-bold transition-all group">
                     <span class="material-symbols-outlined text-slate-400 group-hover:text-primary">calendar_month</span>
@@ -139,7 +148,7 @@
                     <svg fill="currentColor" viewbox="0 0 48 48" class="size-5"><path d="M24 4H6V17.3333V30.6667H24V44H42V30.6667V17.3333H24V44Z"/></svg>
                     DOCBOOK
                 </div>
-                <button class="material-symbols-outlined p-2 bg-slate-100 rounded-lg">menu</button>
+                <button @click="sidebarOpen = !sidebarOpen" class="material-symbols-outlined p-2 bg-slate-100 rounded-lg">menu</button>
             </header>
 
             <main class="flex-1 p-6 lg:p-12">

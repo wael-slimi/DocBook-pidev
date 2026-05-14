@@ -20,7 +20,24 @@ class DashboardController extends AbstractController
 
         // 1. Check if user is a Doctor
         if ($this->isGranted('ROLE_DOCTOR')) {
-            return $this->render('doctor/dashboard.html.twig');
+            /** @var \App\Entity\User $doctor */
+            $doctor = $user;
+            $today = new \DateTimeImmutable('today');
+            $tomorrow = (new \DateTimeImmutable('today'))->modify('+1 day');
+            $todayAppointments = $appointmentRepository->createQueryBuilder('a')
+                ->where('a.doctor = :doctor')
+                ->andWhere('a.scheduledAt BETWEEN :today AND :tomorrow')
+                ->setParameter('doctor', $doctor)
+                ->setParameter('today', $today)
+                ->setParameter('tomorrow', $tomorrow)
+                ->orderBy('a.scheduledAt', 'ASC')
+                ->getQuery()
+                ->getResult();
+            $todayRevenue = count($todayAppointments) * (float) ($doctor->getConsultationFee() ?? 0);
+            return $this->render('doctor/dashboard.html.twig', [
+                'todayAppointments' => $todayAppointments,
+                'todayRevenue' => $todayRevenue,
+            ]);
         }
 
         // 2. Check if user is a Caregiver
@@ -52,15 +69,34 @@ class DashboardController extends AbstractController
     }
 
     #[Route('/test/doctor', name: 'test_doctor')]
-    public function testDoctor(): Response
+    #[IsGranted('ROLE_DOCTOR')]
+    public function testDoctor(AppointmentRepository $appointmentRepository): Response
     {
-        return $this->render('doctor/dashboard.html.twig');
+        /** @var \App\Entity\User $doctor */
+        $doctor = $this->getUser();
+        $today = new \DateTimeImmutable('today');
+        $tomorrow = (new \DateTimeImmutable('today'))->modify('+1 day');
+        $todayAppointments = $appointmentRepository->createQueryBuilder('a')
+            ->where('a.doctor = :doctor')
+            ->andWhere('a.scheduledAt BETWEEN :today AND :tomorrow')
+            ->setParameter('doctor', $doctor)
+            ->setParameter('today', $today)
+            ->setParameter('tomorrow', $tomorrow)
+            ->orderBy('a.scheduledAt', 'ASC')
+            ->getQuery()
+            ->getResult();
+        $todayRevenue = count($todayAppointments) * (float) ($doctor->getConsultationFee() ?? 0);
+        return $this->render('doctor/dashboard.html.twig', [
+            'todayAppointments' => $todayAppointments,
+            'todayRevenue' => $todayRevenue,
+        ]);
     }
 
     /**
      * Direct link to test Caregiver UI: http://localhost:8000/test/caregiver
      */
     #[Route('/test/caregiver', name: 'test_caregiver')]
+    #[IsGranted('ROLE_CAREGIVER')]
     public function testCaregiver(PatientCaregiverRepository $pcRepo): Response
     {
         /** @var \App\Entity\Caregiver $caregiver */
@@ -72,9 +108,23 @@ class DashboardController extends AbstractController
         ]);
     }
     #[Route('/test/patient', name: 'test_patient')]
-    public function testPatient(): Response
+    #[IsGranted('ROLE_PATIENT')]
+    public function testPatient(AppointmentRepository $appointmentRepository): Response
     {
-        return $this->render('patient/dashboard.html.twig');
+        /** @var \App\Entity\User $patient */
+        $patient = $this->getUser();
+        $upcomingAppointments = $appointmentRepository->createQueryBuilder('a')
+            ->where('a.patient = :patient')
+            ->andWhere('a.scheduledAt >= :now')
+            ->setParameter('patient', $patient)
+            ->setParameter('now', new \DateTimeImmutable())
+            ->orderBy('a.scheduledAt', 'ASC')
+            ->setMaxResults(5)
+            ->getQuery()
+            ->getResult();
+        return $this->render('patient/dashboard.html.twig', [
+            'upcomingAppointments' => $upcomingAppointments,
+        ]);
     }
 
 }

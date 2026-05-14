@@ -318,4 +318,16 @@ public function setTempVerificationCode(?string $tempVerificationCode): static
          $this->themePreference = $themePreference;
          return $this;
      }
+
+     public function getInitials(): string
+     {
+         $parts = explode(' ', trim($this->name ?? ''));
+         $initials = '';
+         foreach ($parts as $p) {
+             if ($p !== '') {
+                 $initials .= mb_strtoupper(mb_substr($p, 0, 1));
+             }
+         }
+         return $initials !== '' ? $initials : '?';
+     }
  }
